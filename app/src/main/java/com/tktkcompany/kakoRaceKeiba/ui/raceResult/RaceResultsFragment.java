@@ -1,6 +1,8 @@
 package com.tktkcompany.kakoRaceKeiba.ui.raceResult;
 
-import com.tktkcompany.kakoRaceKeiba.ads.AdFree;
+import com.tktkcompany.kakoRaceKeiba.ads.AdUnits;
+import com.tktkcompany.kakoRaceKeiba.ads.BannerAd;
+import com.tktkcompany.kakoRaceKeiba.ads.InterstitialPacer;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
@@ -20,10 +22,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.LoadAdError;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -78,6 +76,13 @@ public class RaceResultsFragment extends Fragment {
     private String raceDate;
     private Map<String, HorseMemos.Memo> memos = new HashMap<>();
     private static final ExecutorService LIVE_EXECUTOR = Executors.newSingleThreadExecutor();
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // 新しく開いたときだけ数える（回転や、タブを戻したときの作り直しは数えない）
+        if (savedInstanceState == null) InterstitialPacer.onRaceResultOpened(requireContext());
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -474,16 +479,14 @@ public class RaceResultsFragment extends Fragment {
     }
 
     private void loadBannerAd() {
-        AdRequest adRequest = new AdRequest.Builder().build();
-        binding.adView.setAdListener(new AdListener() {
-            @Override public void onAdFailedToLoad(@NonNull LoadAdError adError) { Log.e("Ads", adError.getMessage()); }
-        });
-        AdFree.loadBanner(binding.adView);
+        BannerAd.show(this, binding.adContainer, AdUnits.BANNER_RACE_RESULTS);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+        // 戻る・タブの切り替えで閉じたときだけ（馬のページなどへ進んだときは裏に残るので false）
+        if (isRemoving() && getActivity() != null) InterstitialPacer.onRaceResultClosed(getActivity());
     }
 }

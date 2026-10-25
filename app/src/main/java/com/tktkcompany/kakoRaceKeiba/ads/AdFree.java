@@ -7,7 +7,6 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -83,15 +82,5 @@ public final class AdFree {
             android.view.ViewGroup group = (android.view.ViewGroup) root;
             for (int i = 0; i < group.getChildCount(); i++) applyTo(group.getChildAt(i));
         }
-    }
-
-    /** バナーを読み込む。広告なしのアカウントならバナーを隠す */
-    public static void loadBanner(AdView view) {
-        if (isOn(view.getContext())) {
-            view.setVisibility(View.GONE);
-            return;
-        }
-        view.setVisibility(View.VISIBLE);
-        view.loadAd(new AdRequest.Builder().build());
     }
 }

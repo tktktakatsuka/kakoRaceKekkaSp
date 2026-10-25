@@ -1,6 +1,7 @@
 package com.tktkcompany.kakoRaceKeiba.ui.notifications;
 
-import com.tktkcompany.kakoRaceKeiba.ads.AdFree;
+import com.tktkcompany.kakoRaceKeiba.ads.AdUnits;
+import com.tktkcompany.kakoRaceKeiba.ads.BannerAd;
 import com.tktkcompany.kakoRaceKeiba.util.Lang;
 
 import android.graphics.Color;
@@ -24,10 +25,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.LoadAdError;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.tktkcompany.kakoRaceKeiba.databinding.FragmentNotificationsBinding;
@@ -415,11 +412,7 @@ public class NotificationsFragment extends Fragment {
     }
 
     private void setupAd() {
-        AdRequest adRequest = new AdRequest.Builder().build();
-        binding.adView.setAdListener(new AdListener() {
-            @Override public void onAdFailedToLoad(@NonNull LoadAdError adError) { Log.e("Ads", adError.getMessage()); }
-        });
-        AdFree.loadBanner(binding.adView);
+        BannerAd.show(this, binding.adContainer, AdUnits.BANNER_TRENDS);
     }
 
     @Override

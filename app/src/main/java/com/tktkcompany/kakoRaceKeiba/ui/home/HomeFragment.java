@@ -1,6 +1,7 @@
 package com.tktkcompany.kakoRaceKeiba.ui.home;
 
-import com.tktkcompany.kakoRaceKeiba.ads.AdFree;
+import com.tktkcompany.kakoRaceKeiba.ads.AdUnits;
+import com.tktkcompany.kakoRaceKeiba.ads.BannerAd;
 import com.tktkcompany.kakoRaceKeiba.auth.GuestAccount;
 import com.tktkcompany.kakoRaceKeiba.util.Lang;
 
@@ -20,10 +21,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.LoadAdError;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.tktkcompany.kakoRaceKeiba.MainActivity;
@@ -59,7 +56,6 @@ import org.threeten.bp.format.DateTimeFormatter;
 public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
-    public static AdView bannerAdView;
     private SharedViewModel sharedViewModel;
     private FirebaseAuth mAuth; // mAuthをメンバー変数として追加
     private boolean exeSetRaceResult;
@@ -76,8 +72,8 @@ public class HomeFragment extends Fragment {
         View root = binding.getRoot();
 
 
-        // AdViewのインスタンスを取得、ロード
-        loadBannerAd(binding);
+        // バナー（画面の一番上に固定）
+        BannerAd.show(this, binding.adContainer, AdUnits.BANNER_HOME);
 
         // お気に入り一覧ボタンの設定
         binding.btnFavoriteHorses.setOnClickListener(v -> {
@@ -214,7 +210,7 @@ public class HomeFragment extends Fragment {
     private FavoritesStrip favoritesStrip;
 
     /**
-     * お気に入りなどが使えるとき（Google か匿名で入っている）は、ログインのカードを一番下（広告の上）に回し、
+     * お気に入りなどが使えるとき（Google か匿名で入っている）は、ログインのカードを一番下に回し、
      * 今日の開催を一番上に出す。どちらでも入れていないときは、ログインを促すため一番上に置く
      */
     private void placeAuthCard(boolean signedIn) {
@@ -222,7 +218,7 @@ public class HomeFragment extends Fragment {
         if (parent == null) return;
         parent.removeView(binding.cardUserAuth);
         if (signedIn) {
-            parent.addView(binding.cardUserAuth, parent.indexOfChild(binding.adView));
+            parent.addView(binding.cardUserAuth);
         } else {
             parent.addView(binding.cardUserAuth, 0);
         }
@@ -409,35 +405,6 @@ public class HomeFragment extends Fragment {
                 .show();
     }
 
-    //バナーを表示するメソッド
-    public void loadBannerAd(FragmentHomeBinding binding) {
-        bannerAdView = binding.adView;
-        AdRequest adRequest = new AdRequest.Builder().build();
-
-        bannerAdView.setAdListener(new AdListener() {
-            @Override
-            public void onAdLoaded() {
-            }
-
-            @Override
-            public void onAdFailedToLoad(LoadAdError adError) {
-            }
-
-            @Override
-            public void onAdOpened() {
-            }
-
-            @Override
-            public void onAdClicked() {
-            }
-
-            @Override
-            public void onAdClosed() {
-            }
-        });
-
-        AdFree.loadBanner(bannerAdView);
-    }
 
 
 

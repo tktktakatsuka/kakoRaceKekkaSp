@@ -4,6 +4,7 @@ import com.tktkcompany.kakoRaceKeiba.util.Lang;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.SystemClock;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -14,7 +15,6 @@ import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.rewarded.RewardedAd;
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
-import com.tktkcompany.kakoRaceKeiba.BuildConfig;
 
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.format.DateTimeFormatter;
@@ -29,12 +29,10 @@ public final class RecentRunsReward {
     public static final int NORMAL_RUNS = 3;
     public static final int REWARDED_RUNS = 10;
 
-    // 本番の広告ユニット（出走表近走_リワード）。debug 版では本番の広告を出さないよう Google のテスト用を使う
-    private static final String AD_UNIT_ID = BuildConfig.DEBUG
-            ? "ca-app-pub-3940256099942544/5224354917"
-            : "ca-app-pub-4855274440005459/7569100804";
     private static final String PREFS = "rewards";
     private static final String KEY_UNLOCKED_DATE = "recent_runs_unlocked_date";
+    // 読み込んだ広告を使える時間。古いものは捨てて読み直す
+    private static final long AD_LIFETIME_MS = 60 * 60 * 1000L;
     private static final String TAG = "RecentRunsReward";
 
     public interface Listener {
@@ -45,8 +43,10 @@ public final class RecentRunsReward {
         void onNotShown(String message);
     }
 
-    @Nullable private RewardedAd ad;
-    private boolean loading;
+    // 読み込んだ広告はアプリ全体で1つだけ持つ（画面を閉じても捨てず、次に開いたときに使う）
+    @Nullable private static RewardedAd ad;
+    private static boolean loading;
+    private static long loadedAt;
 
     /** 今日すでに広告を見ていれば（広告なしのアカウントならいつでも） true */
     public static boolean isUnlocked(Context context) {
@@ -68,15 +68,17 @@ public final class RecentRunsReward {
         return LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
     }
 
-    /** ボタンを押してから待たせないよう、画面を開いたときに先に読み込んでおく */
+    /** ボタンを押してから待たせないよう、ボタンを出すときに先に読み込んでおく */
     public void preload(Context context) {
+        dropStale();
         if (ad != null || loading || isUnlocked(context)) return;
         loading = true;
-        RewardedAd.load(context, AD_UNIT_ID, new AdRequest.Builder().build(), new RewardedAdLoadCallback() {
+        RewardedAd.load(context.getApplicationContext(), AdUnits.REWARDED_RECENT_RUNS, new AdRequest.Builder().build(), new RewardedAdLoadCallback() {
             @Override
             public void onAdLoaded(@NonNull RewardedAd loaded) {
                 loading = false;
                 ad = loaded;
+                loadedAt = SystemClock.elapsedRealtime();
             }
 
             @Override
@@ -87,8 +89,13 @@ public final class RecentRunsReward {
         });
     }
 
+    private static void dropStale() {
+        if (ad != null && SystemClock.elapsedRealtime() - loadedAt > AD_LIFETIME_MS) ad = null;
+    }
+
     /** 広告を出す。最後まで見たら今日の分を解放して onRewarded を呼ぶ */
     public void show(Activity activity, Listener listener) {
+        dropStale();
         RewardedAd current = ad;
         if (current == null) {
             listener.onNotShown(loading ? Lang.t("広告を読み込み中です。少し待ってからもう一度押してください", "The ad is loading. Please tap again in a moment")

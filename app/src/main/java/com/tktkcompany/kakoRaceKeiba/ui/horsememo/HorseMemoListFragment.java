@@ -1,6 +1,7 @@
 package com.tktkcompany.kakoRaceKeiba.ui.horsememo;
 
-import com.tktkcompany.kakoRaceKeiba.ads.AdFree;
+import com.tktkcompany.kakoRaceKeiba.ads.AdUnits;
+import com.tktkcompany.kakoRaceKeiba.ads.BannerAd;
 import com.tktkcompany.kakoRaceKeiba.util.Lang;
 
 import android.os.Bundle;
@@ -16,8 +17,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.tktkcompany.kakoRaceKeiba.R;
 import com.tktkcompany.kakoRaceKeiba.util.WeekendDays;
 import com.tktkcompany.kakoRaceKeiba.db.SupabaseManager;
@@ -58,7 +57,7 @@ public class HorseMemoListFragment extends Fragment {
         emptyText = root.findViewById(R.id.text_horse_memos_empty);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
-        AdFree.loadBanner(root.findViewById(R.id.adView));
+        BannerAd.show(this, root.findViewById(R.id.ad_container), AdUnits.BANNER_MEMOS);
         root.findViewById(R.id.card_open_predictions).setOnClickListener(v ->
                 androidx.navigation.Navigation.findNavController(v).navigate(R.id.navigation_predictions));
         return root;

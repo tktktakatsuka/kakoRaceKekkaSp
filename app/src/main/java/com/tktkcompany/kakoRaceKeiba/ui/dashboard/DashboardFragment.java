@@ -1,6 +1,7 @@
 package com.tktkcompany.kakoRaceKeiba.ui.dashboard;
 
-import com.tktkcompany.kakoRaceKeiba.ads.AdFree;
+import com.tktkcompany.kakoRaceKeiba.ads.AdUnits;
+import com.tktkcompany.kakoRaceKeiba.ads.BannerAd;
 import com.tktkcompany.kakoRaceKeiba.util.Lang;
 
 import android.os.Bundle;
@@ -18,8 +19,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.tktkcompany.kakoRaceKeiba.R;
 import com.tktkcompany.kakoRaceKeiba.databinding.FragmentDashboardBinding;
 import com.tktkcompany.kakoRaceKeiba.db.SupabaseManager;
@@ -231,6 +230,6 @@ public class DashboardFragment extends Fragment {
     }
 
     public void loadBannerAd() {
-        AdFree.loadBanner(binding.adView);
+        BannerAd.show(this, binding.adContainer, AdUnits.BANNER_RESULT_LIST);
     }
 }

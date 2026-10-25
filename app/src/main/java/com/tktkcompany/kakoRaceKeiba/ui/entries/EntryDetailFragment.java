@@ -115,7 +115,6 @@ public class EntryDetailFragment extends Fragment {
         raceLabel = (WeekendDays.formatShort(date) + " " + course + raceNo + "R " + raceTitle.trim()).trim();
         binding.textEntriesLead.setText(raceTitle);
         loadEntries(date, course, raceNo);
-        reward.preload(requireContext());
         return binding.getRoot();
     }
 
@@ -297,8 +296,9 @@ public class EntryDetailFragment extends Fragment {
                 }
                 if (runs.size() > shown) {
                     TextView more = new TextView(requireContext());
-                    more.setText(Lang.t("ほか" + (runs.size() - shown) + "走（上のボタンから広告を見ると表示）",
-                            (runs.size() - shown) + " more runs (watch an ad with the button above)"));
+                    more.setText(Lang.t("▶ ほか" + (runs.size() - shown) + "走（タップして広告を見ると表示）",
+                            "▶ " + (runs.size() - shown) + " more runs (tap to watch an ad)"));
+                    more.setOnClickListener(v -> watchRewardAd(entries));
                     more.setTextSize(12);
                     more.setTextColor(0xFF1565C0);
                     more.setPadding(0, 6, 0, 6);
@@ -592,32 +592,39 @@ public class EntryDetailFragment extends Fragment {
             view.setTextColor(0xFF2E7D32);
             bg.setColor(0xFFE8F5E9);
         } else {
-            view.setText(Lang.t("▶ 広告を見て近走を" + RecentRunsReward.REWARDED_RUNS + "走まで表示（今日いっぱい）",
-                    "▶ Watch an ad to see the last " + RecentRunsReward.REWARDED_RUNS + " runs (all day)"));
+            view.setText(Lang.t("▶ 広告を見ると、全馬の近走を" + RecentRunsReward.NORMAL_RUNS + "走→" + RecentRunsReward.REWARDED_RUNS + "走に増やせます（今日いっぱい）",
+                    "▶ Watch an ad to see " + RecentRunsReward.REWARDED_RUNS + " recent runs instead of " + RecentRunsReward.NORMAL_RUNS + " for every horse (all day)"));
             view.setTextColor(0xFF0D47A1);
             view.setTypeface(view.getTypeface(), Typeface.BOLD);
             bg.setColor(0xFFE3F2FD);
             bg.setStroke((int) Math.max(1, density), 0xFF1565C0);
-            view.setOnClickListener(v -> reward.show(requireActivity(), new RecentRunsReward.Listener() {
-                @Override
-                public void onRewarded() {
-                    if (binding == null || !isAdded()) return;
-                    Toast.makeText(getContext(), Lang.t("今日いっぱい、近走を" + RecentRunsReward.REWARDED_RUNS + "走まで表示します",
-                            "Showing the last " + RecentRunsReward.REWARDED_RUNS + " runs for the rest of today"),
-                            Toast.LENGTH_SHORT).show();
-                    // 10走分はもう読んであるので、表示だけ広げる
-                    showHeader(entries);
-                    render(entries, lastResults);
-                }
-
-                @Override
-                public void onNotShown(String message) {
-                    if (isAdded()) Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-                }
-            }));
+            // ボタンを出すときに読み込んでおく（押されそうなときだけリクエストする）
+            reward.preload(requireContext());
+            view.setOnClickListener(v -> watchRewardAd(entries));
         }
         view.setBackground(bg);
         return view;
+    }
+
+    /** リワード広告を出し、最後まで見たら近走を10走まで広げて描き直す */
+    private void watchRewardAd(List<SupabaseManager.RaceEntry> entries) {
+        reward.show(requireActivity(), new RecentRunsReward.Listener() {
+            @Override
+            public void onRewarded() {
+                if (binding == null || !isAdded()) return;
+                Toast.makeText(getContext(), Lang.t("今日いっぱい、近走を" + RecentRunsReward.REWARDED_RUNS + "走まで表示します",
+                        "Showing the last " + RecentRunsReward.REWARDED_RUNS + " runs for the rest of today"),
+                        Toast.LENGTH_SHORT).show();
+                // 10走分はもう読んであるので、表示だけ広げる
+                showHeader(entries);
+                render(entries, lastResults);
+            }
+
+            @Override
+            public void onNotShown(String message) {
+                if (isAdded()) Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     /** 印をタップするたびに ◎→○→▲→△→なし。◎○▲は1頭だけなので、ほかの馬の印も書き直す */

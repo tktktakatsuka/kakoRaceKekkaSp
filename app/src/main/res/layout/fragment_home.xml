@@ -6,9 +6,20 @@
     android:layout_height="match_parent"
     tools:context="com.tktkcompany.kakoRaceKeiba.ui.home.HomeFragment">
 
+    <!-- バナーの枠。スクロールしても見えるよう、ScrollView の外の一番上に固定する（中の広告は BannerAd がコードで入れる） -->
+    <FrameLayout
+        android:id="@+id/ad_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ad_container">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -403,15 +414,6 @@
                     android:orientation="vertical" />
 
             </LinearLayout>
-
-            <com.google.android.gms.ads.AdView
-                android:id="@+id/adView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginVertical="16dp"
-                app:adSize="BANNER"
-                app:adUnitId="ca-app-pub-4855274440005459/6616268445" />
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
