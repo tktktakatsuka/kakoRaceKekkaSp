@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Google のテスト用バナーID。デバッグ中の表示が AdMob の実績に入らないようにする -->
+    <string name="ad_unit_home" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="ad_unit_dashboard" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="ad_unit_notifications" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="ad_unit_race_results" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="ad_unit_horse_memos" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
+</resources>

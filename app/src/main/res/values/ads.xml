@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 本番の広告ユニットID。debug ビルドでは src/debug/res/values/ads.xml のテスト用IDに置き換わる -->
+    <string name="ad_unit_home" translatable="false">ca-app-pub-4855274440005459/6616268445</string>
+    <string name="ad_unit_dashboard" translatable="false">ca-app-pub-4855274440005459/3128258657</string>
+    <string name="ad_unit_notifications" translatable="false">ca-app-pub-4855274440005459/6029945088</string>
+    <string name="ad_unit_race_results" translatable="false">ca-app-pub-4855274440005459/4453139536</string>
+    <string name="ad_unit_horse_memos" translatable="false">ca-app-pub-4855274440005459/8405629625</string>
+</resources>

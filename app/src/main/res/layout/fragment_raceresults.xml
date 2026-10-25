@@ -621,6 +621,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         app:adSize="BANNER"
-        app:adUnitId="ca-app-pub-4855274440005459/4453139536" />
+        app:adUnitId="@string/ad_unit_race_results" />
 
 </LinearLayout>
