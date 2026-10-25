@@ -20,13 +20,13 @@ async function query(table, params) {
   return res.json();
 }
 
-// Supabase は1回に1000行までしか返さないので、足りるまで続きを取る
+// Supabase は1回に返す行数に上限がある（既定は1000行）ので、空になるまで続きを取る
 async function queryAll(table, params) {
   const rows = [];
-  for (let offset = 0; ; offset += PAGE_SIZE) {
-    const page = await query(table, `${params}&limit=${PAGE_SIZE}&offset=${offset}`);
+  for (;;) {
+    const page = await query(table, `${params}&limit=${PAGE_SIZE}&offset=${rows.length}`);
+    if (!page.length) return rows;
     rows.push(...page);
-    if (page.length < PAGE_SIZE) return rows;
   }
 }
 
@@ -140,8 +140,9 @@ async function renderHome() {
 
 async function renderRace() {
   const p = new URLSearchParams(location.search);
-  const d = p.get('d'), c = p.get('c'), r = Number(p.get('r'));
-  if (!d || !c || !r) { location.replace('./'); return; }
+  // URL の値は画面のリンクや問い合わせに入るので、形が正しいものだけ受け付ける
+  const d = p.get('d'), c = (p.get('c') || '').trim(), r = Number(p.get('r'));
+  if (!/^\d{8}$/.test(d || '') || !c || !Number.isInteger(r) || r < 1 || r > 12) { location.replace('./'); return; }
 
   const [entries, results, payouts] = await Promise.all([
     query('race_entries', `select=*&${raceFilter(d, c, r)}&order=id.asc`).catch(() => []),

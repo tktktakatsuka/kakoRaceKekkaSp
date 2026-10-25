@@ -20,6 +20,8 @@ concurrency:
 
 jobs:
   deploy:
+    # 手動実行でも、レビュー済みの master 以外は公開しない
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
