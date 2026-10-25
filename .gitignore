@@ -20,3 +20,4 @@ store/work/
 
 # リリース用の署名情報（パスワードを含むので Git に入れない）
 /keystore.properties
+web/config.js

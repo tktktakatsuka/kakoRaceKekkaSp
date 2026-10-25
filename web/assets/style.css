@@ -1,0 +1,108 @@
+:root {
+  --bg: #f4f6f3;
+  --card: #ffffff;
+  --text: #1d2420;
+  --muted: #66706a;
+  --line: #e2e7e3;
+  --brand: #2e7d32;
+  --brand-ink: #ffffff;
+  --accent: #fbc02d;
+  --grade: #c62828;
+  --win: #fff5d6;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111513;
+    --card: #1b211e;
+    --text: #e6ebe7;
+    --muted: #9aa59e;
+    --line: #2c3530;
+    --brand: #43a047;
+    --win: #3a3420;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+a { color: inherit; }
+
+.top {
+  position: sticky; top: 0; z-index: 10;
+  background: var(--brand); color: var(--brand-ink);
+  padding: calc(env(safe-area-inset-top) + 10px) 16px 10px;
+  display: flex; align-items: center; gap: 10px;
+}
+.top img { width: 28px; height: 28px; border-radius: 6px; }
+.top a.home { text-decoration: none; font-weight: 700; font-size: 16px; flex: 1; }
+.top nav a { text-decoration: none; font-size: 14px; margin-left: 12px; opacity: .9; }
+.top nav a.on { opacity: 1; font-weight: 700; border-bottom: 2px solid var(--accent); }
+
+main { max-width: 760px; margin: 0 auto; padding: 12px 16px 24px; }
+h1 { font-size: 20px; margin: 8px 0 4px; }
+h2 { font-size: 16px; margin: 20px 0 8px; }
+.sub { color: var(--muted); font-size: 13px; margin: 0 0 8px; }
+
+.card {
+  background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+  padding: 12px; margin: 8px 0;
+}
+.graded { display: block; text-decoration: none; border-left: 4px solid var(--grade); }
+.graded .name { font-weight: 700; font-size: 17px; }
+.graded .meta { color: var(--muted); font-size: 13px; }
+
+.races { list-style: none; margin: 0; padding: 0; }
+.races li a {
+  display: flex; gap: 10px; align-items: baseline; text-decoration: none;
+  padding: 10px 2px; border-top: 1px solid var(--line);
+}
+.races li:first-child a { border-top: 0; }
+.races .no { font-weight: 700; min-width: 2.6em; color: var(--brand); }
+.races .title { flex: 1; }
+.races .info { color: var(--muted); font-size: 12px; white-space: nowrap; }
+
+.tabs { display: flex; gap: 6px; overflow-x: auto; margin: 8px 0; padding-bottom: 2px; }
+.tabs a, .tabs button {
+  flex: none; border: 1px solid var(--line); background: var(--card); color: var(--text);
+  border-radius: 999px; padding: 6px 14px; font-size: 14px; text-decoration: none; font-family: inherit;
+}
+.tabs .on { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); font-weight: 700; }
+
+select {
+  font: inherit; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--card); color: var(--text);
+}
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { font-size: 12px; color: var(--muted); font-weight: 400; text-align: left; padding: 4px; border-bottom: 1px solid var(--line); }
+td { padding: 8px 4px; border-bottom: 1px solid var(--line); vertical-align: top; }
+td.num, th.num { text-align: right; white-space: nowrap; }
+td.c, th.c { text-align: center; }
+tr.top3 td { background: var(--win); }
+tr.scratched td { color: var(--muted); text-decoration: line-through; }
+.horse { font-weight: 700; }
+.small { color: var(--muted); font-size: 12px; }
+.waku {
+  display: inline-block; min-width: 1.6em; text-align: center; border-radius: 4px;
+  font-size: 12px; font-weight: 700; border: 1px solid #999;
+}
+.w1 { background: #fff; color: #000; } .w2 { background: #222; color: #fff; }
+.w3 { background: #e53935; color: #fff; } .w4 { background: #1e88e5; color: #fff; }
+.w5 { background: #fdd835; color: #000; } .w6 { background: #43a047; color: #fff; }
+.w7 { background: #fb8c00; color: #fff; } .w8 { background: #f48fb1; color: #000; }
+
+.pay td:first-child { white-space: nowrap; font-weight: 700; }
+
+.cta { display: flex; gap: 8px; flex-wrap: wrap; margin: 20px 0 8px; }
+.btn {
+  flex: 1 1 180px; text-align: center; text-decoration: none; font-weight: 700;
+  padding: 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--card);
+}
+.btn.x { background: #000; color: #fff; border-color: #000; }
+.notice { color: var(--muted); text-align: center; padding: 24px 0; }
+footer { color: var(--muted); font-size: 12px; text-align: center; padding: 8px 16px 24px; }
