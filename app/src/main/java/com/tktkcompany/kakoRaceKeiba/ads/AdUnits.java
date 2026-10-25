@@ -18,6 +18,9 @@ public final class AdUnits {
     public static final String BANNER_RESULT_LIST = pick(TEST_BANNER, "ca-app-pub-4855274440005459/3128258657");
     public static final String BANNER_MEMOS = pick(TEST_BANNER, "ca-app-pub-4855274440005459/8405629625");
     public static final String BANNER_TRENDS = pick(TEST_BANNER, "ca-app-pub-4855274440005459/6029945088");
+    public static final String BANNER_FAVORITES = pick(TEST_BANNER, "ca-app-pub-4855274440005459/2481433843");
+    public static final String BANNER_ENTRIES = pick(TEST_BANNER, "ca-app-pub-4855274440005459/4719835945");
+    public static final String BANNER_ENTRY_DETAIL = pick(TEST_BANNER, "ca-app-pub-4855274440005459/3406754276");
 
     /** レース結果を何回か見て戻るときの全画面広告 */
     public static final String INTERSTITIAL = pick(TEST_INTERSTITIAL, "ca-app-pub-4855274440005459/4078939329");

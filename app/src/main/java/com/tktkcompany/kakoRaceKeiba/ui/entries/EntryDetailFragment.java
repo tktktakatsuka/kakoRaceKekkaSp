@@ -1,6 +1,8 @@
 package com.tktkcompany.kakoRaceKeiba.ui.entries;
 
 import com.tktkcompany.kakoRaceKeiba.ads.AdFree;
+import com.tktkcompany.kakoRaceKeiba.ads.AdUnits;
+import com.tktkcompany.kakoRaceKeiba.ads.BannerAd;
 import com.tktkcompany.kakoRaceKeiba.util.Lang;
 
 import android.graphics.Typeface;
@@ -102,6 +104,7 @@ public class EntryDetailFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentEntriesBinding.inflate(inflater, container, false);
+        BannerAd.show(this, binding.adContainer, AdUnits.BANNER_ENTRY_DETAIL);
 
         Bundle args = getArguments();
         String date = args != null ? args.getString(EntriesFragment.ARG_DATE) : null;
@@ -313,8 +316,8 @@ public class EntryDetailFragment extends Fragment {
             horseCards.put(FavoriteHorseNames.normalize(entry.getHorseName()), card);
         }
         // 行がフォーカスを取ってスクロール位置がずれないよう、先頭から表示する
-        binding.getRoot().post(() -> {
-            if (binding != null) binding.getRoot().scrollTo(0, 0);
+        binding.scrollEntries.post(() -> {
+            if (binding != null) binding.scrollEntries.scrollTo(0, 0);
         });
         loadOdds(entries);
         loadRaceCard(entries);

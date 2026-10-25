@@ -55,4 +55,10 @@
             android:visibility="gone" />
     </FrameLayout>
 
+    <!-- バナーの枠（中の広告は BannerAd がコードで入れる） -->
+    <FrameLayout
+        android:id="@+id/ad_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
 </LinearLayout>

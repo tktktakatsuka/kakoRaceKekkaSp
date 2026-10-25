@@ -1,5 +1,7 @@
 package com.tktkcompany.kakoRaceKeiba.ui.favorite;
 
+import com.tktkcompany.kakoRaceKeiba.ads.AdUnits;
+import com.tktkcompany.kakoRaceKeiba.ads.BannerAd;
 import com.tktkcompany.kakoRaceKeiba.util.Lang;
 
 import android.os.Bundle;
@@ -72,6 +74,7 @@ public class FavoriteHorsesFragment extends Fragment {
         root.findViewById(R.id.btn_find_horse).setOnClickListener(v ->
                 androidx.navigation.Navigation.findNavController(v).navigate(R.id.navigation_horseSearch));
 
+        BannerAd.show(this, root.findViewById(R.id.ad_container), AdUnits.BANNER_FAVORITES);
         loadFavorites();
 
         return root;

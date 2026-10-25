@@ -1,6 +1,8 @@
 package com.tktkcompany.kakoRaceKeiba.ui.entries;
 
 import com.tktkcompany.kakoRaceKeiba.util.Lang;
+import com.tktkcompany.kakoRaceKeiba.ads.AdUnits;
+import com.tktkcompany.kakoRaceKeiba.ads.BannerAd;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -49,6 +51,7 @@ public class EntriesFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentEntriesBinding.inflate(inflater, container, false);
         binding.textEntriesLead.setText(Lang.t("レースを選ぶと、出走馬ごとの近走成績を確認できます", "Pick a race to see each runner's recent form"));
+        BannerAd.show(this, binding.adContainer, AdUnits.BANNER_ENTRIES);
         loadEntries();
         return binding.getRoot();
     }
@@ -175,11 +178,11 @@ public class EntriesFragment extends Fragment {
         // 開催日は、最初の競馬場の次のレースが画面の上の方に来るようにスクロールする
         if (firstNextRace != null) {
             View target = firstNextRace;
-            binding.getRoot().post(() -> {
+            binding.scrollEntries.post(() -> {
                 if (binding == null) return;
                 int y = binding.entriesContainer.getTop() + target.getTop()
                         - (int) (48 * getResources().getDisplayMetrics().density);
-                binding.getRoot().scrollTo(0, Math.max(0, y));
+                binding.scrollEntries.scrollTo(0, Math.max(0, y));
             });
         }
     }
