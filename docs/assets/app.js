@@ -25,6 +25,8 @@ function cacheGet(key) {
   }
 }
 function cachePut(key, rows, ttl) {
+  // 空の結果は「まだ入っていないだけ」かもしれないので、長くは取っておかない
+  if (!rows.length) ttl = Math.min(ttl, 3 * MINUTE);
   try {
     localStorage.setItem(key, JSON.stringify({ until: Date.now() + ttl, rows }));
   } catch (e) {
@@ -69,8 +71,12 @@ async function queryAll(table, params, ttl = 3 * MINUTE) {
   return rows;
 }
 
-// 指定日が今日より前なら、その日の結果はもう変わらない
-const settled = d => d < todayJst();
+// 2日以上前の開催なら、結果と払い戻しはもう出そろっていて変わらない
+// （前日分は取り込みが遅れることがあるので、短い保存のままにする）
+function settled(d) {
+  const day = new Date(Date.UTC(+d.slice(0, 4), +d.slice(4, 6) - 1, +d.slice(6, 8)) + 2 * 864e5);
+  return day.toISOString().slice(0, 10).replace(/-/g, '') <= todayJst();
+}
 const HOUR = 60 * MINUTE;
 
 const enc = encodeURIComponent;
@@ -360,7 +366,7 @@ async function renderHorse() {
   document.title = `${name}の過去レース結果 | 競馬 過去レース結果`;
 
   const [runs, next] = await Promise.all([
-    query('race_results', `select=kaisaibi,kaisaijo,race_no,race_title,hassou_time,rank,popular,win_odds,jockey,time,nobori,age,weight&horse_name=eq.${enc(name)}&order=kaisaibi.desc&limit=60`),
+    query('race_results', `select=kaisaibi,kaisaijo,race_no,race_title,hassou_time,rank,popular,win_odds,jockey,time,nobori,age,weight&horse_name=eq.${enc(name)}&order=kaisaibi.desc&limit=300`, HOUR),
     query('race_entries', `select=kaisaibi,kaisaijo,race_no,race_title,race_info,horse_number,jockey&horse_name=eq.${enc(name)}&kaisaibi=gte.${todayJst()}&order=kaisaibi.asc&limit=5`).catch(() => []),
   ]);
   let html = `<div class="hero"><p class="when">競走馬</p><h1>${esc(name)}</h1>
@@ -388,7 +394,7 @@ async function renderHorse() {
       <div><b>${pct(w + s + t)}</b><span>複勝率</span></div>
     </div>
     <h2>過去のレース</h2>
-    <div class="card"><ul class="runs">${runs.map(x => `
+    <div class="card"><ul class="runs">${runs.slice(0, 60).map(x => `
       <li><a href="${raceUrl(x.kaisaibi, x.kaisaijo, x.race_no)}">
         ${rankBadge(x.rank)}
         <span class="title">${titleHtml(x.race_title)}<br>
