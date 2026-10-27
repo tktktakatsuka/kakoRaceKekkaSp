@@ -1,5 +1,5 @@
 // 競馬 過去レース結果 Web版。Supabase の公開キーで、アプリと同じテーブルを読むだけのページ。
-// 接続先は config.js（公開時に GitHub Actions が作る）の window.KEIBA_CONFIG から読む。
+// 接続先は docs/config.js（リポジトリに入れて直接編集する）の window.KEIBA_CONFIG から読む。
 
 const CONFIG = window.KEIBA_CONFIG || {};
 const X_URL = 'https://x.com/tk241277687';
