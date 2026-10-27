@@ -281,3 +281,56 @@ body { padding-bottom: calc(env(safe-area-inset-bottom) + 64px); }
 }
 :root[data-theme="sakura"] .card, :root[data-theme="yume"] .card { border-radius: 18px; }
 :root[data-theme="sakura"] .tabbar a.on .ic, :root[data-theme="yume"] .tabbar a.on .ic { transform: scale(1.2) rotate(-6deg); }
+
+/* ---------- トップ：今週の主役と大きな入り口 ---------- */
+a.hero.spot { display: block; text-decoration: none; margin-top: -12px; padding-top: 20px; }
+.hero .tag {
+  display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px;
+  background: rgba(255, 255, 255, .25); margin-right: 4px;
+}
+.hero.spot h1 { font-size: 26px; }
+.hero .go {
+  display: inline-block; margin-top: 10px; font-size: 14px; font-weight: 700; padding: 8px 16px; border-radius: 999px;
+  background: #fff; color: #1d2420;
+}
+.doors { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 0 8px; }
+.door {
+  display: flex; flex-direction: column; gap: 2px; padding: 14px; border-radius: 16px; text-decoration: none;
+  background: var(--card); border: 1px solid var(--line); box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+  position: relative; overflow: hidden;
+}
+.door .ic { font-size: 30px; line-height: 1.1; }
+.door b { font-size: 17px; color: var(--brand); }
+.door > span:last-child { font-size: 12px; color: var(--muted); }
+.door::after { content: "›"; position: absolute; right: 12px; top: 10px; font-size: 22px; color: var(--muted); }
+.door.week { background: var(--brand); border-color: var(--brand); }
+.door.week b, .door.week > span:last-child, .door.week::after { color: var(--brand-ink); }
+.door:active, a.hero.spot:active { transform: scale(.98); }
+h1.sec { scroll-margin-top: 64px; margin-top: 24px; }
+
+/* 下のメニュー：今いるページを色の丸で目立たせる */
+.tabbar a .ic { display: flex; align-items: center; justify-content: center; width: 52px; height: 30px; border-radius: 999px; }
+.tabbar a.on .ic { background: var(--win); transform: none; }
+.tabbar a { font-size: 12.5px; }
+
+/* ---------- 推し馬ページ：プレビューとテーマごとの飾り ---------- */
+.preview canvas {
+  display: block; width: 100%; height: auto; border-radius: 16px; box-shadow: 0 6px 20px rgba(0, 0, 0, .18);
+}
+.fav-hero #mark { font-size: 1.3em; }
+:root[data-theme="noir"] .oshi { border: 1px solid #d4af37; box-shadow: inset 0 0 0 3px #17171b, inset 0 0 0 4px rgba(212, 175, 55, .5); }
+:root[data-theme="noir"] .oshi-head a.horse { color: #f3e2a9; letter-spacing: .04em; }
+:root[data-theme="noir"] .hero, :root[data-theme="noir"] .door.week { border-bottom: 2px solid #d4af37; }
+:root[data-theme="sakura"] .oshi { border: 2px dashed #f7b6cc; }
+:root[data-theme="sakura"] .oshi-head::after, :root[data-theme="sakura"] .door.week::before { content: "🌸"; font-size: 14px; }
+:root[data-theme="sakura"] .door.week::before { position: absolute; right: 12px; bottom: 8px; opacity: .8; }
+:root[data-theme="yume"] .oshi {
+  border: 2px solid transparent;
+  background: linear-gradient(var(--card), var(--card)) padding-box, linear-gradient(135deg, #c9b6ff, #9fe3f0) border-box;
+}
+:root[data-theme="navy"] .oshi, :root[data-theme="navy"] .door.week { border-left: 6px solid #e53935; }
+:root[data-theme="navy"] .hero:not(.g1):not(.g2):not(.g3) {
+  background: linear-gradient(115deg, transparent 72%, #e53935 72%, #e53935 78%, #fff 78%, #fff 80%, transparent 80%), var(--hero);
+}
+:root[data-theme="standard"] .oshi, :root:not([data-theme]) .oshi { border-top: 4px solid var(--brand); }
+@media (prefers-reduced-motion: reduce) { .door:active, a.hero.spot:active { transform: none; } }
