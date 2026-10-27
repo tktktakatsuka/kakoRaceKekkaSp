@@ -20,3 +20,6 @@ store/work/
 
 # リリース用の署名情報（パスワードを含むので Git に入れない）
 /keystore.properties
+
+# superpowers のブレインストーミングで作った見本の画面（手元で見るだけ）
+/.superpowers/
