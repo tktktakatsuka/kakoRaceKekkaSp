@@ -21,14 +21,19 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://zpsuopyqfozguriwgtzy.supabase.co" crossorigin>
 <link rel="stylesheet" href="assets/style.css">
+<script src="assets/theme.js"></script>
 </head>
 <body>
 <header class="top">
   <img src="assets/icon-192.png" alt="">
   <a class="home" href="./">競馬 過去レース結果</a>
-  <nav><a href="./">今週</a><a href="results.html">結果</a></nav>
 </header>
 <main id="app" data-page="race"><p class="notice">読み込み中…</p></main>
+<nav class="tabbar" aria-label="メニュー">
+  <a href="./"><span class="ic">🏇</span>今週のレース</a>
+  <a href="results.html"><span class="ic">🏁</span>レース結果</a>
+  <a href="fav.html"><span class="ic">★</span>推し馬</a>
+</nav>
 <footer>アプリ「競馬 過去レース結果」のWeb版です。データは公式発表と異なる場合があります。</footer>
 <script src="config.js"></script>
 <script src="assets/app.js" defer></script>

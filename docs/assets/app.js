@@ -240,24 +240,31 @@ function raceList(races, extra) {
 
 // ---------- トップ：今週の出馬表 ----------
 
+// 推し馬それぞれの、いちばん近い出走予定（馬名→出馬表の1行）
+async function favNextRuns(list, today) {
+  if (!list.length) return new Map();
+  const inList = list.map(n => `"${n}"`).join(',');
+  const runs = await query('race_entries',
+    `select=horse_name,kaisaibi,kaisaijo,race_no,race_title,race_info&horse_name=in.(${enc(inList)})&kaisaibi=gte.${today}&order=kaisaibi.asc,race_no.asc`)
+    .catch(() => []);
+  const next = new Map();
+  for (const r of runs) if (!next.has(r.horse_name)) next.set(r.horse_name, r);
+  return next;
+}
+const nextRunHtml = r => (r
+  ? `<a href="${raceUrl(r.kaisaibi, r.kaisaijo, r.race_no)}">${dateLabel(r.kaisaibi)} ${esc(r.kaisaijo)}${r.race_no}R ${titleHtml(r.race_title)}</a>`
+  : '<span class="small">今週の出走予定なし</span>');
+
 // 推し馬の今週の出走予定。推し馬がいなければ登録のしかたを案内する
 async function favSection(today) {
   const list = favs();
   if (!list.length) {
     return '<div class="card hint">☆ 推し馬を登録すると、ここに今週の出走予定が出ます。出馬表や馬のページで馬名の横の ☆ を押してください。</div>';
   }
-  const inList = list.map(n => `"${n}"`).join(',');
-  const runs = await query('race_entries',
-    `select=horse_name,kaisaibi,kaisaijo,race_no,race_title,race_info&horse_name=in.(${enc(inList)})&kaisaibi=gte.${today}&order=kaisaibi.asc,race_no.asc`)
-    .catch(() => []);
-  const rows = list.map(name => {
-    const r = runs.find(x => x.horse_name === name);
-    const where = r
-      ? `<a href="${raceUrl(r.kaisaibi, r.kaisaijo, r.race_no)}">${dateLabel(r.kaisaibi)} ${esc(r.kaisaijo)}${r.race_no}R ${titleHtml(r.race_title)}</a>`
-      : '<span class="small">今週の出走予定なし</span>';
-    return `<li><span class="fav on">★</span> ${horseLink(name)}<br>${where}</li>`;
-  }).join('');
-  return `<h1>推し馬</h1><div class="card"><ul class="favs">${rows}</ul></div>`;
+  const next = await favNextRuns(list, today);
+  const rows = list.map(name => `<li><span class="fav on">★</span> ${horseLink(name)}<br>${nextRunHtml(next.get(name))}</li>`).join('');
+  return `<h1>推し馬</h1><div class="card"><ul class="favs">${rows}</ul>
+    <a class="more" href="fav.html">メモ・着せ替え・シェアは推し馬ページへ ›</a></div>`;
 }
 
 async function renderHome() {
@@ -288,7 +295,7 @@ async function renderHome() {
       }
     }
   }
-  html += '<h2>レース結果</h2><div class="card"><a href="results.html">直近の開催の結果を見る →</a></div>';
+  html += '<a class="bigbtn" href="results.html">🏁 直近のレース結果を見る</a>';
   app.innerHTML = html + cta();
 }
 
@@ -481,5 +488,245 @@ async function renderHorse() {
   app.innerHTML = html + cta(`${name}の過去レース結果`);
 }
 
-const pages = { home: renderHome, race: renderRace, results: renderResults, horse: renderHorse };
+// ---------- 推し馬ページ：メモ・着せ替え・シェア（どれもこの iPhone の中だけに保存） ----------
+
+// 着せ替え。CSS の [data-theme] と、シェア画像の色（bg は上→下のグラデーション）。meta は theme.js と同じ色
+const THEMES = {
+  standard: { meta: '#2e7d32', label: 'スタンダード', bg: ['#1b5e20', '#43a047'], ink: '#ffffff', accent: '#fbc02d', card: 'rgba(255,255,255,.14)' },
+  sakura: { meta: '#e75480', label: 'さくら（かわいい）', bg: ['#ffd1e1', '#ff8fb8'], ink: '#5a1030', accent: '#ffffff', card: 'rgba(255,255,255,.55)' },
+  yume: { meta: '#9b6bd6', label: 'ゆめかわ', bg: ['#c9b6ff', '#9fe3f0'], ink: '#3a2766', accent: '#ffffff', card: 'rgba(255,255,255,.5)' },
+  noir: { meta: '#0d0d0f', label: 'ブラック×ゴールド（かっこいい）', bg: ['#000000', '#2a2a30'], ink: '#f3e2a9', accent: '#d4af37', card: 'rgba(212,175,55,.12)' },
+  navy: { meta: '#1a3d7c', label: '勝負服ネイビー', bg: ['#0f2552', '#1a3d7c'], ink: '#ffffff', accent: '#e53935', card: 'rgba(255,255,255,.12)' },
+};
+const MARKS = ['★', '💖', '🔥', '👑', '🐎', '🌸', '⚡'];
+const MEMO_KEY = 'favMemos';
+const MEMO_MAX = 100;
+const TITLE_MAX = 20;
+
+function store(key, value) {
+  try { localStorage.setItem(key, value); } catch (e) { /* 保存できない環境では、このページを閉じるまでだけ */ }
+}
+function load(key) {
+  try { return localStorage.getItem(key); } catch (e) { return null; }
+}
+const currentTheme = () => (THEMES[load('theme')] ? load('theme') : 'standard');
+const currentMark = () => (MARKS.includes(load('favMark')) ? load('favMark') : '★');
+const favTitle = () => (load('favTitle') || '').slice(0, TITLE_MAX) || 'わたしの推し馬';
+function memos() {
+  try {
+    const m = JSON.parse(load(MEMO_KEY) || '{}');
+    return m && typeof m === 'object' && !Array.isArray(m) ? m : {};
+  } catch (e) {
+    return {};
+  }
+}
+const memoOf = name => (typeof memos()[name] === 'string' ? memos()[name].slice(0, MEMO_MAX) : '');
+function saveMemo(name, text) {
+  const m = memos();
+  if (text) m[name] = text.slice(0, MEMO_MAX); else delete m[name];
+  store(MEMO_KEY, JSON.stringify(m));
+}
+function applyTheme(key) {
+  if (key === 'standard') document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme', key);
+  store('theme', key);
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', THEMES[key].meta);
+}
+
+const absUrl = path => new URL(path, location.href).href;
+const raceLine = r => (r ? `${dateLabel(r.kaisaibi)} ${r.kaisaijo}${r.race_no}R ${r.race_title}` : '');
+// X の投稿文。リンクは馬のページ（見た人も同じ成績が見られる）
+function shareText(name, next) {
+  const memo = memoOf(name);
+  return [`${currentMark()} 推し馬：${name}`, memo, next ? `次走 ${raceLine(next)}` : '', '#推し馬 #競馬'].filter(Boolean).join('\n');
+}
+function listShareText(list) {
+  return [`${currentMark()} ${favTitle()}`, ...list.slice(0, 8).map(n => `・${n}`), '#推し馬 #競馬'].join('\n');
+}
+function openX(text, url) {
+  window.open(`https://x.com/intent/post?text=${enc(text)}&url=${enc(url)}`, '_blank', 'noopener');
+}
+
+// ---------- シェア用の画像（1080×1080 の正方形） ----------
+
+// 1行に入るぶんずつ文字を切って、最大 maxLines 行にする
+function wrapLines(ctx, text, width, maxLines) {
+  const lines = [];
+  for (const para of text.split('\n')) {
+    let line = '';
+    for (const ch of [...para]) {
+      if (ctx.measureText(line + ch).width > width) { lines.push(line); line = ch; } else line += ch;
+    }
+    lines.push(line);
+  }
+  if (lines.length > maxLines) {
+    lines.length = maxLines;
+    lines[maxLines - 1] = [...lines[maxLines - 1]].slice(0, -1).join('') + '…'; // 絵文字を半分で切らない
+  }
+  return lines;
+}
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+const FONT = '"Hiragino Sans", "Noto Sans JP", sans-serif';
+// items: [{ name, memo, next }]。1頭なら大きく、複数ならリストにする
+function drawCard(items) {
+  const t = THEMES[currentTheme()];
+  const S = 1080;
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = S;
+  const ctx = cv.getContext('2d');
+  const g = ctx.createLinearGradient(0, 0, S * 0.4, S);
+  g.addColorStop(0, t.bg[0]);
+  g.addColorStop(1, t.bg[1]);
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, S, S);
+  // 背景にうすく推しマークを散らす
+  ctx.globalAlpha = 0.12;
+  ctx.fillStyle = t.accent;
+  ctx.font = `120px ${FONT}`;
+  for (const [x, y] of [[60, 200], [880, 160], [820, 980], [120, 940], [940, 600]]) ctx.fillText(currentMark(), x, y);
+  ctx.globalAlpha = 1;
+
+  ctx.fillStyle = t.ink;
+  ctx.textBaseline = 'top';
+  ctx.font = `bold 44px ${FONT}`;
+  ctx.fillText(`${currentMark()} ${favTitle()}`, 80, 80);
+  ctx.fillStyle = t.accent;
+  ctx.fillRect(80, 150, 120, 8);
+
+  ctx.fillStyle = t.card;
+  roundRect(ctx, 60, 200, S - 120, 720, 40);
+  ctx.fill();
+  ctx.fillStyle = t.ink;
+  if (items.length === 1) {
+    const { name, memo, next } = items[0];
+    let size = 96;
+    do ctx.font = `bold ${size -= 4}px ${FONT}`; while (size > 48 && ctx.measureText(name).width > S - 220);
+    ctx.fillText(name, 110, 250 + (92 - size) / 2);
+    let y = 400;
+    if (next) {
+      ctx.font = `bold 36px ${FONT}`;
+      for (const l of wrapLines(ctx, `次走 ${raceLine(next)}`, S - 220, 2)) { ctx.fillText(l, 110, y); y += 50; }
+      y += 20;
+    }
+    ctx.font = `44px ${FONT}`;
+    for (const l of wrapLines(ctx, memo || 'がんばれ！', S - 220, next ? 6 : 8)) { ctx.fillText(l, 110, y); y += 62; }
+  } else {
+    let y = 240;
+    for (const { name, memo } of items.slice(0, 7)) {
+      ctx.font = `bold 48px ${FONT}`;
+      ctx.fillText(`${currentMark()} ${name}`, 110, y);
+      if (memo) {
+        ctx.font = `30px ${FONT}`;
+        ctx.globalAlpha = 0.85;
+        ctx.fillText(wrapLines(ctx, memo, S - 260, 1)[0], 150, y + 58);
+        ctx.globalAlpha = 1;
+      }
+      y += 96;
+    }
+  }
+  ctx.font = `28px ${FONT}`;
+  ctx.fillText('競馬 過去レース結果　tktktakatsuka.github.io/kakoRaceKekkaSp', 80, 970);
+  return cv;
+}
+// iPhone なら共有シート（写真に保存・X・LINE など）を出す。出せなければ画像をダウンロード
+async function shareImage(items, text) {
+  const blob = await new Promise(res => drawCard(items).toBlob(res, 'image/png'));
+  if (!blob) return;
+  const file = new File([blob], 'oshiuma.png', { type: 'image/png' });
+  if (navigator.canShare?.({ files: [file] })) {
+    try { await navigator.share({ files: [file], text }); } catch (e) { /* 閉じただけ */ }
+    return;
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'oshiuma.png';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 10e3);
+}
+
+async function renderFav() {
+  const list = favs();
+  const next = await favNextRuns(list, todayJst());
+  const theme = currentTheme();
+  let html = `<div class="hero fav-hero"><p class="when">推し馬ページ</p>
+    <h1><span id="mark">${esc(currentMark())}</span> <span id="title">${esc(favTitle())}</span></h1>
+    <p class="when">${list.length}頭を応援中</p></div>`;
+
+  html += `<h2>着せ替え</h2><div class="card dress">
+    <div class="themes">${Object.entries(THEMES).map(([k, t]) => `
+      <button type="button" class="swatch sw-${k}${k === theme ? ' on' : ''}" data-theme-pick="${k}" aria-pressed="${k === theme}">${esc(t.label)}</button>`).join('')}</div>
+    <p class="small">推しマーク</p>
+    <div class="marks">${MARKS.map(m => `<button type="button" class="mark${m === currentMark() ? ' on' : ''}" data-mark-pick="${esc(m)}">${esc(m)}</button>`).join('')}</div>
+    <label class="small" for="favTitle">ページの名前（${TITLE_MAX}文字まで）</label>
+    <input id="favTitle" class="text" maxlength="${TITLE_MAX}" value="${esc(load('favTitle') || '')}" placeholder="わたしの推し馬">
+  </div>`;
+
+  if (!list.length) {
+    html += '<div class="card hint">☆ まだ推し馬がいません。出馬表や馬のページで馬名の横の ☆ を押すと、ここにメモ欄とシェアボタンが出ます。</div>';
+  } else {
+    html += `<div class="sharebar">
+      <button type="button" class="btn x" data-share-list="x">推し馬リストをXでシェア</button>
+      <button type="button" class="btn" data-share-list="img">リストを画像でシェア</button></div>`;
+    html += list.map(name => `
+      <div class="card oshi">
+        <div class="oshi-head">${horseLink(name)} ${favButton(name)}</div>
+        <div class="small">${nextRunHtml(next.get(name))}</div>
+        <textarea class="memo" data-memo="${esc(name)}" maxlength="${MEMO_MAX}" rows="3" placeholder="メモ（例：次は東京2400mで巻き返す！）">${esc(memoOf(name))}</textarea>
+        <div class="memo-foot"><span class="small" data-count="${esc(name)}">${[...memoOf(name)].length}/${MEMO_MAX}</span>
+          <button type="button" class="pill x" data-share-x="${esc(name)}">Xでシェア</button>
+          <button type="button" class="pill" data-share-img="${esc(name)}">画像でシェア</button></div>
+      </div>`).join('');
+    html += '<p class="small">メモ・着せ替えはこの iPhone の中だけに保存されます（ほかの人には見えません。シェアしたときだけ公開されます）。</p>';
+  }
+  app.innerHTML = html + cta();
+
+  const sel = (attr, v) => [...app.querySelectorAll(`[${attr}]`)].find(el => el.getAttribute(attr) === v);
+  app.addEventListener('input', e => {
+    const name = e.target.dataset?.memo;
+    if (name) {
+      saveMemo(name, e.target.value);
+      const c = sel('data-count', name);
+      if (c) c.textContent = `${[...e.target.value].length}/${MEMO_MAX}`;
+    } else if (e.target.id === 'favTitle') {
+      store('favTitle', e.target.value.slice(0, TITLE_MAX));
+      document.getElementById('title').textContent = favTitle();
+    }
+  });
+  app.addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    const d = b.dataset;
+    if (d.themePick && THEMES[d.themePick]) {
+      applyTheme(d.themePick);
+      for (const s of app.querySelectorAll('[data-theme-pick]')) {
+        s.classList.toggle('on', s === b);
+        s.setAttribute('aria-pressed', String(s === b));
+      }
+    } else if (d.markPick && MARKS.includes(d.markPick)) {
+      store('favMark', d.markPick);
+      document.getElementById('mark').textContent = d.markPick;
+      for (const s of app.querySelectorAll('[data-mark-pick]')) s.classList.toggle('on', s === b);
+    } else if (d.shareX) {
+      openX(shareText(d.shareX, next.get(d.shareX)), absUrl(horseUrl(d.shareX)));
+    } else if (d.shareImg) {
+      const name = d.shareImg;
+      shareImage([{ name, memo: memoOf(name), next: next.get(name) }], `${shareText(name, next.get(name))}\n${absUrl(horseUrl(name))}`);
+    } else if (d.shareList) {
+      const now = favs();
+      if (d.shareList === 'x') openX(listShareText(now), absUrl('./'));
+      else shareImage(now.map(name => ({ name, memo: memoOf(name) })), `${listShareText(now)}\n${absUrl('./')}`);
+    }
+  });
+}
+
+const pages = { home: renderHome, race: renderRace, results: renderResults, horse: renderHorse, fav: renderFav };
 (pages[app.dataset.page] || renderHome)().catch(showError);

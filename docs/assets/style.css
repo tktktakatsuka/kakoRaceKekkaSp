@@ -193,3 +193,91 @@ tr.fav-row { background: rgba(245, 166, 35, .1); }
 .favs li { padding: 8px 2px; border-top: 1px solid var(--line); }
 .favs li:first-child { border-top: 0; }
 .favs li a:not(.horse) { font-size: 13px; }
+
+/* ---------- 下のメニュー（アプリのようなタブ） ---------- */
+body { padding-bottom: calc(env(safe-area-inset-bottom) + 64px); }
+.tabbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  background: var(--card); border-top: 1px solid var(--line);
+  padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, .06);
+}
+.tabbar a {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 8px 4px 6px; text-decoration: none; font-size: 12px; font-weight: 700; color: var(--muted);
+}
+.tabbar .ic { font-size: 22px; line-height: 1; }
+.tabbar a.on { color: var(--brand); }
+.tabbar a.on .ic { transform: scale(1.1); }
+.bigbtn {
+  display: block; text-align: center; text-decoration: none; font-weight: 700; font-size: 16px;
+  margin: 20px 0 8px; padding: 14px; border-radius: 12px; background: var(--brand); color: var(--brand-ink);
+}
+
+/* ---------- 推し馬ページ ---------- */
+:root { --hero: linear-gradient(135deg, #1b5e20, #2e7d32 60%, #43a047); --hero-ink: #ffffff; }
+.hero:not(.g1):not(.g2):not(.g3) { background: var(--hero); color: var(--hero-ink); }
+.more { display: block; margin-top: 8px; font-size: 13px; font-weight: 700; color: var(--brand); text-decoration: none; }
+
+.themes { display: flex; flex-wrap: wrap; gap: 8px; }
+.swatch {
+  font: inherit; font-size: 13px; font-weight: 700; padding: 10px 12px; border-radius: 12px; cursor: pointer;
+  border: 2px solid transparent; color: #fff;
+}
+.swatch.on { border-color: var(--text); box-shadow: 0 0 0 2px var(--card) inset; }
+.swatch.on::before { content: "✓ "; }
+.sw-standard { background: linear-gradient(135deg, #1b5e20, #43a047); }
+.sw-sakura { background: linear-gradient(135deg, #ffd1e1, #ff8fb8); color: #5a1030; }
+.sw-yume { background: linear-gradient(135deg, #c9b6ff, #9fe3f0); color: #3a2766; }
+.sw-noir { background: linear-gradient(135deg, #000, #2a2a30); color: #d4af37; }
+.sw-navy { background: linear-gradient(135deg, #0f2552, #1a3d7c); }
+.dress .small { display: block; margin: 12px 0 4px; }
+.marks { display: flex; flex-wrap: wrap; gap: 6px; }
+.mark {
+  font: inherit; font-size: 22px; width: 44px; height: 44px; border-radius: 50%; cursor: pointer;
+  background: var(--bg); border: 2px solid var(--line); color: #f5a623;
+}
+.mark.on { border-color: var(--brand); background: var(--card); }
+.text, .memo {
+  width: 100%; font: inherit; font-size: 16px; color: var(--text); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 10px; padding: 10px;
+}
+.memo { margin-top: 8px; resize: vertical; }
+.oshi-head { display: flex; align-items: center; justify-content: space-between; font-size: 18px; }
+.oshi .small a { color: var(--text); }
+.memo-foot { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.memo-foot .small { flex: 1; }
+.pill {
+  font: inherit; font-size: 13px; font-weight: 700; padding: 7px 12px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--card); color: var(--text);
+}
+.pill.x { background: #000; color: #fff; border-color: #000; }
+.sharebar { display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0 4px; }
+.sharebar .btn { font: inherit; font-weight: 700; cursor: pointer; color: var(--text); }
+.sharebar .btn.x { color: #fff; }
+
+/* 着せ替え（推し馬ページで選ぶと、全部のページに効く） */
+:root[data-theme="sakura"] {
+  --bg: #fff3f7; --card: #ffffff; --text: #4a1a2c; --muted: #9a6b7c; --line: #f7d3e0;
+  --brand: #e75480; --brand-ink: #ffffff; --accent: #ffd1e1; --win: #ffe8f0;
+  --hero: linear-gradient(135deg, #ffb3cf, #ff8fb8 55%, #ffc6dc); --hero-ink: #5a1030;
+}
+:root[data-theme="yume"] {
+  --bg: #f6f2ff; --card: #ffffff; --text: #2f2450; --muted: #7d72a0; --line: #e3dbfa;
+  --brand: #9b6bd6; --brand-ink: #ffffff; --accent: #9fe3f0; --win: #ece6ff;
+  --hero: linear-gradient(135deg, #c9b6ff, #b7c8ff 50%, #9fe3f0); --hero-ink: #3a2766;
+}
+:root[data-theme="noir"] {
+  --bg: #0b0b0d; --card: #17171b; --text: #f1ead2; --muted: #a39a7c; --line: #2c2a24;
+  --brand: #d4af37; --brand-ink: #0b0b0d; --accent: #d4af37; --win: #2a2412;
+  --hero: linear-gradient(135deg, #000, #1c1c22 60%, #3a3220); --hero-ink: #f3e2a9;
+}
+:root[data-theme="noir"] .top { background: #000; color: #d4af37; }
+:root[data-theme="navy"] {
+  --bg: #eef3fb; --card: #ffffff; --text: #13213d; --muted: #5d6b86; --line: #d6dfee;
+  --brand: #1a3d7c; --brand-ink: #ffffff; --accent: #e53935; --win: #fff1d6;
+  --hero: linear-gradient(135deg, #0f2552, #1a3d7c 60%, #2f5aa8); --hero-ink: #ffffff;
+}
+:root[data-theme="sakura"] .card, :root[data-theme="yume"] .card { border-radius: 18px; }
+:root[data-theme="sakura"] .tabbar a.on .ic, :root[data-theme="yume"] .tabbar a.on .ic { transform: scale(1.2) rotate(-6deg); }
