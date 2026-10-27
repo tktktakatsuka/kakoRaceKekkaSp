@@ -176,10 +176,11 @@ app.addEventListener('click', e => {
 });
 
 // 表の上に出す、色や横棒の意味の説明
-function legend() {
-  return `<div class="legend">
+// withOdds が false（オッズ発売前）なら、☆の説明だけ出す
+function legend(withOdds = true) {
+  return `<div class="legend">${withOdds ? `
     <span><span class="pop p1">1人気</span><span class="pop p2">2人気</span><span class="pop p3">3人気</span> 単勝の人気順（金・銀・銅）</span>
-    <span><span class="bar demo"><i></i></span> 横棒が長いほど単勝オッズが低い＝勝ちそうと見られている</span>
+    <span><span class="bar demo"><i></i></span> 横棒が長いほど単勝オッズが低い＝勝ちそうと見られている</span>` : ''}
     <span><span class="fav on">★</span> を押すと推し馬に登録（この iPhone に保存）</span>
   </div>`;
 }
@@ -375,7 +376,7 @@ function entryTable(entries, last) {
   const updated = entries.find(e => e.odds_updated_at)?.odds_updated_at;
   const note = hasOdds && updated
     ? `<p class="small">オッズは ${new Date(updated).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })} 時点</p>` : '';
-  return `${hasOdds ? legend() : ''}<div class="card"><table>
+  return `${legend(hasOdds)}<div class="card"><table>
     <tr><th class="c">馬番</th><th>馬名・騎手</th>${hasOdds ? '<th class="num">人気・単勝</th>' : ''}</tr>${rows}</table>${note}</div>`;
 }
 
