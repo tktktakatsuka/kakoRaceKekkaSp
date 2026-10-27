@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -17,7 +18,9 @@ import androidx.navigation.Navigation;
 
 import com.google.android.material.card.MaterialCardView;
 import com.tktkcompany.kakoRaceKeiba.R;
+import com.tktkcompany.kakoRaceKeiba.db.LiveResults;
 import com.tktkcompany.kakoRaceKeiba.db.SupabaseManager;
+import com.tktkcompany.kakoRaceKeiba.notification.RaceStartNotices;
 import com.tktkcompany.kakoRaceKeiba.ui.entries.FavoriteHorseNames;
 import com.tktkcompany.kakoRaceKeiba.ui.favorite.CardStyles;
 import com.tktkcompany.kakoRaceKeiba.ui.horse.HorseFragment;
@@ -26,10 +29,12 @@ import com.tktkcompany.kakoRaceKeiba.util.Lang;
 import com.tktkcompany.kakoRaceKeiba.util.WeekendDays;
 
 import org.threeten.bp.LocalDate;
+import org.threeten.bp.LocalDateTime;
 import org.threeten.bp.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,8 +44,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * ホームの上の「あなたのお気に入り馬」。登録した馬を横に並べたカードで出す。
- * 次に走る予定のある馬を先頭に（発走の早い順）、それ以外は最近走った順。最後に「＋ 馬を追加」
+ * ホームの推し馬。Spotlight が選んだ1頭を主役のカード（SpotlightCard）に、残りを横に並べたカードで出す。
+ * 横並びは、次に走る予定のある馬を先頭に（発走の早い順）、それ以外は最近走った順。最後に「＋ 馬を追加」
  */
 final class FavoritesStrip {
 
@@ -60,25 +65,36 @@ final class FavoritesStrip {
         }
     }
 
+    // 主役のカードを入れる枠・「ほかの推し馬」の欄全体・横並びのカードを入れる行
+    private final FrameLayout spotlight;
+    private final View section;
     private final LinearLayout container;
     private final Handler main = new Handler(Looper.getMainLooper());
     private int generation;
     // 最後に並べた馬（飾りを読み込んだあとや、飾りを変えたあとに描き直すため）
     private List<Item> shown = new ArrayList<>();
+    // 次走・前走を読み終えたか（読み終えるまでは主役を選ばない）
+    private boolean shownLoaded;
 
-    FavoritesStrip(LinearLayout container) {
+    FavoritesStrip(FrameLayout spotlight, View section, LinearLayout container) {
+        this.spotlight = spotlight;
+        this.section = section;
         this.container = container;
     }
 
-    /** お気に入りの馬の次走・前走を読んでから並べる（読む前は名前だけで並べておく） */
+    /** 推し馬の次走・前走・今日の速報を読んでから、主役と横並びに分けて並べる。空なら推し馬を見つける案内 */
     void show(Set<String> favorites) {
         int gen = ++generation;
+        if (favorites.isEmpty()) {
+            render(new ArrayList<>(), true);
+            return;
+        }
         List<Item> items = new ArrayList<>();
         for (String name : favorites) items.add(new Item(name));
-        render(items);
+        render(items, false);
         // カードの飾り（アイコン・背景）を読んだら描き直す
         CardStyles.load(() -> {
-            if (gen == generation) render(shown);
+            if (gen == generation) render(shown, shownLoaded);
         });
         String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         List<String> names = new ArrayList<>(favorites);
@@ -86,21 +102,39 @@ final class FavoritesStrip {
             Map<String, Item> byName = new HashMap<>();
             for (String name : names) byName.put(name, new Item(name));
             try {
+                LocalDateTime now = LocalDateTime.now();
+                Map<String, SupabaseManager.RaceEntry> finishedRaces = new LinkedHashMap<>();
                 for (SupabaseManager.RaceEntry e : SupabaseManager.fetchUpcomingEntriesBlocking(today)) {
                     Item item = byName.get(FavoriteHorseNames.normalize(e.getHorseName()));
-                    if (item != null && !e.getScratched() && (item.next == null || order(e).compareTo(order(item.next)) < 0)) item.next = e;
+                    if (item == null || e.getScratched()) continue;
+                    // もう発走したレースは次走にしない。今日の、確定していそうなレースは速報を読む
+                    LocalDateTime start = RaceStartNotices.startTime(e.getKaisaibi(), e.getRaceInfo());
+                    if (start != null && start.isBefore(now)) {
+                        if (today.equals(e.getKaisaibi()) && start.plusMinutes(10).isBefore(now)) {
+                            finishedRaces.put(e.getKaisaibi() + e.getKaisaijo() + e.getRaceNo(), e);
+                        }
+                        continue;
+                    }
+                    if (item.next == null || order(e).compareTo(order(item.next)) < 0) item.next = e;
                 }
                 // 新しい順に返ってくるので、最初に出てきたものが前走
                 for (SupabaseManager.RaceResult r : SupabaseManager.fetchResultsForHorsesBlocking(names, null)) {
                     Item item = byName.get(FavoriteHorseNames.normalize(r.getHorseName()));
                     if (item != null && item.last == null) item.last = r;
                 }
+                // 同じレースに何頭いても、速報は1回だけ読む
+                for (SupabaseManager.RaceEntry race : finishedRaces.values()) {
+                    for (SupabaseManager.RaceResult r : LiveResults.fetchRaceBlocking(race.getKaisaibi(), race.getKaisaijo(), race.getRaceNo())) {
+                        Item item = byName.get(FavoriteHorseNames.normalize(r.getHorseName()));
+                        if (item != null && r.getRank() != null) item.live = r;
+                    }
+                }
             } catch (Exception e) {
-                Log.w("FavoritesStrip", "お気に入り馬の次走・前走の取得に失敗", e);
+                Log.w("FavoritesStrip", "推し馬の次走・前走の取得に失敗", e);
             }
             List<Item> sorted = sort(new ArrayList<>(byName.values()));
             main.post(() -> {
-                if (gen == generation) render(sorted);
+                if (gen == generation) render(sorted, true);
             });
         });
     }
@@ -125,11 +159,22 @@ final class FavoritesStrip {
         return e.getKaisaibi() + time + String.format("%02d", e.getRaceNo());
     }
 
-    private void render(List<Item> items) {
+    /** loaded が false の間（次走・前走を読む前）は、主役のカードの場所に「読み込み中…」を出しておく */
+    private void render(List<Item> items, boolean loaded) {
         shown = items;
+        shownLoaded = loaded;
         Context context = container.getContext();
+        Spotlight.Pick pick = loaded ? Spotlight.pick(items, LocalDateTime.now()) : null;
+        spotlight.removeAllViews();
+        spotlight.addView(pick != null ? SpotlightCard.create(context, pick, () -> render(shown, shownLoaded))
+                : SpotlightCard.loading(context));
+        section.setVisibility(pick != null && pick.kind == Spotlight.Kind.ONBOARDING ? View.GONE : View.VISIBLE);
         container.removeAllViews();
-        for (Item item : items) container.addView(card(context, item));
+        // 主役に出した馬は横並びに出さない
+        for (Item item : items) {
+            if (pick != null && item == pick.item) continue;
+            container.addView(card(context, item));
+        }
         container.addView(addCard(context));
         // 並べ直したら左端（次走の近い馬）から見せる
         if (container.getParent() instanceof android.widget.HorizontalScrollView) {
@@ -174,7 +219,7 @@ final class FavoritesStrip {
         card.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.navigation_horse, HorseFragment.args(item.name)));
         // 長押しで、アイコンと背景を選ぶ
         card.setOnLongClickListener(v -> {
-            CardStyles.showEditor(context, item.name, item.name, () -> render(shown));
+            CardStyles.showEditor(context, item.name, item.name, () -> render(shown, shownLoaded));
             return true;
         });
         return card;

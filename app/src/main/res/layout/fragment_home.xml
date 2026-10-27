@@ -122,7 +122,13 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginVertical="24dp" />
 
-            <!-- あなたのお気に入り馬（横に並べたカード。中身はコードで作る）。お気に入りがいる人だけ -->
+            <!-- 主役のカード（推し馬1頭を大きく。推し馬がいなければ見つける案内）。中身は SpotlightCard がコードで作る -->
+            <FrameLayout
+                android:id="@+id/spotlight_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <!-- ほかの推し馬（横に並べたカード。中身はコードで作る） -->
             <LinearLayout
                 android:id="@+id/layout_my_horses"
                 android:layout_width="match_parent"

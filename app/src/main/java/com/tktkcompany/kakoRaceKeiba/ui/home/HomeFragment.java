@@ -139,6 +139,8 @@ public class HomeFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         if (todayCard != null) todayCard.stop();
+        // 古い画面の部品を持ち続けないよう、次に画面を作ったときに作り直す
+        favoritesStrip = null;
     }
 
 
@@ -191,19 +193,21 @@ public class HomeFragment extends Fragment {
      * 1頭もいなければ「好きな馬を登録しよう」のカードを出す
      */
     private void refreshFavorites(@androidx.annotation.Nullable FirebaseUser user) {
+        // 推し馬がいないときの案内は主役のカードが出すので、前のカードは使わない（Task 3 でレイアウトから消す）
+        binding.cardOnboarding.setVisibility(View.GONE);
         if (user == null) {
-            binding.cardOnboarding.setVisibility(View.GONE);
+            binding.spotlightContainer.setVisibility(View.GONE);
             binding.layoutMyHorses.setVisibility(View.GONE);
             return;
         }
+        binding.spotlightContainer.setVisibility(View.VISIBLE);
         FavoriteHorseNames.load(favorites -> {
             if (binding == null) return;
-            binding.cardOnboarding.setVisibility(favorites.isEmpty() ? View.VISIBLE : View.GONE);
-            binding.layoutMyHorses.setVisibility(favorites.isEmpty() ? View.GONE : View.VISIBLE);
-            if (!favorites.isEmpty()) {
-                if (favoritesStrip == null) favoritesStrip = new FavoritesStrip(binding.myHorsesContainer);
-                favoritesStrip.show(favorites);
+            if (favoritesStrip == null) {
+                favoritesStrip = new FavoritesStrip(binding.spotlightContainer, binding.layoutMyHorses, binding.myHorsesContainer);
             }
+            // 空でも呼ぶ（主役のカードに推し馬を見つける案内を出し、横並びの欄を隠す）
+            favoritesStrip.show(favorites);
         });
     }
 
