@@ -13,11 +13,6 @@
     <string name="login_benefit">推し馬・メモ・予想はログインなしで使えます。Google でログインすると、機種変更しても引き継げます</string>
     <string name="signed_in">ログイン中</string>
     <string name="logout">ログアウト</string>
-    <string name="today_meeting">今日の開催</string>
-    <string name="favorites_button">★ 推し馬</string>
-    <string name="predictions_button">◎ 答え合わせ</string>
-    <string name="this_week_meeting">今週の開催</string>
-    <string name="this_week_entries">今週の出走馬</string>
     <string name="race_results">レース結果</string>
     <string name="see_details">詳細を見る &gt;</string>
     <string name="open_predictions_card">◎ 予想の答え合わせ ›\n出走表で付けた◎○▲△の結果と、◎の成績を見る</string>
@@ -36,14 +31,13 @@
     <string name="nav_results">結果</string>
     <string name="nav_memos">メモ・予想</string>
     <string name="nav_favorites">推し馬</string>
-    <string name="my_horses">★ あなたが応援している推し馬</string>
     <string name="see_all">すべて見る ›</string>
+    <string name="other_horses">★ ほかの推し馬</string>
+    <string name="notification_settings_link">🔔 通知の設定 ›</string>
     <string name="label_favorites">推し馬</string>
     <string name="label_predictions">予想・買い目の答え合わせ</string>
     <string name="label_entry_detail">出走馬の近走成績</string>
     <string name="last_main_races">前回の開催のメインレース</string>
     <string name="label_horse_search">馬を探す</string>
     <string name="find_horse">＋ 馬を探して推し馬にする</string>
-    <string name="onboarding_title">推し馬を見つけて、応援しよう</string>
-    <string name="onboarding_body">推し馬（応援したいお気に入りの馬）を登録すると、出走が決まったとき・発走30分前・レース結果をお知らせします。ログインなしで使えます</string>
 </resources>

@@ -13,11 +13,6 @@
     <string name="login_benefit">Favorites, notes and picks work without signing in. Sign in with Google to keep them when you change phones</string>
     <string name="signed_in">Signed in</string>
     <string name="logout">Sign out</string>
-    <string name="today_meeting">Today\'s races</string>
-    <string name="favorites_button">★ Favorites</string>
-    <string name="predictions_button">◎ My picks</string>
-    <string name="this_week_meeting">This week</string>
-    <string name="this_week_entries">This week\'s runners</string>
     <string name="race_results">Race results</string>
     <string name="see_details">Details &gt;</string>
     <string name="open_predictions_card">◎ Check my picks ›\nResults of your ◎○▲△ marks and your ◎ record</string>
@@ -36,14 +31,13 @@
     <string name="nav_results">Results</string>
     <string name="nav_memos">Notes &amp; picks</string>
     <string name="nav_favorites">Favorites</string>
-    <string name="my_horses">★ Your favorite horses</string>
     <string name="see_all">See all ›</string>
+    <string name="other_horses">★ Your other horses</string>
+    <string name="notification_settings_link">🔔 Notification settings ›</string>
     <string name="label_favorites">Favorite horses</string>
     <string name="label_predictions">My picks &amp; bets</string>
     <string name="label_entry_detail">Runners\' recent form</string>
     <string name="last_main_races">Main races of the last meeting</string>
     <string name="label_horse_search">Find a horse</string>
     <string name="find_horse">+ Find a horse to follow</string>
-    <string name="onboarding_title">Follow your favorite horse</string>
-    <string name="onboarding_body">Add a favorite and get notified when it is entered, 30 minutes before post time and with its result. No sign-in needed</string>
 </resources>

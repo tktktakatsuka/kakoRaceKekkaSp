@@ -114,7 +114,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- 出馬表を読み込んでいる間だけ出す -->
+            <!-- メインレースを読み込んでいる間だけ出す -->
             <ProgressBar
                 android:id="@+id/progress_home"
                 android:layout_width="wrap_content"
@@ -148,9 +148,9 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="@string/my_horses"
+                        android:text="@string/other_horses"
                         android:textColor="#1B5E20"
-                        android:textSize="18sp"
+                        android:textSize="16sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -163,6 +163,17 @@
                         android:textColor="#2E7D32"
                         android:textSize="14sp"
                         android:textStyle="bold" />
+
+                    <!-- 通知の設定（前は「今週の開催」のカードにあった） -->
+                    <TextView
+                        android:id="@+id/text_notification_settings"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:padding="6dp"
+                        android:text="@string/notification_settings_link"
+                        android:textColor="#1565C0"
+                        android:textSize="13sp" />
                 </LinearLayout>
 
                 <HorizontalScrollView
@@ -181,224 +192,12 @@
                 </HorizontalScrollView>
             </LinearLayout>
 
-            <!-- お気に入りの馬がまだいない人に、最初の1頭の登録を勧める -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_onboarding"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:visibility="gone"
-                app:cardBackgroundColor="#FFF8E1"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="3dp"
-                app:strokeWidth="0dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="18dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/onboarding_title"
-                        android:textColor="#E65100"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:text="@string/onboarding_body"
-                        android:textColor="#4E342E"
-                        android:textSize="14sp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn_onboarding_find"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:backgroundTint="#FFB300"
-                        android:text="@string/find_horse"
-                        android:textColor="#3E2723"
-                        android:textSize="16sp"
-                        app:cornerRadius="12dp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- 今日の開催（開催日だけ表示。次のレース・お気に入り馬・直前の結果。中身はコードで作る） -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_today"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:visibility="gone"
-                app:cardBackgroundColor="#E8F5E9"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:strokeColor="#43A047"
-                app:strokeWidth="2dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:id="@+id/text_today_header"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/today_meeting"
-                        android:textColor="@color/green_dark"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <LinearLayout
-                        android:id="@+id/today_container"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:orientation="vertical" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- お気に入り馬・予想の答え合わせ（ログイン中だけ。横に2つ並べる） -->
-            <LinearLayout
-                android:id="@+id/layout_quick_buttons"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="4dp"
-                android:orientation="horizontal"
-                android:visibility="gone">
-
-                <Button
-                    android:id="@+id/btn_favorite_horses"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="4dp"
-                    android:layout_weight="1"
-                    android:backgroundTint="#FFD700"
-                    android:text="@string/favorites_button"
-                    android:textColor="@android:color/black" />
-
-                <Button
-                    android:id="@+id/btn_predictions"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="4dp"
-                    android:layout_weight="1"
-                    android:backgroundTint="#1565C0"
-                    android:text="@string/predictions_button"
-                    android:textColor="@android:color/white" />
-            </LinearLayout>
-
-            <!-- 今週の開催 -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_upcoming"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:visibility="gone"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/this_week_meeting"
-                        android:textColor="@color/green_dark"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/text_upcoming_body"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:textColor="@android:color/black"
-                        android:textSize="14sp" />
-
-                    <TextView
-                        android:id="@+id/text_upcoming_hint"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="end"
-                        android:layout_marginTop="4dp"
-                        android:background="?attr/selectableItemBackground"
-                        android:padding="4dp"
-                        android:textColor="#1565C0"
-                        android:textSize="13sp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- 今週の出走馬（出馬表が登録されているときだけ表示する） -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_entries"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:visibility="gone"
-                app:cardBackgroundColor="#FFF8E1"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/this_week_entries"
-                            android:textColor="@color/green_dark"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/text_entries_body"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
-                            android:textColor="@android:color/black"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="›"
-                        android:textColor="#999999"
-                        android:textSize="24sp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- 直近の開催のメインレース結果（開催日は今日の開催カードがあるので隠す） -->
+            <!-- 最新の開催日のメインレース結果（開催日も含めていつも出す） -->
             <LinearLayout
                 android:id="@+id/layout_last_results"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone">
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/text_last_results_header"

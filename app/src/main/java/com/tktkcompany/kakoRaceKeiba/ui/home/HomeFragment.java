@@ -18,7 +18,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,18 +29,14 @@ import com.tktkcompany.kakoRaceKeiba.db.SupabaseManager;
 import com.tktkcompany.kakoRaceKeiba.notification.FavoriteResultWorker;
 import com.tktkcompany.kakoRaceKeiba.notification.GradedRaceWorker;
 import com.tktkcompany.kakoRaceKeiba.ui.entries.FavoriteHorseNames;
-import com.tktkcompany.kakoRaceKeiba.ui.horsememo.HorseMemos;
 import com.tktkcompany.kakoRaceKeiba.dto.SharedViewModel;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.TextUtils;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.widget.TextView;
@@ -49,8 +44,6 @@ import android.widget.Toast;
 
 import com.tktkcompany.kakoRaceKeiba.util.WeekendDays;
 
-import org.threeten.bp.LocalDate;
-import org.threeten.bp.format.DateTimeFormatter;
 
 
 public class HomeFragment extends Fragment {
@@ -59,12 +52,6 @@ public class HomeFragment extends Fragment {
     private SharedViewModel sharedViewModel;
     private FirebaseAuth mAuth; // mAuthをメンバー変数として追加
     private boolean exeSetRaceResult;
-    // 「今日の開催」カード（開催日だけ表示）
-    private TodayCard todayCard;
-    // 「今週の開催」に出馬表の開催日・競馬場を出したか（出していれば開催中の競馬場の一覧で上書きしない）
-    private boolean entriesSummaryShown;
-    // yyyyMMdd形式用
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
@@ -75,25 +62,11 @@ public class HomeFragment extends Fragment {
         // バナー（画面の一番上に固定）
         BannerAd.show(this, binding.adContainer, AdUnits.BANNER_HOME);
 
-        // お気に入り一覧ボタンの設定
-        binding.btnFavoriteHorses.setOnClickListener(v -> {
-            NavController navController = Navigation.findNavController(v);
-            navController.navigate(R.id.action_navigation_home_to_navigation_favorites);
-        });
-
-        binding.btnPredictions.setOnClickListener(v ->
-                Navigation.findNavController(v).navigate(R.id.navigation_predictions));
-        binding.btnOnboardingFind.setOnClickListener(v ->
-                Navigation.findNavController(v).navigate(R.id.navigation_horseSearch));
-        binding.cardEntries.setOnClickListener(v ->
-                Navigation.findNavController(v).navigate(R.id.action_navigation_home_to_navigation_entries));
-        // 下の「お気に入り」タブに切り替える（タブの選択も合わせるため、画面遷移ではなくタブを選ぶ）
+        // 下の「推し馬」タブに切り替える（タブの選択も合わせるため、画面遷移ではなくタブを選ぶ）
         binding.textMyHorsesAll.setOnClickListener(v -> {
             com.google.android.material.bottomnavigation.BottomNavigationView nav = requireActivity().findViewById(R.id.nav_view);
             if (nav != null) nav.setSelectedItemId(R.id.navigation_favorites);
         });
-        todayCard = new TodayCard(this, binding.cardToday, binding.todayContainer);
-        loadUpcomingEntries();
 
         // ログイン・ログアウトボタンの設定
         binding.btnLogin.setOnClickListener(v -> {
@@ -126,9 +99,10 @@ public class HomeFragment extends Fragment {
 
         // 🔑 setJoNames 完了後にここが呼ばれる
         sharedViewModel.getJoNames().observe(getViewLifecycleOwner(), joNames -> {
-            updateUpcomingCard(joNames);
-            if (joNames == null || joNames.isEmpty()) return;
-
+            if (joNames == null || joNames.isEmpty()) {
+                binding.progressHome.setVisibility(View.GONE);
+                return;
+            }
             loadMainRaces(joNames);
         });
 
@@ -138,7 +112,6 @@ public class HomeFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (todayCard != null) todayCard.stop();
         // 古い画面の部品を持ち続けないよう、次に画面を作ったときに作り直す
         favoritesStrip = null;
     }
@@ -169,7 +142,7 @@ public class HomeFragment extends Fragment {
         // ログインに失敗したときなどは null で呼ばれるので、今のアカウント（匿名かもしれない）で表示する
         if (user == null) user = FirebaseAuth.getInstance().getCurrentUser();
 
-        updateUpcomingHint(user);
+        bindNotificationSettings(user);
 
         if (GuestAccount.isGoogle(user)) {
             // Google でログイン中
@@ -182,8 +155,6 @@ public class HomeFragment extends Fragment {
             binding.layoutUserInfo.setVisibility(View.GONE);
             binding.layoutLogin.setVisibility(View.VISIBLE);
         }
-        // お気に入りは下のタブと「あなたのお気に入り馬」から、予想はメモ・予想のタブから開くので、ボタンは出さない
-        binding.layoutQuickButtons.setVisibility(View.GONE);
         placeAuthCard(user != null);
         refreshFavorites(user);
     }
@@ -193,8 +164,6 @@ public class HomeFragment extends Fragment {
      * 1頭もいなければ「好きな馬を登録しよう」のカードを出す
      */
     private void refreshFavorites(@androidx.annotation.Nullable FirebaseUser user) {
-        // 推し馬がいないときの案内は主役のカードが出すので、前のカードは使わない（Task 3 でレイアウトから消す）
-        binding.cardOnboarding.setVisibility(View.GONE);
         if (user == null) {
             binding.spotlightContainer.setVisibility(View.GONE);
             binding.layoutMyHorses.setVisibility(View.GONE);
@@ -228,86 +197,6 @@ public class HomeFragment extends Fragment {
         }
     }
 
-
-    // 「今週の開催」カードに開催中の競馬場と次の開催日を表示する
-    private void updateUpcomingCard(List<String> joNames) {
-        if (binding == null) return;
-        List<LocalDate> days = WeekendDays.getUpcomingRaceDays();
-        if (joNames == null || joNames.isEmpty() || days.isEmpty()) {
-            binding.cardUpcoming.setVisibility(View.GONE);
-            return;
-        }
-        List<String> dayLabels = new ArrayList<>();
-        for (LocalDate d : days) {
-            dayLabels.add(WeekendDays.formatShort(d.format(formatter)));
-        }
-        // 出馬表が読めたら、そちらの開催日・競馬場で書き直す（新潟などの開催も入るため）
-        if (!entriesSummaryShown) {
-            binding.textUpcomingBody.setText(TextUtils.join("・", dayLabels) + "　" + TextUtils.join("・", courseNames(joNames)));
-        }
-        binding.cardUpcoming.setVisibility(View.VISIBLE);
-        updateUpcomingHint(mAuth != null ? mAuth.getCurrentUser() : null);
-    }
-
-    // 出馬表が登録されていれば「今週の出走馬」カードを出す
-    private void loadUpcomingEntries() {
-        String today = LocalDate.now().format(formatter);
-        SupabaseManager.fetchUpcomingEntries(today, new SupabaseManager.SupabaseCallback<List<SupabaseManager.RaceEntry>>() {
-            @Override
-            public void onSuccess(List<SupabaseManager.RaceEntry> entries) {
-                if (!isAdded() || binding == null) return;
-                binding.progressHome.setVisibility(View.GONE);
-                if (entries.isEmpty()) {
-                    // 出馬表がまだ無い週は開催日ではないので、前の開催の結果を出す
-                    binding.layoutLastResults.setVisibility(View.VISIBLE);
-                    return;
-                }
-                Set<String> days = new LinkedHashSet<>();
-                Set<String> courses = new LinkedHashSet<>();
-                Set<String> races = new LinkedHashSet<>();
-                for (SupabaseManager.RaceEntry e : entries) {
-                    days.add(WeekendDays.formatShort(e.getKaisaibi()));
-                    courses.add(e.getKaisaijo());
-                    races.add(e.getKaisaibi() + e.getKaisaijo() + e.getRaceNo());
-                }
-                binding.textUpcomingBody.setText(TextUtils.join("・", days) + "　" + TextUtils.join("・", courseNames(courses)));
-                entriesSummaryShown = true;
-                String body = Lang.t(races.size() + "レースの出走馬と近走成績", races.size() + " races: runners and recent form");
-                binding.textEntriesBody.setText(body);
-                binding.cardEntries.setVisibility(View.VISIBLE);
-
-                // お気に入り馬・メモした馬が出走予定なら、その馬名も出す
-                FavoriteHorseNames.load(favorites -> HorseMemos.load(memos -> {
-                    if (!isAdded() || binding == null) return;
-                    Set<String> favoriteRunners = new LinkedHashSet<>();
-                    Set<String> memoRunners = new LinkedHashSet<>();
-                    for (SupabaseManager.RaceEntry e : entries) {
-                        if (FavoriteHorseNames.contains(favorites, e.getHorseName())) favoriteRunners.add(e.getHorseName());
-                        if (HorseMemos.find(memos, e.getHorseName()) != null) memoRunners.add(e.getHorseName());
-                    }
-                    // 馬名を全部並べると長くなるので、頭数と最初の2頭だけ出す
-                    StringBuilder text = new StringBuilder(body);
-                    if (!favoriteRunners.isEmpty()) text.append(Lang.t("\n★ 推し馬 ", "\n★ Favorites: ")).append(runnersLabel(favoriteRunners));
-                    if (!memoRunners.isEmpty()) text.append(Lang.t("\n📝 メモした馬 ", "\n📝 Noted: ")).append(runnersLabel(memoRunners));
-                    binding.textEntriesBody.setText(text);
-                    todayCard.show(entries, favorites);
-                    // 開催日は今日の開催カードで足りるので、前の開催のメインレース結果は出さない
-                    // （最初は隠しておき、開催日でないと分かってから出す。先に出すと開催日に一瞬見えるため）
-                    binding.layoutLastResults.setVisibility(
-                            binding.cardToday.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
-                }));
-            }
-
-            @Override
-            public void onFailure(@NonNull String message) {
-                Log.w("HomeFragment", "Entries load failed: " + message);
-                if (isAdded() && binding != null) {
-                    binding.progressHome.setVisibility(View.GONE);
-                    binding.layoutLastResults.setVisibility(View.VISIBLE);
-                }
-            }
-        });
-    }
 
     /** 開催していた競馬場すべてのメインレース(11R)の結果を集め、G1 から順にカードで出す */
     private void loadMainRaces(List<String> joNames) {
@@ -344,6 +233,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void showMainRaces(List<List<SupabaseManager.RaceResult>> collected) {
+        binding.progressHome.setVisibility(View.GONE);
         LinearLayout container = binding.lastResultsContainer;
         container.removeAllViews();
         List<List<SupabaseManager.RaceResult>> races = MainRaces.sort(collected);
@@ -361,24 +251,10 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    /** 競馬場名の一覧を表示の言語にする */
-    private static List<String> courseNames(java.util.Collection<String> courses) {
-        List<String> names = new ArrayList<>();
-        for (String c : courses) names.add(Lang.course(c));
-        return names;
-    }
-
-    /** 1頭なら馬名、何頭もいれば「7頭（バルチックアンバー ほか）」 */
-    static String runnersLabel(Set<String> names) {
-        List<String> list = new ArrayList<>(names);
-        if (list.size() == 1) return list.get(0);
-        return Lang.t(list.size() + "頭（" + list.get(0) + " ほか）", list.size() + " (" + list.get(0) + " and more)");
-    }
-
-    private void updateUpcomingHint(FirebaseUser user) {
+    /** 「ほかの推し馬」の見出しの右の「🔔 通知の設定 ›」 */
+    private void bindNotificationSettings(FirebaseUser user) {
         if (binding == null) return;
-        binding.textUpcomingHint.setText(Lang.t("🔔 通知の設定 ›", "🔔 Notification settings ›"));
-        binding.textUpcomingHint.setOnClickListener(v -> showNotificationSettings(user != null));
+        binding.textNotificationSettings.setOnClickListener(v -> showNotificationSettings(user != null));
     }
 
     /** 通知の説明と設定（今は重賞の発走前の通知のオン・オフだけ） */
