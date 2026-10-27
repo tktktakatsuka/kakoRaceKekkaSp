@@ -2,13 +2,15 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src https://zpsuopyqfozguriwgtzy.supabase.co; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>競馬 今週の出馬表・レース結果 | 競馬 過去レース結果</title>
-<meta name="description" content="今週の重賞と全レースの出馬表、オッズ、レース結果と払い戻しをスマホでサッと確認。">
+<title>レース結果 | 競馬 過去レース結果</title>
+<meta name="description" content="開催日・競馬場ごとの全レースの結果。">
 <meta name="theme-color" content="#2e7d32">
 <meta property="og:type" content="website">
-<meta property="og:title" content="競馬 今週の出馬表・レース結果 | 競馬 過去レース結果">
-<meta property="og:description" content="今週の重賞と全レースの出馬表、オッズ、レース結果と払い戻しをスマホでサッと確認。">
+<meta property="og:title" content="レース結果 | 競馬 過去レース結果">
+<meta property="og:description" content="開催日・競馬場ごとの全レースの結果。">
 <meta property="og:image" content="https://tktktakatsuka.github.io/kakoRaceKekkaSp/assets/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@tk241277687">
@@ -23,9 +25,9 @@
 <header class="top">
   <img src="assets/icon-192.png" alt="">
   <a class="home" href="./">競馬 過去レース結果</a>
-  <nav><a href="./" class="on">今週</a><a href="results.html">結果</a></nav>
+  <nav><a href="./">今週</a><a href="results.html" class="on">結果</a></nav>
 </header>
-<main id="app" data-page="home"><p class="notice">読み込み中…</p></main>
+<main id="app" data-page="results"><p class="notice">読み込み中…</p></main>
 <footer>アプリ「競馬 過去レース結果」のWeb版です。データは公式発表と異なる場合があります。</footer>
 <script src="config.js"></script>
 <script src="assets/app.js" defer></script>
