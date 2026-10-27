@@ -796,7 +796,7 @@ public class EntryDetailFragment extends Fragment {
                 FavoriteResultWorker.runOnce(requireContext());
                 FavoriteHorseNames.showAdded(requireContext(), horseName);
             } else {
-                Toast.makeText(getContext(), Lang.t(horseName + "をお気に入りから外しました", "Removed " + horseName + " from favorites"), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), Lang.t(horseName + "を推し馬から外しました", "Removed " + horseName + " from favorites"), Toast.LENGTH_SHORT).show();
             }
         });
     }

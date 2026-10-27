@@ -60,7 +60,7 @@ public final class RaceStartNotices {
 
     public static String title(List<Horse> horses) {
         if (horses.size() == 1) return Lang.t("★" + horses.get(0).name + "がまもなく出走", "★" + horses.get(0).name + " is about to run");
-        return Lang.t("★お気に入り馬" + horses.size() + "頭がまもなく出走", "★" + horses.size() + " favorites are about to run");
+        return Lang.t("★推し馬" + horses.size() + "頭がまもなく出走！", "★" + horses.size() + " favorites are about to run");
     }
 
     /** 「15:30発走 京都11R」/「Kyoto R11, post 15:30」 */

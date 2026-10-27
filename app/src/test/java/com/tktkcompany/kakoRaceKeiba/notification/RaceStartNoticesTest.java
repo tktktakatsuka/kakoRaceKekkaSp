@@ -39,7 +39,7 @@ public class RaceStartNoticesTest {
     public void severalHorsesInOneRace() {
         RaceStartNotices.Horse a = new RaceStartNotices.Horse("アンムート", "5", null, null);
         RaceStartNotices.Horse b = new RaceStartNotices.Horse("クラリス", null, null, null);
-        assertEquals("★お気に入り馬2頭がまもなく出走", RaceStartNotices.title(Arrays.asList(a, b)));
+        assertEquals("★推し馬2頭がまもなく出走！", RaceStartNotices.title(Arrays.asList(a, b)));
         assertEquals("9:55発走 京都1R\n5番 アンムート\nクラリス",
                 RaceStartNotices.body(LocalDateTime.of(2026, 10, 17, 9, 55), "京都", 1, null, null, Arrays.asList(a, b), "9:25"));
     }

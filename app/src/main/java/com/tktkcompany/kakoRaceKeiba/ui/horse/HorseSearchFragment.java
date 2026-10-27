@@ -80,7 +80,7 @@ public class HorseSearchFragment extends Fragment {
         HorseViews.inner(box).addView(input);
         root.addView(box);
 
-        status = HorseViews.text(context, Lang.t("2文字以上入れると探します。☆を押すとお気に入りに登録できます",
+        status = HorseViews.text(context, Lang.t("2文字以上入れると探します。☆を押すと推し馬にできます",
                 "Type at least 2 letters. Tap ☆ to add a favorite"), 13, HorseViews.GRAY, false);
         status.setPadding(HorseViews.dp(context, 4), HorseViews.dp(context, 4), 0, HorseViews.dp(context, 4));
         root.addView(status);
@@ -149,7 +149,7 @@ public class HorseSearchFragment extends Fragment {
         int gen = ++generation;
         if (query.length() < 2) {
             lastHits = null;
-            status.setText(Lang.t("2文字以上入れると探します。☆を押すとお気に入りに登録できます", "Type at least 2 letters. Tap ☆ to add a favorite"));
+            status.setText(Lang.t("2文字以上入れると探します。☆を押すと推し馬にできます", "Type at least 2 letters. Tap ☆ to add a favorite"));
             progress.setVisibility(View.GONE);
             renderDiscover();
             return;
@@ -176,7 +176,7 @@ public class HorseSearchFragment extends Fragment {
                 status.setText(result.isEmpty()
                         ? Lang.t("「" + query + "」を含む馬は見つかりませんでした（2025年10月以降に走った馬・出走予定の馬から探します）",
                         "No horse found for \"" + query + "\"")
-                        : Lang.t(result.size() + "頭見つかりました。☆でお気に入りに登録、行を押すと馬カルテを開きます",
+                        : Lang.t(result.size() + "頭見つかりました。☆で推し馬に登録、行を押すと馬カルテを開きます",
                         result.size() + " horses. Tap ☆ to add, tap a row to open"));
                 render(result);
             });
@@ -220,7 +220,7 @@ public class HorseSearchFragment extends Fragment {
         list.removeAllViews();
         if (list.getParent() instanceof ScrollView) ((ScrollView) list.getParent()).scrollTo(0, 0);
         if (popular != null && !popular.isEmpty()) {
-            list.addView(HorseViews.section(context, Lang.t("❤ みんなのお気に入り", "❤ Popular with everyone")));
+            list.addView(HorseViews.section(context, Lang.t("❤ みんなの推し馬", "❤ Popular with everyone")));
             MaterialCardView card = HorseViews.card(context, 0xFFFFFFFF);
             com.google.android.material.chip.ChipGroup chips = new com.google.android.material.chip.ChipGroup(context);
             for (SupabaseManager.FavoriteRank r : popular) {
@@ -330,7 +330,7 @@ public class HorseSearchFragment extends Fragment {
                 // 出走予定があれば発走前の通知をすぐ予約する
                 com.tktkcompany.kakoRaceKeiba.notification.FavoriteResultWorker.runOnce(context);
             } else {
-                Toast.makeText(context, Lang.t(hit.name + "をお気に入りから外しました", "Removed " + hit.name), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, Lang.t(hit.name + "を推し馬から外しました", "Removed " + hit.name), Toast.LENGTH_SHORT).show();
             }
         });
         inner.addView(star);
@@ -357,7 +357,7 @@ public class HorseSearchFragment extends Fragment {
         boolean on = favorites.contains(FavoriteHorseNames.normalize(name));
         star.setText(on ? "★" : "☆");
         star.setTextColor(on ? 0xFFFFB300 : 0xFFBDBDBD);
-        star.setContentDescription(on ? Lang.t("お気に入りから外す", "Remove favorite") : Lang.t("お気に入りに登録", "Add favorite"));
+        star.setContentDescription(on ? Lang.t("推し馬から外す", "Remove favorite") : Lang.t("推し馬にする", "Add favorite"));
     }
 
     static String raceLabel(String date, String course, int raceNo, @Nullable String title) {

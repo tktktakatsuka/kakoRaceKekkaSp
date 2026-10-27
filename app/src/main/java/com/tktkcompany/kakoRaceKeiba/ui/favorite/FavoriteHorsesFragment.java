@@ -98,7 +98,7 @@ public class FavoriteHorsesFragment extends Fragment {
     private void loadFavorites() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
-            noDataText.setText(Lang.t("通信できないため、お気に入りを読み込めませんでした", "Couldn't load favorites. Check your connection"));
+            noDataText.setText(Lang.t("通信できないため、推し馬を読み込めませんでした", "Couldn't load favorites. Check your connection"));
             noDataText.setVisibility(View.VISIBLE);
             return;
         }
@@ -123,7 +123,7 @@ public class FavoriteHorsesFragment extends Fragment {
                 progressBar.setVisibility(View.GONE);
                 if (favoriteHorses.isEmpty()) {
                     noDataText.setVisibility(View.VISIBLE);
-                    noDataText.setText(Lang.t("まだお気に入りの馬はいません。\n上のボタンから好きな馬を探して登録すると、出走が決まったとき・発走前・結果をお知らせします",
+                    noDataText.setText(Lang.t("まだ推し馬がいません。\n上のボタンから応援したい馬を探して登録すると、出走が決まったとき・発走前・結果をお知らせします",
                             "No favorites yet.\nFind a horse above to get entry, post-time and result notifications"));
                 } else {
                     noDataText.setVisibility(View.GONE);
@@ -271,12 +271,12 @@ public class FavoriteHorsesFragment extends Fragment {
         if (user == null || getContext() == null) return;
         String name = FavoriteHorsesAdapter.displayName(horseName);
         new androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                .setMessage(Lang.t(name + "をお気に入りから外しますか？", "Remove " + name + " from favorites?"))
+                .setMessage(Lang.t(name + "を推し馬から外しますか？", "Remove " + name + " from favorites?"))
                 .setPositiveButton(Lang.t("外す", "Remove"), (dialog, which) -> {
                     // 一覧は Firebase の変更を監視しているので、削除すると自動で消える
                     FirebaseManager.removeFavoriteHorse(user.getUid(), horseName);
                     SupabaseManager.removeFavorite(user.getUid(), horseName);
-                    Toast.makeText(getContext(), Lang.t(name + "をお気に入りから外しました", "Removed " + name + " from favorites"), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), Lang.t(name + "を推し馬から外しました", "Removed " + name + " from favorites"), Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton(Lang.t("キャンセル", "Cancel"), null)
                 .show();

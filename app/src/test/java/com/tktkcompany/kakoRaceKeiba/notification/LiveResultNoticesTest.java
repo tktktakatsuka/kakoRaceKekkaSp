@@ -29,7 +29,7 @@ public class LiveResultNoticesTest {
     public void severalHorses() {
         LiveResultNotices.Finish a = new LiveResultNotices.Finish("デニスバローズ", "2", "4", null, null);
         LiveResultNotices.Finish b = new LiveResultNotices.Finish("ダルマレッド", "取消", null, null, null);
-        assertEquals("★京都6R お気に入り馬の結果", LiveResultNotices.title("京都", 6, Arrays.asList(a, b)));
+        assertEquals("★京都6R 推し馬の結果", LiveResultNotices.title("京都", 6, Arrays.asList(a, b)));
         assertEquals("2026年10月17日(土) 京都6R\n2着 デニスバローズ（4番人気）\n取消 ダルマレッド\n📝 タップしてメモを残せます",
                 LiveResultNotices.body("20261017", "京都", 6, null, Arrays.asList(a, b)));
     }

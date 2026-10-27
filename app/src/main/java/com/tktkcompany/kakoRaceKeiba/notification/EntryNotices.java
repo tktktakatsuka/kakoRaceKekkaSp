@@ -52,7 +52,7 @@ public final class EntryNotices {
             Item item = items.get(0);
             return Lang.t(mark(item) + item.horseName + "が出走予定", mark(item) + item.horseName + " is entered");
         }
-        return Lang.t("お気に入り・メモした馬が" + items.size() + "頭出走予定", items.size() + " of your horses are entered");
+        return Lang.t("推し馬・メモした馬が" + items.size() + "頭出走予定", items.size() + " of your horses are entered");
     }
 
     public static String body(List<Item> items) {

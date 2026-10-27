@@ -47,7 +47,7 @@ public final class LiveResultNotices {
             if ("1".equals(f.rank)) return Lang.t("★" + f.horseName + "が1着！" + popular, "★" + f.horseName + " won!" + popular);
             return "★" + f.horseName + " " + rankLabel(f.rank) + popular;
         }
-        return "★" + Lang.race(course, raceNo) + Lang.t(" お気に入り馬の結果", " favorites' results");
+        return "★" + Lang.race(course, raceNo) + Lang.t(" 推し馬の結果", " favorites' results");
     }
 
     /** 1行目にレース、続けて結果、最後にメモへの案内 */

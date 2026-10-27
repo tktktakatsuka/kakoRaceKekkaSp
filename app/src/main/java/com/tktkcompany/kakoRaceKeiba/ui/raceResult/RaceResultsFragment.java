@@ -462,7 +462,7 @@ public class RaceResultsFragment extends Fragment {
             TableLayout table = (TableLayout) row.getParent();
             row.setBackgroundColor(TARGET_ROW.equals(row.getTag()) ? TARGET_ROW_COLOR
                     : stripeColor(table != null ? table.indexOfChild(row) : 1));
-            Toast.makeText(getContext(), Lang.t(safeName + "をお気に入りから削除しました", "Removed " + safeName + " from favorites"), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), Lang.t(safeName + "を推し馬から外しました", "Removed " + safeName + " from favorites"), Toast.LENGTH_SHORT).show();
         }
     }
 

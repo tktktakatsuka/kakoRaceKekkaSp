@@ -283,7 +283,7 @@ public class HomeFragment extends Fragment {
                     }
                     // 馬名を全部並べると長くなるので、頭数と最初の2頭だけ出す
                     StringBuilder text = new StringBuilder(body);
-                    if (!favoriteRunners.isEmpty()) text.append(Lang.t("\n★ お気に入り ", "\n★ Favorites: ")).append(runnersLabel(favoriteRunners));
+                    if (!favoriteRunners.isEmpty()) text.append(Lang.t("\n★ 推し馬 ", "\n★ Favorites: ")).append(runnersLabel(favoriteRunners));
                     if (!memoRunners.isEmpty()) text.append(Lang.t("\n📝 メモした馬 ", "\n📝 Noted: ")).append(runnersLabel(memoRunners));
                     binding.textEntriesBody.setText(text);
                     todayCard.show(entries, favorites);
@@ -388,8 +388,8 @@ public class HomeFragment extends Fragment {
         text.setSpan(new StyleSpan(Typeface.BOLD), 0, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         text.setSpan(new RelativeSizeSpan(1.3f), 0, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         text.append("\n\n").append(signedIn
-                ? Lang.t("お気に入り馬・メモした馬の出走予定、お気に入り馬の発走30分前と結果（確定後すぐ）をお知らせします。", "We'll notify you when your favorite or noted horses are entered, 30 minutes before your favorites run, and as soon as their results are official.")
-                : Lang.t("ログインしてお気に入り馬を登録すると、出走予定・発走前・結果もお知らせします。", "Sign in and add favorites to get entry, pre-race and result notifications."));
+                ? Lang.t("推し馬・メモした馬の出走予定、推し馬の発走30分前と結果（確定後すぐ）をお知らせします。", "We'll notify you when your favorite or noted horses are entered, 30 minutes before your favorites run, and as soon as their results are official.")
+                : Lang.t("ログインして推し馬を登録すると、出走予定・発走前・結果もお知らせします。", "Sign in and add favorites to get entry, pre-race and result notifications."));
         title.setText(text);
         title.setTextColor(0xFF333333);
         new AlertDialog.Builder(requireContext())

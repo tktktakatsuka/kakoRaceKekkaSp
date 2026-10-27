@@ -99,13 +99,13 @@ public final class FavoriteHorseNames {
 
     /** お気に入りに登録したときの案内（登録すると何が起きるかを伝える）。長めに表示する */
     public static void showAdded(android.content.Context context, String horseName) {
-        android.widget.Toast.makeText(context, Lang.t("★" + horseName + "をお気に入りに登録しました。\n出走が決まったとき・発走30分前・レース結果をお知らせします",
+        android.widget.Toast.makeText(context, Lang.t("★" + horseName + "を推し馬にしました。\n出走が決まったとき・発走30分前・レース結果をお知らせします。一緒に応援しましょう",
                 "★ Added " + horseName + ".\nWe'll notify you of entries, 30 minutes before post time and results"), android.widget.Toast.LENGTH_LONG).show();
     }
 
     /** 匿名でも入れていない（通信できなかったなど）ときの案内 */
     public static void showCannotSave(android.content.Context context) {
-        android.widget.Toast.makeText(context, Lang.t("お気に入りを保存できませんでした。通信状態を確かめてください",
+        android.widget.Toast.makeText(context, Lang.t("推し馬を保存できませんでした。通信状態を確かめてください",
                 "Couldn't save the favorite. Check your connection"), android.widget.Toast.LENGTH_SHORT).show();
     }
 

@@ -159,7 +159,7 @@ public class EntriesFragment extends Fragment {
                 if (next) subText = Lang.t("▶ 次のレース・", "▶ Next race・") + subText;
                 if (favoriteCount > 0) {
                     // お気に入り馬が出るレースは目立たせる
-                    subText += Lang.t("・★お気に入り" + favoriteCount + "頭", "・★" + favoriteCount + " favorite" + (favoriteCount == 1 ? "" : "s"));
+                    subText += Lang.t("・★推し馬" + favoriteCount + "頭", "・★" + favoriteCount + " favorite" + (favoriteCount == 1 ? "" : "s"));
                     sub.setTextColor(0xFFE65100);
                 }
                 sub.setText(subText);

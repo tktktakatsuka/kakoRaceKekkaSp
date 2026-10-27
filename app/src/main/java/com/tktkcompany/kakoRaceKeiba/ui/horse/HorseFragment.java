@@ -208,7 +208,7 @@ public class HorseFragment extends Fragment {
         LinearLayout names = new LinearLayout(context);
         names.setOrientation(LinearLayout.VERTICAL);
         names.setPadding(HorseViews.dp(context, 14), 0, 0, 0);
-        names.addView(HorseViews.text(context, favorites.contains(name) ? Lang.t("★ お気に入り", "★ Favorite") : Lang.t("馬カルテ", "Horse profile"),
+        names.addView(HorseViews.text(context, favorites.contains(name) ? Lang.t("★ 推し馬", "★ Favorite") : Lang.t("馬カルテ", "Horse profile"),
                 12, 0xFFFFD54F, true));
         names.addView(HorseViews.text(context, name, 26, 0xFFFFFFFF, true));
         title.addView(names);
@@ -268,7 +268,7 @@ public class HorseFragment extends Fragment {
 
     private void bindFavoriteButton(MaterialButton button) {
         boolean on = favorites.contains(name);
-        button.setText(on ? Lang.t("★ お気に入り登録中", "★ Following") : Lang.t("☆ お気に入りに登録して通知を受け取る", "☆ Follow and get notified"));
+        button.setText(on ? Lang.t("★ 推し馬として応援中", "★ Following") : Lang.t("☆ 推し馬にして、出走・結果を通知で受け取る", "☆ Follow and get notified"));
         button.setBackgroundTintList(android.content.res.ColorStateList.valueOf(on ? 0x33FFFFFF : 0xFFFFC107));
         button.setTextColor(on ? 0xFFFFFFFF : 0xFF3E2723);
         button.setStrokeColor(android.content.res.ColorStateList.valueOf(0x99FFFFFF));

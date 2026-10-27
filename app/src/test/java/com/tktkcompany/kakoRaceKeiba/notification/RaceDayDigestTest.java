@@ -20,7 +20,7 @@ public class RaceDayDigestTest {
     public void severalHorsesInPostOrder() {
         RaceDayDigest.Run late = new RaceDayDigest.Run("アンムート", "京都", 11, LocalDateTime.of(2026, 10, 24, 15, 40));
         RaceDayDigest.Run early = new RaceDayDigest.Run("ダルマレッド", "東京", 5, LocalDateTime.of(2026, 10, 24, 12, 25));
-        assertEquals("今日はお気に入りの馬が2頭走ります", RaceDayDigest.title("20261024", Arrays.asList(late, early)));
+        assertEquals("今日は推し馬が2頭走ります🏇", RaceDayDigest.title("20261024", Arrays.asList(late, early)));
         assertEquals("2026年10月24日(土)\n12:25 東京5R ★ダルマレッド\n15:40 京都11R ★アンムート\n発走30分前にもお知らせします",
                 RaceDayDigest.body("20261024", Arrays.asList(late, early)));
     }

@@ -43,7 +43,7 @@ public final class RaceDayDigest {
         if (runs.size() == 1) {
             return Lang.t("今日は★" + runs.get(0).horseName + "が走ります", "★" + runs.get(0).horseName + " runs today");
         }
-        return Lang.t("今日はお気に入りの馬が" + runs.size() + "頭走ります", runs.size() + " of your favorites run today");
+        return Lang.t("今日は推し馬が" + runs.size() + "頭走ります🏇", runs.size() + " of your favorites run today");
     }
 
     /** 「2026年10月24日(土)\n11:20 京都5R ★アンムート\n…」。発走時刻の早い順 */

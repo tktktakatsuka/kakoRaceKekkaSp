@@ -29,7 +29,7 @@ public class EntryNoticesTest {
 
     @Test
     public void severalHorsesAreListedOnePerLine() {
-        assertEquals("お気に入り・メモした馬が2頭出走予定", EntryNotices.title(Arrays.asList(FAVORITE, MEMO)));
+        assertEquals("推し馬・メモした馬が2頭出走予定", EntryNotices.title(Arrays.asList(FAVORITE, MEMO)));
         assertEquals("★アンムート　2026年10月17日(土) 京都9R もみじステークス\n📝セタキト　2026年10月18日(日) 東京11R",
                 EntryNotices.body(Arrays.asList(FAVORITE, MEMO)));
     }
