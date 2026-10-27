@@ -13,22 +13,65 @@ const app = document.getElementById('app');
 
 // ---------- データ取得 ----------
 
-async function query(table, params) {
-  if (!CONFIG.url || !CONFIG.key) throw new Error('接続先が設定されていません');
-  const res = await fetch(`${CONFIG.url}/rest/v1/${table}?${params}`, { headers: { apikey: CONFIG.key } });
-  if (!res.ok) throw new Error(`${table}: ${res.status}`);
-  return res.json();
-}
-
-// Supabase は1回に返す行数に上限がある（既定は1000行）ので、空になるまで続きを取る
-async function queryAll(table, params) {
-  const rows = [];
-  for (;;) {
-    const page = await query(table, `${params}&limit=${PAGE_SIZE}&offset=${rows.length}`);
-    if (!page.length) return rows;
-    rows.push(...page);
+const MINUTE = 60e3;
+// 読んだデータはこの端末に少しのあいだ取っておき、同じページを開き直したときは通信せずに出す。
+// 保存できない環境（プライベートブラウズなど）では、毎回読むだけになる
+function cacheGet(key) {
+  try {
+    const hit = JSON.parse(localStorage.getItem(key) || 'null');
+    return hit && hit.until > Date.now() ? hit.rows : null;
+  } catch (e) {
+    return null;
   }
 }
+function cachePut(key, rows, ttl) {
+  try {
+    localStorage.setItem(key, JSON.stringify({ until: Date.now() + ttl, rows }));
+  } catch (e) {
+    // 容量いっぱいなら、古い保存をまとめて消して諦める
+    try { for (const k of Object.keys(localStorage)) if (k.startsWith('q:')) localStorage.removeItem(k); } catch (e2) { /* 何もしない */ }
+  }
+}
+
+async function request(table, params, headers = {}) {
+  if (!CONFIG.url || !CONFIG.key) throw new Error('接続先が設定されていません');
+  const res = await fetch(`${CONFIG.url}/rest/v1/${table}?${params}`, { headers: { apikey: CONFIG.key, ...headers } });
+  if (!res.ok) throw new Error(`${table}: ${res.status}`);
+  return res;
+}
+
+// ttl: 保存しておく時間。オッズが動く出馬表は短く、終わった日の結果は長くする
+async function query(table, params, ttl = 3 * MINUTE) {
+  const key = `q:${table}?${params}`;
+  const cached = cacheGet(key);
+  if (cached) return cached;
+  const rows = await (await request(table, params)).json();
+  cachePut(key, rows, ttl);
+  return rows;
+}
+
+// Supabase は1回に返す行数に上限がある（既定は1000行）。1回目で全部の件数を聞き、残りはまとめて同時に取る
+async function queryAll(table, params, ttl = 3 * MINUTE) {
+  const key = `q:${table}?${params}&all`;
+  const cached = cacheGet(key);
+  if (cached) return cached;
+  const first = await request(table, `${params}&limit=${PAGE_SIZE}&offset=0`, { Prefer: 'count=exact' });
+  const rows = await first.json();
+  const total = Number((first.headers.get('content-range') || '').split('/')[1]) || rows.length;
+  if (rows.length && rows.length < total) {
+    const step = rows.length; // サーバーの上限が1000より小さくても、返ってきた件数ずつ進める
+    const offsets = [];
+    for (let o = step; o < total; o += step) offsets.push(o);
+    const pages = await Promise.all(offsets.map(o => request(table, `${params}&limit=${step}&offset=${o}`).then(r => r.json())));
+    for (const page of pages) rows.push(...page);
+  }
+  cachePut(key, rows, ttl);
+  return rows;
+}
+
+// 指定日が今日より前なら、その日の結果はもう変わらない
+const settled = d => d < todayJst();
+const HOUR = 60 * MINUTE;
 
 const enc = encodeURIComponent;
 const raceFilter = (d, c, r) => `kaisaibi=eq.${d}&kaisaijo=eq.${enc(c)}&race_no=eq.${r}`;
@@ -177,8 +220,8 @@ async function renderRace() {
 
   const [entries, results, payouts] = await Promise.all([
     query('race_entries', `select=*&${raceFilter(d, c, r)}&order=id.asc`).catch(() => []),
-    query('race_results', `select=*&${raceFilter(d, c, r)}&order=id.asc`),
-    query('race_payouts', `select=*&${raceFilter(d, c, r)}&order=sort.asc`).catch(() => []),
+    query('race_results', `select=*&${raceFilter(d, c, r)}&order=id.asc`, settled(d) ? 12 * HOUR : 3 * MINUTE),
+    query('race_payouts', `select=*&${raceFilter(d, c, r)}&order=sort.asc`, settled(d) ? 12 * HOUR : 3 * MINUTE).catch(() => []),
   ]);
   const head = entries[0] || results[0];
   if (!head) {
@@ -227,7 +270,7 @@ async function lastRuns(names, before) {
   if (!list.length) return {};
   const inList = list.map(n => `"${n.replace(/"/g, '')}"`).join(',');
   const rows = await query('race_results',
-    `select=horse_name,kaisaibi,kaisaijo,race_title,rank&horse_name=in.(${enc(inList)})&kaisaibi=lt.${before}&order=kaisaibi.desc&limit=${list.length * 4}`)
+    `select=horse_name,kaisaibi,kaisaijo,race_title,rank&horse_name=in.(${enc(inList)})&kaisaibi=lt.${before}&order=kaisaibi.desc&limit=${list.length * 4}`, HOUR)
     .catch(() => []);
   const last = {};
   for (const row of rows) if (!last[row.horse_name]) last[row.horse_name] = row;
@@ -286,7 +329,8 @@ async function renderResults() {
   const c = courses.includes(p.get('c')) ? p.get('c') : courses[0];
 
   const rows = await queryAll('race_results',
-    `select=kaisaibi,kaisaijo,race_no,race_title,hassou_time,rank,horse_name,popular&kaisaibi=eq.${d}&kaisaijo=eq.${enc(c)}&order=race_no.asc,id.asc`);
+    `select=kaisaibi,kaisaijo,race_no,race_title,hassou_time,rank,horse_name,popular&kaisaibi=eq.${d}&kaisaijo=eq.${enc(c)}&order=race_no.asc,id.asc`,
+    settled(d) ? 12 * HOUR : 3 * MINUTE);
   const races = groupRaces(rows).map(r => ({ ...r, race_info: r.hassou_time }));
   const winners = {};
   for (const row of rows) if (row.rank === '1' && !winners[row.race_no]) winners[row.race_no] = row;
