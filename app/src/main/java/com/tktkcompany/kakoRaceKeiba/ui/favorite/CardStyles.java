@@ -250,7 +250,7 @@ public final class CardStyles {
             cell.setGravity(Gravity.CENTER);
             cell.setTextSize(10);
             cell.setTextColor(0xFF555555);
-            cell.setText(choice != null ? choice.label : Lang.t("いつもの", "Default"));
+            cell.setText(choice != null ? choice.label : Lang.t("標準", "Auto"));
             cell.setOnClickListener(v -> {
                 bg[0] = choice;
                 refresh[0].run();
