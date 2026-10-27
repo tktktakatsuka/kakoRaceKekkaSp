@@ -166,3 +166,30 @@ a.horse { font-weight: 700; text-decoration: none; border-bottom: 1px dotted var
 .runs .info { color: var(--muted); font-size: 12px; white-space: nowrap; }
 .rank.rx { font-size: 10px; font-weight: 400; }
 th.c { white-space: nowrap; }
+
+/* ---------- 推し馬と凡例 ---------- */
+.fav {
+  font: inherit; font-size: 16px; line-height: 1; background: none; border: 0; padding: 2px 4px;
+  color: var(--muted); cursor: pointer; vertical-align: -1px;
+}
+.fav.on { color: #f5a623; }
+span.fav { padding: 0; cursor: default; }
+.fav.big {
+  margin-top: 10px; font-size: 14px; font-weight: 700; padding: 8px 14px; border-radius: 999px;
+  background: rgba(255, 255, 255, .2); color: #fff; border: 1px solid rgba(255, 255, 255, .5);
+}
+.fav.big.on { background: #fff; color: #b8860b; }
+tr.fav-row td { box-shadow: inset 3px 0 0 #f5a623; }
+tr.fav-row td ~ td { box-shadow: none; }
+tr.fav-row { background: rgba(245, 166, 35, .1); }
+
+.legend { display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: var(--muted); margin: 4px 4px 8px; }
+.legend > span { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.bar.demo { display: inline-block; width: 56px; margin: 0; }
+.bar.demo i { width: 60%; }
+
+.hint { color: var(--muted); font-size: 13px; }
+.favs { list-style: none; margin: 0; padding: 0; }
+.favs li { padding: 8px 2px; border-top: 1px solid var(--line); }
+.favs li:first-child { border-top: 0; }
+.favs li a:not(.horse) { font-size: 13px; }

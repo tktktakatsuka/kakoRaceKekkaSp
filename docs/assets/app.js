@@ -129,8 +129,63 @@ const courseLabel = info => {
 const raceUrl = (d, c, r) => `race.html?d=${d}&c=${enc(c)}&r=${r}`;
 const horseUrl = name => `horse.html?n=${enc(name)}`;
 const horseLink = name => (name ? `<a class="horse" href="${horseUrl(name)}">${esc(name)}</a>` : '');
+// 馬名として受け付ける形（問い合わせに入るので、長すぎるものや記号を含むものは外す）
+const validHorseName = name => !!name && name.length <= 30 && !/[(),"\\]/.test(name);
+
+// ---------- 推し馬（この iPhone の中だけに保存。ログインなし） ----------
+
+const FAV_KEY = 'favHorses';
+const FAV_MAX = 50;
+function favs() {
+  try {
+    const list = JSON.parse(localStorage.getItem(FAV_KEY) || '[]');
+    return Array.isArray(list) ? list.filter(validHorseName) : [];
+  } catch (e) {
+    return [];
+  }
+}
+const isFav = name => favs().includes(name);
+function toggleFav(name) {
+  const list = favs();
+  const on = !list.includes(name);
+  const next = on ? [name, ...list].slice(0, FAV_MAX) : list.filter(n => n !== name);
+  try { localStorage.setItem(FAV_KEY, JSON.stringify(next)); } catch (e) { return !on; }
+  return on;
+}
+// ☆ボタン。big は馬のページの大きいボタン
+function favButton(name, big = false) {
+  if (!validHorseName(name)) return '';
+  const on = isFav(name);
+  return `<button type="button" class="fav${big ? ' big' : ''}${on ? ' on' : ''}" data-fav="${esc(name)}" aria-pressed="${on}">${favText(on, big)}</button>`;
+}
+const favText = (on, big) => (big ? (on ? '★ 推し馬に登録中' : '☆ 推し馬に登録') : (on ? '★' : '☆'));
+// ボタンが押されたら、同じ馬のボタンと行の色をまとめて切り替える
+app.addEventListener('click', e => {
+  const btn = e.target.closest('[data-fav]');
+  if (!btn) return;
+  e.preventDefault();
+  const name = btn.dataset.fav;
+  const on = toggleFav(name);
+  for (const b of app.querySelectorAll('[data-fav]')) {
+    if (b.dataset.fav !== name) continue;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', String(on));
+    b.textContent = favText(on, b.classList.contains('big'));
+    b.closest('tr')?.classList.toggle('fav-row', on);
+  }
+});
+
+// 表の上に出す、色や横棒の意味の説明
+// withOdds が false（オッズ発売前）なら、☆の説明だけ出す
+function legend(withOdds = true) {
+  return `<div class="legend">${withOdds ? `
+    <span><span class="pop p1">1人気</span><span class="pop p2">2人気</span><span class="pop p3">3人気</span> 単勝の人気順（金・銀・銅）</span>
+    <span><span class="bar demo"><i></i></span> 横棒が長いほど単勝オッズが低い＝勝ちそうと見られている</span>` : ''}
+    <span><span class="fav on">★</span> を押すと推し馬に登録（この iPhone に保存）</span>
+  </div>`;
+}
 // 人気の印（1〜3番人気は色つきの丸）
-const popBadge = pop => (pop ? `<span class="pop${Number(pop) <= 3 ? ` p${Number(pop)}` : ''}">${esc(pop)}</span>` : '');
+const popBadge = pop => (pop ? `<span class="pop${Number(pop) <= 3 ? ` p${Number(pop)}` : ''}">${esc(pop)}人気</span>` : '');
 // 単勝オッズの横棒。オッズが低い（人気の）馬ほど長い。幅は描いたあとに barWidths() で入れる
 const oddsBar = odds => {
   const o = parseFloat(odds);
@@ -185,12 +240,33 @@ function raceList(races, extra) {
 
 // ---------- トップ：今週の出馬表 ----------
 
+// 推し馬の今週の出走予定。推し馬がいなければ登録のしかたを案内する
+async function favSection(today) {
+  const list = favs();
+  if (!list.length) {
+    return '<div class="card hint">☆ 推し馬を登録すると、ここに今週の出走予定が出ます。出馬表や馬のページで馬名の横の ☆ を押してください。</div>';
+  }
+  const inList = list.map(n => `"${n}"`).join(',');
+  const runs = await query('race_entries',
+    `select=horse_name,kaisaibi,kaisaijo,race_no,race_title,race_info&horse_name=in.(${enc(inList)})&kaisaibi=gte.${today}&order=kaisaibi.asc,race_no.asc`)
+    .catch(() => []);
+  const rows = list.map(name => {
+    const r = runs.find(x => x.horse_name === name);
+    const where = r
+      ? `<a href="${raceUrl(r.kaisaibi, r.kaisaijo, r.race_no)}">${dateLabel(r.kaisaibi)} ${esc(r.kaisaijo)}${r.race_no}R ${titleHtml(r.race_title)}</a>`
+      : '<span class="small">今週の出走予定なし</span>';
+    return `<li><span class="fav on">★</span> ${horseLink(name)}<br>${where}</li>`;
+  }).join('');
+  return `<h1>推し馬</h1><div class="card"><ul class="favs">${rows}</ul></div>`;
+}
+
 async function renderHome() {
   const today = todayJst();
   const entries = await queryAll('race_entries',
     `select=kaisaibi,kaisaijo,race_no,race_title,race_info&kaisaibi=gte.${today}&order=kaisaibi.asc,kaisaijo.asc,race_no.asc,id.asc`);
   const races = groupRaces(entries);
-  let html = '<h1>今週のレース</h1>';
+  let html = await favSection(today);
+  html += '<h1>今週のレース</h1>';
 
   if (!races.length) {
     html += '<p class="notice">今週の出馬表はまだ出ていません（例年、木曜ごろに出ます）。</p>';
@@ -289,9 +365,9 @@ function entryTable(entries, last) {
   const rows = [...entries].sort((a, b) => (Number(a.horse_number) || 99) - (Number(b.horse_number) || 99)).map(e => {
     const prev = last[e.horse_name];
     const prevText = prev ? `前走 ${fullDate(prev.kaisaibi)} ${prev.kaisaijo} ${(prev.race_title || '').trim()} ${prev.rank}着` : '';
-    return `<tr class="${e.scratched ? 'scratched' : ''}">
+    return `<tr class="${[e.scratched ? 'scratched' : '', isFav(e.horse_name) ? 'fav-row' : ''].join(' ').trim()}">
       <td class="c">${waku(e.waku)}<br>${esc(e.horse_number)}</td>
-      <td>${horseLink(e.horse_name)} <span class="small">${esc(e.sex_age)}</span><br>
+      <td>${horseLink(e.horse_name)} ${favButton(e.horse_name)} <span class="small">${esc(e.sex_age)}</span><br>
         <span class="small">${esc(e.card_jockey || e.jockey)} ${esc(e.weight)} / ${esc(e.trainer)}</span>
         ${prevText ? `<br><span class="small">${esc(prevText)}</span>` : ''}</td>
       ${hasOdds ? `<td class="num">${popBadge(e.popular)} ${esc(e.win_odds)}${oddsBar(e.win_odds)}</td>` : ''}
@@ -300,20 +376,20 @@ function entryTable(entries, last) {
   const updated = entries.find(e => e.odds_updated_at)?.odds_updated_at;
   const note = hasOdds && updated
     ? `<p class="small">オッズは ${new Date(updated).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })} 時点</p>` : '';
-  return `<div class="card"><table>
-    <tr><th class="c">馬番</th><th>馬名・騎手</th>${hasOdds ? '<th class="num">単勝</th>' : ''}</tr>${rows}</table>${note}</div>`;
+  return `${legend(hasOdds)}<div class="card"><table>
+    <tr><th class="c">馬番</th><th>馬名・騎手</th>${hasOdds ? '<th class="num">人気・単勝</th>' : ''}</tr>${rows}</table>${note}</div>`;
 }
 
 function resultTable(results) {
-  const rows = results.map(x => `<tr class="${['1', '2', '3'].includes(x.rank) ? 'top3' : ''}">
+  const rows = results.map(x => `<tr class="${[['1', '2', '3'].includes(x.rank) ? 'top3' : '', isFav(x.horse_name) ? 'fav-row' : ''].join(' ').trim()}">
     <td class="c">${rankBadge(x.rank)}</td>
     <td class="c">${waku(x.waku)}<br>${esc(x.horse_number)}</td>
-    <td>${horseLink(x.horse_name)} <span class="small">${esc(x.age)}</span><br>
+    <td>${horseLink(x.horse_name)} ${favButton(x.horse_name)} <span class="small">${esc(x.age)}</span><br>
       <span class="small">${esc(x.jockey)} ${esc(x.weight)}　${esc(x.time)} ${esc(x.tyakusa)}　上がり${esc(x.nobori)}</span></td>
     <td class="num">${popBadge(x.popular)} ${esc(x.win_odds)}${oddsBar(x.win_odds)}</td>
   </tr>`).join('');
-  return `<div class="card"><table>
-    <tr><th class="c">着</th><th class="c">馬番</th><th>馬名・騎手</th><th class="num">単勝</th></tr>${rows}</table></div>`;
+  return `${legend()}<div class="card"><table>
+    <tr><th class="c">着</th><th class="c">馬番</th><th>馬名・騎手</th><th class="num">人気・単勝</th></tr>${rows}</table></div>`;
 }
 
 function payoutTable(payouts) {
@@ -362,7 +438,7 @@ async function renderResults() {
 async function renderHorse() {
   const name = (new URLSearchParams(location.search).get('n') || '').trim();
   // 馬名は問い合わせに入るので、長すぎるものや記号だけのものは受け付けない
-  if (!name || name.length > 30 || /[(),"\\]/.test(name)) { location.replace('./'); return; }
+  if (!validHorseName(name)) { location.replace('./'); return; }
   document.title = `${name}の過去レース結果 | 競馬 過去レース結果`;
 
   const [runs, next] = await Promise.all([
@@ -370,7 +446,7 @@ async function renderHorse() {
     query('race_entries', `select=kaisaibi,kaisaijo,race_no,race_title,race_info,horse_number,jockey&horse_name=eq.${enc(name)}&kaisaibi=gte.${todayJst()}&order=kaisaibi.asc&limit=5`).catch(() => []),
   ]);
   let html = `<div class="hero"><p class="when">競走馬</p><h1>${esc(name)}</h1>
-    <p class="when">${esc(runs[0]?.age || '')}</p></div>`;
+    <p class="when">${esc(runs[0]?.age || '')}</p>${favButton(name, true)}</div>`;
 
   if (next.length) {
     html += '<h2>出走予定</h2>' + next.map(e => `
