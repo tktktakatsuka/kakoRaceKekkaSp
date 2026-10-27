@@ -1,5 +1,5 @@
 // 競馬 過去レース結果 Web版。Supabase の公開キーで、アプリと同じテーブルを読むだけのページ。
-// 接続先は config.js（公開時に GitHub Actions が作る）の window.KEIBA_CONFIG から読む。
+// 接続先は docs/config.js（リポジトリに入れて直接編集する）の window.KEIBA_CONFIG から読む。
 
 const CONFIG = window.KEIBA_CONFIG || {};
 const X_URL = 'https://x.com/tk241277687';
@@ -180,7 +180,7 @@ async function renderRace() {
   // 前後のレースへ
   const nav = [r > 1 ? `<a href="${raceUrl(d, c, r - 1)}">← ${r - 1}R</a>` : '',
     r < 12 ? `<a href="${raceUrl(d, c, r + 1)}">${r + 1}R →</a>` : ''];
-  html += `<div class="tabs" style="justify-content:space-between">${nav.join('')}</div>`;
+  html += `<div class="tabs spread">${nav.join('')}</div>`;
 
   const what = results.length ? '結果' : '出馬表';
   app.innerHTML = html + cta(`${title}の${what}（${dateLabel(d)} ${c}${r}R）`);
