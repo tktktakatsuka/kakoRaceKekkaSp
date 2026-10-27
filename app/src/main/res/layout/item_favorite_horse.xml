@@ -19,15 +19,12 @@
         android:paddingStart="14dp"
         android:paddingEnd="4dp">
 
-        <!-- 馬のアイコン -->
-        <ImageView
+        <!-- 馬のアイコン（選んだ絵文字か馬のイラスト。CardStyles がコードで入れる） -->
+        <FrameLayout
+            android:id="@+id/avatar_container"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginEnd="12dp"
-            android:background="@drawable/bg_avatar"
-            android:contentDescription="@null"
-            android:padding="8dp"
-            android:src="@drawable/uma" />
+            android:layout_marginEnd="12dp" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -63,15 +60,47 @@
                 android:background="?attr/selectableItemBackground"
                 android:textColor="#555555"
                 android:textSize="13sp" />
+
+            <!-- 前走・速報が1着のときだけ出す。押すと共有メニュー（X・LINE など）を開く -->
+            <TextView
+                android:id="@+id/btn_share_win"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_share_win"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp"
+                android:textColor="#C62828"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
         </LinearLayout>
 
-        <ImageButton
-            android:id="@+id/btn_delete"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/cd_remove_favorite"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"
-            app:tint="#BDBDBD" />
+        <!-- 右側：カードを飾る（上）と、推し馬から外す（下） -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/btn_decorate"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/cd_decorate_card"
+                android:gravity="center"
+                android:text="🎨"
+                android:textSize="18sp" />
+
+            <ImageButton
+                android:id="@+id/btn_delete"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/cd_remove_favorite"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                app:tint="#BDBDBD" />
+        </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

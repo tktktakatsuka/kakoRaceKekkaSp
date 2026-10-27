@@ -19,6 +19,7 @@ import com.google.android.material.card.MaterialCardView;
 import com.tktkcompany.kakoRaceKeiba.R;
 import com.tktkcompany.kakoRaceKeiba.db.SupabaseManager;
 import com.tktkcompany.kakoRaceKeiba.ui.entries.FavoriteHorseNames;
+import com.tktkcompany.kakoRaceKeiba.ui.favorite.CardStyles;
 import com.tktkcompany.kakoRaceKeiba.ui.horse.HorseFragment;
 import com.tktkcompany.kakoRaceKeiba.ui.horse.HorseViews;
 import com.tktkcompany.kakoRaceKeiba.util.Lang;
@@ -60,6 +61,8 @@ final class FavoritesStrip {
     private final LinearLayout container;
     private final Handler main = new Handler(Looper.getMainLooper());
     private int generation;
+    // 最後に並べた馬（飾りを読み込んだあとや、飾りを変えたあとに描き直すため）
+    private List<Item> shown = new ArrayList<>();
 
     FavoritesStrip(LinearLayout container) {
         this.container = container;
@@ -71,6 +74,10 @@ final class FavoritesStrip {
         List<Item> items = new ArrayList<>();
         for (String name : favorites) items.add(new Item(name));
         render(items);
+        // カードの飾り（アイコン・背景）を読んだら描き直す
+        CardStyles.load(() -> {
+            if (gen == generation) render(shown);
+        });
         String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         List<String> names = new ArrayList<>(favorites);
         EXECUTOR.execute(() -> {
@@ -117,6 +124,7 @@ final class FavoritesStrip {
     }
 
     private void render(List<Item> items) {
+        shown = items;
         Context context = container.getContext();
         container.removeAllViews();
         for (Item item : items) container.addView(card(context, item));
@@ -129,9 +137,10 @@ final class FavoritesStrip {
     }
 
     private View card(Context context, Item item) {
-        MaterialCardView card = baseCard(context, item.next != null ? 0xFFFFF8E1 : 0xFFFFFFFF);
+        MaterialCardView card = baseCard(context, 0xFFFFFFFF);
+        CardStyles.applyBackground(card, item.name, item.next != null ? 0xFFFFF8E1 : 0xFFFFFFFF);
         LinearLayout inner = (LinearLayout) card.getChildAt(0);
-        inner.addView(HorseViews.avatar(context, 44));
+        inner.addView(CardStyles.avatar(context, item.name, 44));
 
         TextView name = text(context, item.name, 15, 0xFF1B1B1B, true);
         name.setMaxLines(2);
@@ -161,6 +170,11 @@ final class FavoritesStrip {
             inner.addView(text(context, Lang.t("出走予定を待っています", "Waiting for an entry"), 12, 0xFF9E9E9E, false));
         }
         card.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.navigation_horse, HorseFragment.args(item.name)));
+        // 長押しで、アイコンと背景を選ぶ
+        card.setOnLongClickListener(v -> {
+            CardStyles.showEditor(context, item.name, item.name, () -> render(shown));
+            return true;
+        });
         return card;
     }
 

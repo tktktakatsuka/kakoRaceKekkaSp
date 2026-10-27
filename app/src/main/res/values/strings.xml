@@ -30,6 +30,7 @@
     <string name="cd_mark">Pick mark</string>
     <string name="cd_memo">Note</string>
     <string name="cd_remove_favorite">Remove from favorites</string>
+    <string name="cd_decorate_card">Decorate card</string>
     <string name="nav_home">Home</string>
     <string name="nav_entries">Race cards</string>
     <string name="nav_results">Results</string>

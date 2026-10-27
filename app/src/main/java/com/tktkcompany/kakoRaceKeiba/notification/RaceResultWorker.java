@@ -22,6 +22,7 @@ import com.tktkcompany.kakoRaceKeiba.MainActivity;
 import com.tktkcompany.kakoRaceKeiba.db.FavoriteResultFetcher;
 import com.tktkcompany.kakoRaceKeiba.db.LiveResults;
 import com.tktkcompany.kakoRaceKeiba.db.SupabaseManager;
+import com.tktkcompany.kakoRaceKeiba.share.WinShare;
 import com.tktkcompany.kakoRaceKeiba.ui.entries.FavoriteHorseNames;
 import com.tktkcompany.kakoRaceKeiba.util.WeekendDays;
 
@@ -143,11 +144,19 @@ public class RaceResultWorker extends Worker {
             extras.putString(MainActivity.EXTRA_MEMO_FROM, (WeekendDays.formatShort(date) + " " + course + raceNo + "R "
                     + title + " " + LiveResultNotices.rankLabel(first.rank)).replaceAll("\\s+", " ").trim());
 
+            // 推し馬が勝っていたら、通知に「🎉 シェア」ボタンを付ける
+            String shareText = null;
+            for (LiveResultNotices.Finish f : fresh) {
+                if (WinShare.isWin(f.rank)) {
+                    shareText = WinShare.text(f.horseName, date, course, raceNo, raceTitle);
+                    break;
+                }
+            }
             NotificationHelper.show(context, NotificationHelper.LIVE_RESULT_CHANNEL_ID,
                     ("result" + date + course + raceNo).hashCode(),
                     LiveResultNotices.title(course, raceNo, fresh),
                     LiveResultNotices.body(date, course, raceNo, raceTitle, fresh),
-                    extras);
+                    extras, shareText);
             prefs.edit().putStringSet(prefKey, kept).apply();
             return Result.success();
         } catch (Exception e) {

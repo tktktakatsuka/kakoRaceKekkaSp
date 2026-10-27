@@ -30,6 +30,7 @@
     <string name="cd_mark">予想の印</string>
     <string name="cd_memo">メモ</string>
     <string name="cd_remove_favorite">推し馬から外す</string>
+    <string name="cd_decorate_card">カードを飾る</string>
     <string name="nav_home">ホーム</string>
     <string name="nav_entries">出走表</string>
     <string name="nav_results">結果</string>

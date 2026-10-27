@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat;
 
 import com.tktkcompany.kakoRaceKeiba.MainActivity;
 import com.tktkcompany.kakoRaceKeiba.R;
+import com.tktkcompany.kakoRaceKeiba.share.WinShare;
 
 /**
  * 通知チャンネルの作成と通知の表示をまとめたクラス。
@@ -91,6 +92,14 @@ public class NotificationHelper {
      */
     public static void show(Context context, String channelId, int notificationId, String title, String message,
                             @Nullable Bundle extras) {
+        show(context, channelId, notificationId, title, message, extras, null);
+    }
+
+    /**
+     * shareText を渡すと「🎉 シェア」ボタンを付ける（推し馬が勝ったとき）。押すと共有メニュー（X・LINE など）を開く
+     */
+    public static void show(Context context, String channelId, int notificationId, String title, String message,
+                            @Nullable Bundle extras, @Nullable String shareText) {
         if (!canPostNotifications(context)) return;
         createChannels(context);
 
@@ -107,6 +116,12 @@ public class NotificationHelper {
                 .setSmallIcon(R.drawable.uma)
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent);
+        if (shareText != null) {
+            // 通知を開く PendingIntent と区別するため、request code をずらす
+            PendingIntent share = PendingIntent.getActivity(context, notificationId + 1, WinShare.chooser(shareText),
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+            builder.addAction(0, Lang.t("🎉 シェア", "🎉 Share"), share);
+        }
 
         try {
             NotificationManagerCompat.from(context).notify(notificationId, builder.build());

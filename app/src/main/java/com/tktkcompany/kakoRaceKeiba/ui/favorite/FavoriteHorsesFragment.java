@@ -75,6 +75,10 @@ public class FavoriteHorsesFragment extends Fragment {
                 androidx.navigation.Navigation.findNavController(v).navigate(R.id.navigation_horseSearch));
 
         BannerAd.show(this, root.findViewById(R.id.ad_container), AdUnits.BANNER_FAVORITES);
+        // カードの飾り（アイコン・背景）を読んだら描き直す
+        CardStyles.load(() -> {
+            if (adapter != null) adapter.refresh();
+        });
         loadFavorites();
 
         return root;

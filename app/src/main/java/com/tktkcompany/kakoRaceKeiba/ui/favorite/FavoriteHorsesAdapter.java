@@ -10,6 +10,7 @@ import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -21,6 +22,7 @@ import com.google.android.material.card.MaterialCardView;
 import com.tktkcompany.kakoRaceKeiba.R;
 import com.tktkcompany.kakoRaceKeiba.db.HorseResult;
 import com.tktkcompany.kakoRaceKeiba.db.SupabaseManager;
+import com.tktkcompany.kakoRaceKeiba.share.WinShare;
 import com.tktkcompany.kakoRaceKeiba.ui.entries.EntryForm;
 import com.tktkcompany.kakoRaceKeiba.ui.entries.FavoriteHorseNames;
 import com.tktkcompany.kakoRaceKeiba.util.WeekendDays;
@@ -194,9 +196,19 @@ public class FavoriteHorsesAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         // 馬名（カードの空いたところ）を押すと馬カルテを開く
         holder.card.setOnClickListener(v -> androidx.navigation.Navigation.findNavController(v)
                 .navigate(R.id.navigation_horse, com.tktkcompany.kakoRaceKeiba.ui.horse.HorseFragment.args(name)));
+        // 🎨 か長押しで、アイコンと背景を選ぶ
+        holder.decorateButton.setOnClickListener(v -> CardStyles.showEditor(v.getContext(), name, displayName(name), this::refresh));
+        holder.card.setOnLongClickListener(v -> {
+            CardStyles.showEditor(v.getContext(), name, displayName(name), this::refresh);
+            return true;
+        });
+        holder.avatarContainer.removeAllViews();
+        View avatar = CardStyles.avatar(holder.avatarContainer.getContext(), name, 48);
+        avatar.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        holder.avatarContainer.addView(avatar);
 
         SupabaseManager.RaceEntry next = nextEntries.get(FavoriteHorseNames.normalize(name));
-        holder.card.setCardBackgroundColor(next != null ? 0xFFFFF8E1 : 0xFFFFFFFF);
+        CardStyles.applyBackground(holder.card, name, next != null ? 0xFFFFF8E1 : 0xFFFFFFFF);
         if (next == null) {
             holder.nextEntryView.setVisibility(View.GONE);
             holder.nextEntryView.setOnClickListener(null);
@@ -225,6 +237,27 @@ public class FavoriteHorsesAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         } else {
             holder.latestResultView.setText(resultLabel(Lang.t("前走", "Last"), latest));
             holder.latestResultView.setOnClickListener(v -> resultClickListener.onResultClick(latest));
+        }
+
+        // 表示している結果（速報か前走）が1着なら、勝利をシェアできるようにする。
+        // カードは使い回されるので、1着でないときは必ず隠す
+        HorseResult shown = isLive ? live : latest;
+        if (shown != null && WinShare.isWin(shown.tyaku)) {
+            holder.shareButton.setText(Lang.t("🎉 勝利をシェア", "🎉 Share the win"));
+            holder.shareButton.setVisibility(View.VISIBLE);
+            holder.shareButton.setOnClickListener(v -> WinShare.open(v.getContext(),
+                    WinShare.text(name, nz(shown.kaisaibi), nz(shown.kaisaijo), raceNo(shown.raceNo), shown.raceTitle)));
+        } else {
+            holder.shareButton.setVisibility(View.GONE);
+            holder.shareButton.setOnClickListener(null);
+        }
+    }
+
+    private static int raceNo(String raceNo) {
+        try {
+            return Integer.parseInt(nz(raceNo).trim());
+        } catch (NumberFormatException e) {
+            return 0;
         }
     }
 
@@ -291,6 +324,9 @@ public class FavoriteHorsesAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         TextView latestResultView;
         TextView nextEntryView;
         ImageButton deleteButton;
+        FrameLayout avatarContainer;
+        TextView decorateButton;
+        TextView shareButton;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -299,6 +335,9 @@ public class FavoriteHorsesAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             latestResultView = itemView.findViewById(R.id.text_latest_result);
             nextEntryView = itemView.findViewById(R.id.text_next_entry);
             deleteButton = itemView.findViewById(R.id.btn_delete);
+            avatarContainer = itemView.findViewById(R.id.avatar_container);
+            decorateButton = itemView.findViewById(R.id.btn_decorate);
+            shareButton = itemView.findViewById(R.id.btn_share_win);
         }
     }
 }
