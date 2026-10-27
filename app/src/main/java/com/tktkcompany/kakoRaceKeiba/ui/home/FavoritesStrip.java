@@ -52,6 +52,8 @@ final class FavoritesStrip {
         final String name;
         @Nullable SupabaseManager.RaceEntry next;
         @Nullable SupabaseManager.RaceResult last;
+        /** 今日走り終えたレースの速報（夜の取り込み前） */
+        @Nullable SupabaseManager.RaceResult live;
 
         Item(String name) {
             this.name = name;
