@@ -244,7 +244,7 @@ function raceList(races, extra) {
 async function favSection(today) {
   const list = favs();
   if (!list.length) {
-    return '<div class="card hint">☆ 推し馬を登録すると、ここに今週の出走予定が出ます。出馬表や馬のページで馬名の横の ☆ を押してください。</div>';
+    return '<div class="card hint" id="fav">☆ 推し馬を登録すると、ここに今週の出走予定が出ます。出馬表や馬のページで馬名の横の ☆ を押してください。</div>';
   }
   const inList = list.map(n => `"${n}"`).join(',');
   const runs = await query('race_entries',
@@ -257,7 +257,7 @@ async function favSection(today) {
       : '<span class="small">今週の出走予定なし</span>';
     return `<li><span class="fav on">★</span> ${horseLink(name)}<br>${where}</li>`;
   }).join('');
-  return `<h1>推し馬</h1><div class="card"><ul class="favs">${rows}</ul></div>`;
+  return `<h1 id="fav">推し馬</h1><div class="card"><ul class="favs">${rows}</ul></div>`;
 }
 
 async function renderHome() {
@@ -288,8 +288,10 @@ async function renderHome() {
       }
     }
   }
-  html += '<h2>レース結果</h2><div class="card"><a href="results.html">直近の開催の結果を見る →</a></div>';
+  html += '<a class="bigbtn" href="results.html">🏁 直近のレース結果を見る</a>';
   app.innerHTML = html + cta();
+  // 「推し馬」タブから来たときは、描き終わってからその場所へ動かす
+  if (location.hash === '#fav') document.getElementById('fav')?.scrollIntoView();
 }
 
 // ---------- レース：出馬表・結果・払い戻し ----------
