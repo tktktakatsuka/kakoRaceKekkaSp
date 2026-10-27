@@ -45,7 +45,7 @@ final class SpotlightCard {
     private static final int GRAY = 0xFF757575;
     private static final int INK = 0xFF1B1B1B;
     /** 読み込み中のカードと、読み込んだあとのカードの高さをそろえる（ガタつかないように） */
-    private static final int MIN_HEIGHT_DP = 132;
+    private static final int MIN_HEIGHT_DP = 168;
 
     private SpotlightCard() {
     }

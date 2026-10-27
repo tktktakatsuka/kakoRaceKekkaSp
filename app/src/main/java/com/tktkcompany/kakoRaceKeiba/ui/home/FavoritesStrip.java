@@ -75,6 +75,8 @@ final class FavoritesStrip {
     private List<Item> shown = new ArrayList<>();
     // 次走・前走を読み終えたか（読み終えるまでは主役を選ばない）
     private boolean shownLoaded;
+    // 最後に読み終えた推し馬の顔ぶれ（同じなら、読み直すあいだも今のカードを出したままにする）
+    @Nullable private Set<String> loadedFavorites;
 
     FavoritesStrip(FrameLayout spotlight, View section, LinearLayout container) {
         this.spotlight = spotlight;
@@ -89,9 +91,13 @@ final class FavoritesStrip {
             render(new ArrayList<>(), true);
             return;
         }
-        List<Item> items = new ArrayList<>();
-        for (String name : favorites) items.add(new Item(name));
-        render(items, false);
+        // ホームに戻るたびに「読み込み中…」に戻すとガタつくので、顔ぶれが同じなら今のカードを残して読み直す
+        if (!shownLoaded || !favorites.equals(loadedFavorites)) {
+            List<Item> items = new ArrayList<>();
+            for (String name : favorites) items.add(new Item(name));
+            render(items, false);
+        }
+        Set<String> snapshot = new java.util.HashSet<>(favorites);
         // カードの飾り（アイコン・背景）を読んだら描き直す
         CardStyles.load(() -> {
             if (gen == generation) render(shown, shownLoaded);
@@ -134,7 +140,9 @@ final class FavoritesStrip {
             }
             List<Item> sorted = sort(new ArrayList<>(byName.values()));
             main.post(() -> {
-                if (gen == generation) render(sorted, true);
+                if (gen != generation) return;
+                loadedFavorites = snapshot;
+                render(sorted, true);
             });
         });
     }

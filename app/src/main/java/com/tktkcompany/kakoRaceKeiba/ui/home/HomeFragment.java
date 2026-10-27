@@ -92,6 +92,8 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull String message) {
+                // 読み込めなかったときも、くるくるを止める
+                if (binding != null) binding.progressHome.setVisibility(View.GONE);
                 Toast.makeText(getContext(), Lang.t("データの読み込みに失敗しました", "Couldn't load data"), Toast.LENGTH_SHORT).show();
             }
         });
@@ -112,8 +114,10 @@ public class HomeFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        // 古い画面の部品を持ち続けないよう、次に画面を作ったときに作り直す
+        // 古い画面の部品を持ち続けないよう、次に画面を作ったときに作り直す。
+        // binding も空にして、画面が無くなったあとに返ってきた読み込み（推し馬・メインレース）が何もしないようにする
         favoritesStrip = null;
+        binding = null;
     }
 
 
@@ -170,6 +174,10 @@ public class HomeFragment extends Fragment {
             return;
         }
         binding.spotlightContainer.setVisibility(View.VISIBLE);
+        // 推し馬の一覧を読み終えるまでも主役のカードの場所を取っておく（あとから現れて下が押し下げられないように）
+        if (binding.spotlightContainer.getChildCount() == 0) {
+            binding.spotlightContainer.addView(SpotlightCard.loading(requireContext()));
+        }
         FavoriteHorseNames.load(favorites -> {
             if (binding == null) return;
             if (favoritesStrip == null) {

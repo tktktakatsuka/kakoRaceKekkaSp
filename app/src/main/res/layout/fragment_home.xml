@@ -114,14 +114,6 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- メインレースを読み込んでいる間だけ出す -->
-            <ProgressBar
-                android:id="@+id/progress_home"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginVertical="24dp" />
-
             <!-- 主役のカード（推し馬1頭を大きく。推し馬がいなければ見つける案内）。中身は SpotlightCard がコードで作る -->
             <FrameLayout
                 android:id="@+id/spotlight_container"
@@ -191,6 +183,14 @@
                         android:paddingVertical="6dp" />
                 </HorizontalScrollView>
             </LinearLayout>
+
+            <!-- メインレースを読み込んでいる間だけ出す。主役のカードより下に置き、消えても上のカードが動かないようにする -->
+            <ProgressBar
+                android:id="@+id/progress_home"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginVertical="24dp" />
 
             <!-- 最新の開催日のメインレース結果（開催日も含めていつも出す） -->
             <LinearLayout
