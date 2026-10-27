@@ -229,11 +229,14 @@ function groupRaces(rows) {
     a.kaisaibi.localeCompare(b.kaisaibi) || courseSort(a.kaisaijo, b.kaisaijo) || a.race_no - b.race_no);
 }
 
+// 一覧では左に「1R」を出すので、題名の頭の「1R 」は外す
+const listTitle = title => (title || '').replace(/^\s*\d{1,2}R\s*/, '') || title;
+
 function raceList(races, extra) {
   return `<ul class="races">${races.map(r => `
     <li><a href="${raceUrl(r.kaisaibi, r.kaisaijo, r.race_no)}">
       <span class="no">${r.race_no}R</span>
-      <span class="title">${titleHtml(r.race_title)}${extra ? extra(r) : ''}</span>
+      <span class="title">${titleHtml(listTitle(r.race_title))}${extra ? extra(r) : ''}</span>
       <span class="info">${esc([startTime(r.race_info), courseLabel(r.race_info)].filter(Boolean).join(' '))}</span>
     </a></li>`).join('')}</ul>`;
 }
@@ -252,7 +255,7 @@ async function favNextRuns(list, today) {
   return next;
 }
 const nextRunHtml = r => (r
-  ? `<a href="${raceUrl(r.kaisaibi, r.kaisaijo, r.race_no)}">${dateLabel(r.kaisaibi)} ${esc(r.kaisaijo)}${r.race_no}R ${titleHtml(r.race_title)}</a>`
+  ? `<a href="${raceUrl(r.kaisaibi, r.kaisaijo, r.race_no)}">${dateLabel(r.kaisaibi)} ${esc(r.kaisaijo)}${r.race_no}R ${titleHtml(listTitle(r.race_title))}</a>`
   : '<span class="small">今週の出走予定なし</span>');
 
 // 推し馬の今週の出走予定。推し馬がいなければ登録のしかたを案内する
@@ -263,17 +266,57 @@ async function favSection(today) {
   }
   const next = await favNextRuns(list, today);
   const rows = list.map(name => `<li><span class="fav on">★</span> ${horseLink(name)}<br>${nextRunHtml(next.get(name))}</li>`).join('');
-  return `<h1>推し馬</h1><div class="card"><ul class="favs">${rows}</ul>
+  return `<h2>${esc(currentMark())} 推し馬の出走予定</h2><div class="card"><ul class="favs">${rows}</ul>
     <a class="more" href="fav.html">メモ・着せ替え・シェアは推し馬ページへ ›</a></div>`;
+}
+
+// あと何日か（今日なら「今日」）
+function daysLeft(d, today) {
+  const t = v => Date.UTC(+v.slice(0, 4), +v.slice(4, 6) - 1, +v.slice(6, 8));
+  const n = Math.round((t(d) - t(today)) / 864e5);
+  return n <= 0 ? '今日' : n === 1 ? 'あした' : `あと${n}日`;
+}
+
+// 今週いちばん格の高いレース（同じ格なら早いほう）。重賞がなければ null
+function mainRace(races) {
+  return races.filter(r => isGraded(r.race_title))
+    .sort((a, b) => gradeOf(a.race_title) - gradeOf(b.race_title) || a.kaisaibi.localeCompare(b.kaisaibi))[0] || null;
+}
+
+// トップのいちばん上：今週の主役のレースと、「今週のレース」「レース結果」への大きな入り口
+function homeTop(races, today, latest) {
+  const main = mainRace(races);
+  const days = [...new Set(races.map(r => r.kaisaibi))];
+  let html = '';
+  if (main) {
+    const g = gradeOf(main.race_title);
+    html += `<a class="hero spot g${g}" href="${raceUrl(main.kaisaibi, main.kaisaijo, main.race_no)}">
+      <p class="when"><span class="tag">今週の主役</span> ${esc(daysLeft(main.kaisaibi, today))}</p>
+      <h1>${titleHtml(main.race_title)}</h1>
+      <p class="when">${dateLabel(main.kaisaibi)} ${esc(main.kaisaijo)}${main.race_no}R ${esc(startTime(main.race_info))}発走 ${esc(courseLabel(main.race_info))}</p>
+      <span class="go">出馬表を見る ›</span>
+    </a>`;
+  }
+  html += `<div class="doors">
+    <a class="door week" href="#week"><span class="ic">🏇</span><b>今週のレース</b>
+      <span>${races.length ? `${days.map(dateLabel).join('・')}<br>全${races.length}レース` : '木曜ごろに出ます'}</span></a>
+    <a class="door result" href="${latest ? `results.html?d=${latest}` : 'results.html'}"><span class="ic">🏁</span><b>レース結果</b>
+      <span>${latest ? `${dateLabel(latest)}の結果<br>払い戻しも` : '直近の結果'}</span></a>
+  </div>`;
+  return html;
 }
 
 async function renderHome() {
   const today = todayJst();
-  const entries = await queryAll('race_entries',
-    `select=kaisaibi,kaisaijo,race_no,race_title,race_info&kaisaibi=gte.${today}&order=kaisaibi.asc,kaisaijo.asc,race_no.asc,id.asc`);
+  const [entries, days] = await Promise.all([
+    queryAll('race_entries',
+      `select=kaisaibi,kaisaijo,race_no,race_title,race_info&kaisaibi=gte.${today}&order=kaisaibi.asc,kaisaijo.asc,race_no.asc,id.asc`),
+    raceDays().catch(() => []),
+  ]);
   const races = groupRaces(entries);
-  let html = await favSection(today);
-  html += '<h1>今週のレース</h1>';
+  let html = homeTop(races, today, days[0]?.kaisaibi);
+  html += await favSection(today);
+  html += '<h1 id="week" class="sec">🏇 今週のレース</h1>';
 
   if (!races.length) {
     html += '<p class="notice">今週の出馬表はまだ出ていません（例年、木曜ごろに出ます）。</p>';
@@ -425,8 +468,9 @@ async function renderResults() {
   for (const row of rows) if (row.rank === '1' && !winners[row.race_no]) winners[row.race_no] = row;
 
   const go = (dd, cc) => `results.html?d=${dd}&c=${enc(cc)}`;
-  let html = `<h1>レース結果</h1>
-    <p><select id="date">${dates.map(x => `<option value="${x}" ${x === d ? 'selected' : ''}>${x.slice(0, 4)}/${dateLabel(x)}</option>`).join('')}</select></p>
+  let html = `<div class="hero"><p class="when">🏁 レース結果</p><h1>${fullDate(d)} ${esc(c)}</h1>
+    <p class="when">レースを押すと、着順と払い戻しが見られます</p></div>
+    <p><select id="date" aria-label="開催日">${dates.map(x => `<option value="${x}" ${x === d ? 'selected' : ''}>${x.slice(0, 4)}/${dateLabel(x)}</option>`).join('')}</select></p>
     <div class="tabs">${courses.map(x => `<a href="${go(d, x)}" class="${x === c ? 'on' : ''}">${esc(x)}</a>`).join('')}</div>
     <div class="card">${raceList(races, r => {
       const w = winners[r.race_no];
@@ -492,11 +536,12 @@ async function renderHorse() {
 
 // 着せ替え。CSS の [data-theme] と、シェア画像の色（bg は上→下のグラデーション）。meta は theme.js と同じ色
 const THEMES = {
-  standard: { meta: '#2e7d32', label: 'スタンダード', bg: ['#1b5e20', '#43a047'], ink: '#ffffff', accent: '#fbc02d', card: 'rgba(255,255,255,.14)' },
-  sakura: { meta: '#e75480', label: 'さくら（かわいい）', bg: ['#ffd1e1', '#ff8fb8'], ink: '#5a1030', accent: '#ffffff', card: 'rgba(255,255,255,.55)' },
-  yume: { meta: '#9b6bd6', label: 'ゆめかわ', bg: ['#c9b6ff', '#9fe3f0'], ink: '#3a2766', accent: '#ffffff', card: 'rgba(255,255,255,.5)' },
-  noir: { meta: '#0d0d0f', label: 'ブラック×ゴールド（かっこいい）', bg: ['#000000', '#2a2a30'], ink: '#f3e2a9', accent: '#d4af37', card: 'rgba(212,175,55,.12)' },
-  navy: { meta: '#1a3d7c', label: '勝負服ネイビー', bg: ['#0f2552', '#1a3d7c'], ink: '#ffffff', accent: '#e53935', card: 'rgba(255,255,255,.12)' },
+  // deco: シェア画像の飾り（turf=芝のしま、petal=花びら、sparkle=きらきら、frame=金の額縁、stripe=勝負服のたすき）
+  standard: { meta: '#2e7d32', label: 'スタンダード', bg: ['#1b5e20', '#43a047'], ink: '#ffffff', accent: '#fbc02d', card: 'rgba(255,255,255,.14)', deco: 'turf' },
+  sakura: { meta: '#e75480', label: 'さくら（かわいい）', bg: ['#ffd1e1', '#ff8fb8'], ink: '#5a1030', accent: '#ffffff', card: 'rgba(255,255,255,.55)', deco: 'petal' },
+  yume: { meta: '#9b6bd6', label: 'ゆめかわ', bg: ['#c9b6ff', '#9fe3f0'], ink: '#3a2766', accent: '#ffffff', card: 'rgba(255,255,255,.5)', deco: 'sparkle' },
+  noir: { meta: '#0d0d0f', label: 'ブラック×ゴールド（かっこいい）', bg: ['#000000', '#2a2a30'], ink: '#f3e2a9', accent: '#d4af37', card: 'rgba(212,175,55,.12)', deco: 'frame' },
+  navy: { meta: '#1a3d7c', label: '勝負服ネイビー', bg: ['#0f2552', '#1a3d7c'], ink: '#ffffff', accent: '#e53935', card: 'rgba(255,255,255,.12)', deco: 'stripe' },
 };
 const MARKS = ['★', '💖', '🔥', '👑', '🐎', '🌸', '⚡'];
 const MEMO_KEY = 'favMemos';
@@ -535,7 +580,7 @@ function applyTheme(key) {
 }
 
 const absUrl = path => new URL(path, location.href).href;
-const raceLine = r => (r ? `${dateLabel(r.kaisaibi)} ${r.kaisaijo}${r.race_no}R ${r.race_title}` : '');
+const raceLine = r => (r ? `${dateLabel(r.kaisaibi)} ${r.kaisaijo}${r.race_no}R ${listTitle(r.race_title)}` : '');
 // X の投稿文。リンクは馬のページ（見た人も同じ成績が見られる）
 function shareText(name, next) {
   const memo = memoOf(name);
@@ -576,6 +621,48 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 const FONT = '"Hiragino Sans", "Noto Sans JP", sans-serif';
+// 着せ替えごとの背景の飾り
+function drawDeco(ctx, t, S) {
+  ctx.save();
+  if (t.deco === 'turf') {
+    // 芝刈りのしま模様
+    ctx.fillStyle = 'rgba(255,255,255,.06)';
+    for (let x = -S; x < S; x += 160) {
+      ctx.beginPath(); ctx.moveTo(x, S); ctx.lineTo(x + 80, S); ctx.lineTo(x + 80 + S, 0); ctx.lineTo(x + S, 0); ctx.fill();
+    }
+  } else if (t.deco === 'stripe') {
+    // 勝負服のたすき（赤白）
+    // 右上の角だけを斜めに横切らせる（名前やメモにかからないように）
+    ctx.translate(S * 0.8, -60);
+    ctx.rotate(-Math.PI / 5);
+    ctx.fillStyle = t.accent; ctx.fillRect(0, 0, 70, S * 1.6);
+    ctx.fillStyle = 'rgba(255,255,255,.9)'; ctx.fillRect(70, 0, 22, S * 1.6);
+  } else if (t.deco === 'petal' || t.deco === 'sparkle') {
+    const mark = t.deco === 'petal' ? '🌸' : '✦';
+    ctx.fillStyle = t.deco === 'petal' ? '#ffffff' : t.accent;
+    ctx.textBaseline = 'middle';
+    const spots = [[70, 150, 70], [960, 120, 90], [1010, 520, 54], [40, 600, 46], [930, 1010, 80], [110, 1010, 60], [540, 60, 40], [680, 1050, 44]];
+    for (const [x, y, size] of spots) {
+      ctx.globalAlpha = t.deco === 'petal' ? 0.55 : 0.7;
+      ctx.font = `${size}px ${FONT}`;
+      ctx.fillText(mark, x - size / 2, y);
+    }
+  } else if (t.deco === 'frame') {
+    // 金の二重の額縁
+    ctx.strokeStyle = t.accent;
+    ctx.lineWidth = 6; ctx.strokeRect(24, 24, S - 48, S - 48);
+    ctx.lineWidth = 2; ctx.strokeRect(40, 40, S - 80, S - 80);
+  }
+  ctx.restore();
+  // うすく推しマーク
+  ctx.save();
+  ctx.globalAlpha = 0.1;
+  ctx.fillStyle = t.accent;
+  ctx.font = `220px ${FONT}`;
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText(currentMark(), S - 300, S - 150);
+  ctx.restore();
+}
 // items: [{ name, memo, next }]。1頭なら大きく、複数ならリストにする
 function drawCard(items) {
   const t = THEMES[currentTheme()];
@@ -588,12 +675,7 @@ function drawCard(items) {
   g.addColorStop(1, t.bg[1]);
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, S, S);
-  // 背景にうすく推しマークを散らす
-  ctx.globalAlpha = 0.12;
-  ctx.fillStyle = t.accent;
-  ctx.font = `120px ${FONT}`;
-  for (const [x, y] of [[60, 200], [880, 160], [820, 980], [120, 940], [940, 600]]) ctx.fillText(currentMark(), x, y);
-  ctx.globalAlpha = 1;
+  drawDeco(ctx, t, S);
 
   ctx.fillStyle = t.ink;
   ctx.textBaseline = 'top';
@@ -669,6 +751,7 @@ async function renderFav() {
     <label class="small" for="favTitle">ページの名前（${TITLE_MAX}文字まで）</label>
     <input id="favTitle" class="text" maxlength="${TITLE_MAX}" value="${esc(load('favTitle') || '')}" placeholder="わたしの推し馬">
   </div>`;
+  if (list.length) html += '<h2>シェア画像のプレビュー</h2><div class="preview" id="preview"></div>';
 
   if (!list.length) {
     html += '<div class="card hint">☆ まだ推し馬がいません。出馬表や馬のページで馬名の横の ☆ を押すと、ここにメモ欄とシェアボタンが出ます。</div>';
@@ -690,6 +773,21 @@ async function renderFav() {
   app.innerHTML = html + cta();
 
   const sel = (attr, v) => [...app.querySelectorAll(`[${attr}]`)].find(el => el.getAttribute(attr) === v);
+  // 着せ替え・マーク・名前・メモを変えると、シェア画像の見本もすぐ変わる（打っている間は少し待ってから描く）
+  const preview = document.getElementById('preview');
+  let timer = 0;
+  const redraw = () => {
+    if (!preview) return;
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      const now = favs();
+      const items = now.length === 1
+        ? [{ name: now[0], memo: memoOf(now[0]), next: next.get(now[0]) }]
+        : now.map(name => ({ name, memo: memoOf(name) }));
+      preview.replaceChildren(items.length ? drawCard(items) : '');
+    }, 150);
+  };
+  redraw();
   app.addEventListener('input', e => {
     const name = e.target.dataset?.memo;
     if (name) {
@@ -700,6 +798,7 @@ async function renderFav() {
       store('favTitle', e.target.value.slice(0, TITLE_MAX));
       document.getElementById('title').textContent = favTitle();
     }
+    redraw();
   });
   app.addEventListener('click', e => {
     const b = e.target.closest('button');
@@ -715,7 +814,8 @@ async function renderFav() {
       store('favMark', d.markPick);
       document.getElementById('mark').textContent = d.markPick;
       for (const s of app.querySelectorAll('[data-mark-pick]')) s.classList.toggle('on', s === b);
-    } else if (d.shareX) {
+    }
+    if (d.themePick || d.markPick || d.fav) redraw(); else if (d.shareX) {
       openX(shareText(d.shareX, next.get(d.shareX)), absUrl(horseUrl(d.shareX)));
     } else if (d.shareImg) {
       const name = d.shareImg;
