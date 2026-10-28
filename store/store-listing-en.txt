@@ -1,0 +1,70 @@
+■ App name (max 30)
+Oshiuma Note: JRA Race Alerts
+
+■ Short description (max 80)
+Follow your favorite JRA horses: alerts when entered, before post time & results
+
+■ Full description (max 4000)
+When does your favorite horse run next?
+No more searching the race cards every week.
+Star a horse and Oshiuma Note tells you when it's entered, 30 minutes before post time, and as soon as the result is official.
+
+Works right after install. No sign-in needed.
+
+━━━━━━━━━━━━━━━
+Alerts that keep you in the loop
+━━━━━━━━━━━━━━━
+・Entry: when your horse is entered in a race (also for horses you've taken notes on)
+・Race day morning: a digest of your horses running today
+・30 minutes before post: with the current win odds and popularity
+・Right after the race: the official finishing position
+・Graded races: the top favorites and odds 30 minutes before post (can be turned off)
+
+━━━━━━━━━━━━━━━
+Find horses to follow
+━━━━━━━━━━━━━━━
+・Search by name and tap ☆ to follow
+・Not sure who to pick? Choose from this week's graded race runners or the most-followed horses
+・Your next runner appears big at the top of the home screen, with the rest lined up beside it
+
+━━━━━━━━━━━━━━━
+Make each horse's card your own
+━━━━━━━━━━━━━━━
+・Pick an icon (🏆 👑 🍀 🌸 and more) and a background color for every horse you follow
+・When your horse wins, share it on X, LINE and more with one tap
+
+━━━━━━━━━━━━━━━
+Horse profiles
+━━━━━━━━━━━━━━━
+・Next race and full race history on one screen
+・Records by turf/dirt, distance and racecourse to spot each horse's strengths
+・Keep notes and look back at them before the next race
+
+━━━━━━━━━━━━━━━
+Make picks and check them
+━━━━━━━━━━━━━━━
+・Mark ◎○▲△ on the race card and see how your picks did after the race
+・Win, top-2 and top-3 rates of your ◎ picks are tallied automatically
+・Record bets to track your return from the official payouts (record only — no betting in the app)
+
+━━━━━━━━━━━━━━━
+Everything for race day
+━━━━━━━━━━━━━━━
+・Race cards with each runner's recent form and hints such as layoffs, distance changes and jockey changes
+・Win and place odds, body weight, scratches, jockey changes, weather and track condition
+・Full results with draw colors and popularity, and payouts by bet type
+・Main race results from every racecourse on the home screen, G1 first
+・Course trends: upset rates, sires, jockeys and trainers by racecourse
+
+━━━━━━━━━━━━━━━
+Good to know
+━━━━━━━━━━━━━━━
+・Free to use (shows ads)
+・Race cards show the last 3 runs; watch an ad to see the last 10 for the rest of the day
+・No sign-in needed. Sign in with Google to keep your horses, notes and picks when you change phones
+・Requires an internet connection to load race cards, odds and results
+・The app is available in English, but horse names, race names and jockey names are shown in Japanese as published
+
+※ Covers JRA (Japan Racing Association) races. Results are available from October 2025 onward.
+※ You can't buy betting tickets in this app.
+※ We do our best to keep the information accurate, but it is not guaranteed. Please check the official announcements for final results and odds.
