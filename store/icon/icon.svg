@@ -1,31 +1,30 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108">
+  <!-- make-icon.js が書き出したもの。直すときは make-icon.js を直して書き出し直す -->
   <defs>
-    <linearGradient id="turf" x1="0" y1="0" x2="108" y2="108" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#35A853"/>
-      <stop offset="1" stop-color="#0F5C33"/>
-    </linearGradient>
-    <linearGradient id="gold" x1="30" y1="28" x2="78" y2="78" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#FFE27A"/>
-      <stop offset="1" stop-color="#F0A21B"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="108" y2="108" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFF1A8"/>
+      <stop offset="1" stop-color="#F5A623"/>
     </linearGradient>
   </defs>
-  <!-- background: turf with mowing stripes -->
-  <rect width="108" height="108" fill="url(#turf)"/>
-  <path d="M0,36 L36,0 L60,0 L0,60 Z M0,84 L84,0 L108,0 L0,108 Z M24,108 L108,24 L108,48 L48,108 Z M72,108 L108,72 L108,96 L96,108 Z" fill="#FFFFFF" fill-opacity="0.06"/>
-  <!-- foreground: horseshoe -->
-  <path d="M38,74 L34,52 A20,20 0 1 1 74,52 L70,74" fill="none" stroke="url(#gold)" stroke-width="9.5" stroke-linejoin="round"/>
-  <g fill="#0F5C33">
-    <circle cx="35.6" cy="61.5" r="1.5"/>
-    <circle cx="35.9" cy="43.5" r="1.5"/>
-    <circle cx="44" cy="34.7" r="1.5"/>
-    <circle cx="64" cy="34.7" r="1.5"/>
-    <circle cx="72.1" cy="43.5" r="1.5"/>
-    <circle cx="72.4" cy="61.5" r="1.5"/>
-  </g>
-  <!-- result bars -->
-  <g fill="#FFFFFF">
-    <rect x="43.5" y="63" width="5.6" height="11" rx="1.4"/>
-    <rect x="51.2" y="56" width="5.6" height="18" rx="1.4"/>
-    <rect x="58.9" y="48.5" width="5.6" height="25.5" rx="1.4"/>
-  </g>
+  <rect width="108" height="108" fill="url(#bg)"/>
+  <path d="M21,56a33,33 0,1 0,66,0a33,33 0,1 0,-66,0Z" fill="#FFFFFF" fill-opacity="0.35"/>
+  <path d="M36.5,44C31,28 35,19 45.5,31Z" fill="#D9944A" stroke="#6B4423" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M71.5,44C77,28 73,19 62.5,31Z" fill="#D9944A" stroke="#6B4423" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M38.5,40C36,31 37.5,27 42.5,32.5Z" fill="#F2B8A0"/>
+  <path d="M69.5,40C72,31 70.5,27 65.5,32.5Z" fill="#F2B8A0"/>
+  <path d="M32.5,57a21.5,24 0,1 0,43,0a21.5,24 0,1 0,-43,0Z" fill="#D9944A" stroke="#6B4423" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M42,38Q45,27 52,33Q55,25 61,32Q67,29 66,38Q60,43 54,40Q47,44 42,38Z" fill="#8B5A2B" stroke="#6B4423" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M42.1,54a3.4,3.9 0,1 0,6.8,0a3.4,3.9 0,1 0,-6.8,0Z" fill="#4A2E19"/>
+  <path d="M59.1,54a3.4,3.9 0,1 0,6.8,0a3.4,3.9 0,1 0,-6.8,0Z" fill="#4A2E19"/>
+  <path d="M45.45,52.6a1.25,1.25 0,1 0,2.5,0a1.25,1.25 0,1 0,-2.5,0Z" fill="#FFFFFF"/>
+  <path d="M62.45,52.6a1.25,1.25 0,1 0,2.5,0a1.25,1.25 0,1 0,-2.5,0Z" fill="#FFFFFF"/>
+  <path d="M35.4,63a3.6,2.2 0,1 0,7.2,0a3.6,2.2 0,1 0,-7.2,0Z" fill="#F08A8A" fill-opacity="0.75"/>
+  <path d="M65.4,63a3.6,2.2 0,1 0,7.2,0a3.6,2.2 0,1 0,-7.2,0Z" fill="#F08A8A" fill-opacity="0.75"/>
+  <path d="M39.5,71a14.5,9.8 0,1 0,29,0a14.5,9.8 0,1 0,-29,0Z" fill="#FBE3C4" stroke="#6B4423" stroke-width="2.2" stroke-linejoin="round"/>
+  <path d="M47.3,70.5a1.7,2.3 0,1 0,3.4,0a1.7,2.3 0,1 0,-3.4,0Z" fill="#6B4423"/>
+  <path d="M57.3,70.5a1.7,2.3 0,1 0,3.4,0a1.7,2.3 0,1 0,-3.4,0Z" fill="#6B4423"/>
+  <path d="M50.5,76Q54,78.8 57.5,76" fill="none" stroke="#6B4423" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M26,28.4l2.2399999999999998,3.36 3.36,2.2399999999999998 -3.36,2.2399999999999998 -2.2399999999999998,3.36 -2.2399999999999998,-3.36 -3.36,-2.2399999999999998 3.36,-2.2399999999999998Z" fill="#FFFFFF"/>
+  <path d="M82,73.5l1.8,2.6999999999999997 2.6999999999999997,1.8 -2.6999999999999997,1.8 -1.8,2.6999999999999997 -1.8,-2.6999999999999997 -2.6999999999999997,-1.8 2.6999999999999997,-1.8Z" fill="#FFFFFF"/>
+  <path d="M80,29l1.4000000000000001,2.1 2.1,1.4000000000000001 -2.1,1.4000000000000001 -1.4000000000000001,2.1 -1.4000000000000001,-2.1 -2.1,-1.4000000000000001 2.1,-1.4000000000000001Z" fill="#FFFFFF"/>
 </svg>

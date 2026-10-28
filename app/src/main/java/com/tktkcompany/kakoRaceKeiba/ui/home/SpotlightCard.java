@@ -151,6 +151,9 @@ final class SpotlightCard {
         inner.addView(body);
         MaterialButton button = new MaterialButton(context);
         button.setText(Lang.t("今週の重賞に出る馬から選ぶ", "Pick from this week's graded races"));
+        // テーマの文字色だと緑の上で読みにくいので、白にそろえる
+        button.setTextColor(0xFFFFFFFF);
+        button.setBackgroundTintList(android.content.res.ColorStateList.valueOf(GREEN));
         button.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.navigation_horseSearch));
         inner.addView(button, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         return card;

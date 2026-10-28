@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- store/icon/make-icon.js が書き出したもの。直すときは make-icon.js を直して書き出し直す -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
@@ -8,22 +9,14 @@
     <path android:pathData="M0,0h108v108h-108z">
         <aapt:attr name="android:fillColor">
             <gradient
-                android:endX="108"
-                android:endY="108"
+                android:type="linear"
                 android:startX="0"
                 android:startY="0"
-                android:type="linear">
-                <item
-                    android:color="#FF35A853"
-                    android:offset="0.0" />
-                <item
-                    android:color="#FF0F5C33"
-                    android:offset="1.0" />
+                android:endX="108"
+                android:endY="108">
+                <item android:offset="0" android:color="#FFF1A8" />
+                <item android:offset="1" android:color="#F5A623" />
             </gradient>
         </aapt:attr>
     </path>
-    <path
-        android:fillAlpha="0.06"
-        android:fillColor="#FFFFFF"
-        android:pathData="M0,36L36,0L60,0L0,60ZM0,84L84,0L108,0L0,108ZM24,108L108,24L108,48L48,108ZM72,108L108,72L108,96L96,108Z" />
 </vector>
