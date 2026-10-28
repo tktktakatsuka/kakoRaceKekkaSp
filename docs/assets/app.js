@@ -1,4 +1,4 @@
-// 競馬 過去レース結果 Web版。Supabase の公開キーで、アプリと同じテーブルを読むだけのページ。
+// 推し馬ノート Web版。Supabase の公開キーで、アプリと同じテーブルを読むだけのページ。
 // 接続先は docs/config.js（リポジトリに入れて直接編集する）の window.KEIBA_CONFIG から読む。
 
 const CONFIG = window.KEIBA_CONFIG || {};
@@ -362,7 +362,7 @@ async function renderRace() {
   }
   const title = (head.race_title || '').trim() || `${c}${r}R`;
   const info = head.race_info || head.hassou_time || '';
-  document.title = `${title} ${results.length ? '結果' : '出馬表'} | 競馬 過去レース結果`;
+  document.title = `${title} ${results.length ? '結果' : '出馬表'} | 推し馬ノート`;
 
   const g = gradeOf(title);
   let html = `<div class="hero${g ? ` g${g}` : ''}">
@@ -490,7 +490,7 @@ async function renderHorse() {
   const name = (new URLSearchParams(location.search).get('n') || '').trim();
   // 馬名は問い合わせに入るので、長すぎるものや記号だけのものは受け付けない
   if (!validHorseName(name)) { location.replace('./'); return; }
-  document.title = `${name}の過去レース結果 | 競馬 過去レース結果`;
+  document.title = `${name}の過去レース結果 | 推し馬ノート`;
 
   const [runs, next] = await Promise.all([
     query('race_results', `select=kaisaibi,kaisaijo,race_no,race_title,hassou_time,rank,popular,win_odds,jockey,time,nobori,age,weight&horse_name=eq.${enc(name)}&order=kaisaibi.desc&limit=300`, HOUR),
@@ -716,7 +716,7 @@ function drawCard(items) {
     }
   }
   ctx.font = `28px ${FONT}`;
-  ctx.fillText('競馬 過去レース結果　tktktakatsuka.github.io/kakoRaceKekkaSp', 80, 970);
+  ctx.fillText('推し馬ノート　tktktakatsuka.github.io/kakoRaceKekkaSp', 80, 970);
   return cv;
 }
 // iPhone なら共有シート（写真に保存・X・LINE など）を出す。出せなければ画像をダウンロード
