@@ -192,13 +192,15 @@ final class FavoritesStrip {
     }
 
     private View card(Context context, Item item) {
-        MaterialCardView card = baseCard(context, 0xFFFFFFFF);
-        CardStyles.applyBackground(card, item.name, item.next != null ? 0xFFFFF8E1 : 0xFFFFFFFF);
+        // 文字の色は主役のカードと同じ（淡い背景の上なので、夜のテーマでも昼の色）
+        MaterialCardView card = baseCard(context, SpotlightCard.SPOT);
+        CardStyles.applyBackground(card, item.name, SpotlightCard.SPOT);
         LinearLayout inner = (LinearLayout) card.getChildAt(0);
         inner.addView(CardStyles.avatar(context, item.name, 44));
 
-        TextView name = text(context, item.name, 15, 0xFF1B1B1B, true);
-        name.setMaxLines(2);
+        TextView name = text(context, item.name, 15, SpotlightCard.INK, true);
+        // 名前は1行（長いときは「…」）。折り返すとカードの高さがそろわない
+        name.setMaxLines(1);
         name.setEllipsize(TextUtils.TruncateAt.END);
         name.setPadding(0, HorseViews.dp(context, 8), 0, HorseViews.dp(context, 4));
         inner.addView(name);
@@ -207,22 +209,22 @@ final class FavoritesStrip {
             SupabaseManager.RaceEntry e = item.next;
             Matcher m = START.matcher(e.getRaceInfo() != null ? e.getRaceInfo() : "");
             String time = m.find() ? " " + Integer.parseInt(m.group(1)) + ":" + m.group(2) : "";
-            inner.addView(text(context, Lang.t("▶ 次走", "▶ Next"), 11, 0xFFE65100, true));
-            inner.addView(text(context, WeekendDays.formatCompact(e.getKaisaibi()) + time, 13, 0xFFE65100, true));
-            inner.addView(text(context, Lang.race(e.getKaisaijo(), e.getRaceNo()), 13, 0xFF5D4037, false));
+            inner.addView(text(context, Lang.t("次走", "Next"), 11, SpotlightCard.SOFT, true));
+            inner.addView(text(context, WeekendDays.formatCompact(e.getKaisaibi()) + time, 13, SpotlightCard.INK, true));
+            inner.addView(text(context, Lang.race(e.getKaisaijo(), e.getRaceNo()), 13, SpotlightCard.SOFT, false));
         } else if (item.last != null) {
             SupabaseManager.RaceResult r = item.last;
             LinearLayout row = new LinearLayout(context);
             row.setOrientation(LinearLayout.HORIZONTAL);
             row.setGravity(Gravity.CENTER_VERTICAL);
             row.addView(HorseViews.rankBadge(context, r.getRank(), 26));
-            TextView label = text(context, "  " + Lang.t("前走", "Last"), 12, 0xFF757575, false);
+            TextView label = text(context, "  " + Lang.t("前走", "Last"), 12, SpotlightCard.SOFT, false);
             row.addView(label);
             inner.addView(row);
             inner.addView(text(context, WeekendDays.formatCompact(r.getKaisaibi()) + " " + Lang.race(r.getKaisaijo(), r.getRaceNo()),
-                    12, 0xFF757575, false));
+                    12, SpotlightCard.SOFT, false));
         } else {
-            inner.addView(text(context, Lang.t("出走予定を待っています", "Waiting for an entry"), 12, 0xFF9E9E9E, false));
+            inner.addView(text(context, Lang.t("出走予定を待っています", "Waiting for an entry"), 12, SpotlightCard.SOFT, false));
         }
         card.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.navigation_horse, HorseFragment.args(item.name)));
         // 長押しで、アイコンと背景を選ぶ
@@ -235,15 +237,15 @@ final class FavoritesStrip {
 
     /** 最後の「＋ 馬を追加」 */
     private View addCard(Context context) {
-        MaterialCardView card = baseCard(context, 0xFFE8F5E9);
+        MaterialCardView card = baseCard(context, 0xFFFFF1C9);
         card.setCardElevation(0);
         LinearLayout inner = (LinearLayout) card.getChildAt(0);
         inner.setGravity(Gravity.CENTER);
         inner.setMinimumHeight(HorseViews.dp(context, 150));
-        TextView plus = text(context, "＋", 34, 0xFF2E7D32, true);
+        TextView plus = text(context, "＋", 34, SpotlightCard.AMBER, true);
         plus.setGravity(Gravity.CENTER);
         inner.addView(plus);
-        TextView label = text(context, Lang.t("馬を追加", "Add a horse"), 14, 0xFF2E7D32, true);
+        TextView label = text(context, Lang.t("馬を追加", "Add a horse"), 14, SpotlightCard.BROWN, true);
         label.setGravity(Gravity.CENTER);
         inner.addView(label);
         card.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.navigation_horseSearch));

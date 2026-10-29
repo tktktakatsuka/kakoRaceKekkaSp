@@ -11,7 +11,13 @@
         <item name="colorSurface">@color/oshi_surface</item>
         <item name="colorOnSurface">@color/oshi_ink</item>
         <item name="colorOnSurfaceVariant">@color/oshi_ink_soft</item>
+        <!-- Material 3 のカード・ダイアログ・メニューが使う面。灰色にならないよう、白とクリームにそろえる -->
+        <item name="colorSurfaceContainerLowest">@color/oshi_surface</item>
+        <item name="colorSurfaceContainerLow">@color/oshi_surface</item>
         <item name="colorSurfaceContainer">@color/oshi_nav</item>
+        <item name="colorSurfaceContainerHigh">@color/oshi_surface</item>
+        <item name="colorSurfaceContainerHighest">@color/oshi_nav</item>
+        <item name="colorSurfaceVariant">@color/oshi_nav</item>
         <item name="android:colorBackground">@color/oshi_bg</item>
         <item name="colorOnBackground">@color/oshi_ink</item>
         <item name="colorOutline">@color/oshi_line</item>

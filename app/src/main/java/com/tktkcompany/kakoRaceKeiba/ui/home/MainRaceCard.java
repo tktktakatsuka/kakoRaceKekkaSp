@@ -48,7 +48,8 @@ final class MainRaceCard {
         float density = parent.getResources().getDisplayMetrics().density;
 
         int[] colors = HEADER[grade - 1];
-        GradientDrawable header = new GradientDrawable(GradientDrawable.Orientation.TL_BR, colors);
+        // 上の面はアプリの色（濃い茶）。グレードの色は、下のバッジに残す
+        GradientDrawable header = new GradientDrawable(GradientDrawable.Orientation.TL_BR, new int[]{0xFF5A3A1A, 0xFF8B5A2B});
         card.findViewById(R.id.header).setBackground(header);
 
         TextView gradeView = card.findViewById(R.id.grade);
@@ -57,10 +58,10 @@ final class MainRaceCard {
             gradeView.setText(label);
             GradientDrawable chip = new GradientDrawable();
             chip.setCornerRadius(12 * density);
-            // G1 は金色で目立たせる
-            chip.setColor(grade == MainRaces.G1 ? 0xFFFFD54F : 0xFFFFFFFF);
+            // G1 は金色で目立たせる。ほかはグレードの色の札に白い文字
+            chip.setColor(grade == MainRaces.G1 ? 0xFFFFD54F : colors[0]);
             gradeView.setBackground(chip);
-            gradeView.setTextColor(grade == MainRaces.G1 ? 0xFF3E2723 : colors[0]);
+            gradeView.setTextColor(grade == MainRaces.G1 ? 0xFF3E2723 : 0xFFFFFFFF);
         } else {
             gradeView.setVisibility(View.GONE);
         }
