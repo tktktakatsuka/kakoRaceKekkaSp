@@ -19,7 +19,7 @@
         android:background="?attr/selectableItemBackground"
         android:gravity="center"
         android:paddingHorizontal="12dp"
-        android:textColor="@color/oshi_ink_soft"
+        android:textColor="#56664A"
         android:textSize="14sp" />
 
     <androidx.viewpager2.widget.ViewPager2
