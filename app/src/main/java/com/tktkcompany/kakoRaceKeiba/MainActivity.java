@@ -15,6 +15,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
@@ -76,6 +77,8 @@ public class MainActivity extends AppCompatActivity {
     private ActivityResultLauncher<Intent> googleSignInLauncher;
     // 通知権限（Android 13以降）のリクエスト用
     private ActivityResultLauncher<String> notificationPermissionLauncher;
+    // 退会の本人確認のための Google ログイン中なら true（ログインできたら、つなぎ替えではなく退会を続ける）
+    private boolean reauthForDelete;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,9 +103,12 @@ public class MainActivity extends AppCompatActivity {
                             }
                         } catch (ApiException e) {
                             Log.w(TAG, "Google sign in failed", e);
+                            reauthForDelete = false;
                             Toast.makeText(this, Lang.t("Googleサインインに失敗しました", "Google sign-in failed"), Toast.LENGTH_SHORT).show();
                             updateHomeFragmentUI(null);
                         }
+                    } else {
+                        reauthForDelete = false;
                     }
                 }
         );
@@ -277,10 +283,12 @@ public class MainActivity extends AppCompatActivity {
                                 firebaseAuthWithGoogle(idToken);
                             } catch (Exception e) {
                                 Log.e(TAG, "GoogleIdTokenCredential の作成に失敗", e);
+                                reauthForDelete = false;
                                 updateHomeFragmentUI(null);
                             }
                         } else {
                             Log.w(TAG, "取得した Credential が Google ID トークンではありませんでした。");
+                            reauthForDelete = false;
                             Toast.makeText(MainActivity.this, Lang.t("ログインに失敗しました。", "Sign-in failed."), Toast.LENGTH_SHORT).show();
                             updateHomeFragmentUI(null);
                         }
@@ -293,6 +301,7 @@ public class MainActivity extends AppCompatActivity {
                             launchGoogleSignInFallback();
                         } else {
                             Log.e(TAG, "GetCredential failed", e);
+                            reauthForDelete = false;
                             Toast.makeText(MainActivity.this, Lang.t("ログイン処理でエラーが発生しました。", "An error occurred while signing in."), Toast.LENGTH_SHORT).show();
                         }
                         updateHomeFragmentUI(null);
@@ -321,6 +330,42 @@ public class MainActivity extends AppCompatActivity {
         ensureGuest();
     }
 
+    /**
+     * 退会処理（HomeFragment で確認したあとに呼ばれる）。データとアカウントを消し、新しい匿名アカウントで入り直す
+     */
+    public void deleteAccount() {
+        Toast.makeText(this, Lang.t("アカウントを削除しています…", "Deleting your account…"), Toast.LENGTH_SHORT).show();
+        GuestAccount.deleteAccount(result -> {
+            if (isFinishing() || isDestroyed()) return;
+            switch (result) {
+                case DELETED:
+                    mAuth.signOut();
+                    refreshAdFree();
+                    new ViewModelProvider(this).get(SharedViewModel.class).setUid(null);
+                    updateHomeFragmentUI(null);
+                    Toast.makeText(this, Lang.t("アカウントを削除しました。", "Your account has been deleted."), Toast.LENGTH_LONG).show();
+                    ensureGuest();
+                    break;
+                case NEEDS_SIGN_IN:
+                    new AlertDialog.Builder(this)
+                            .setTitle(Lang.t("本人確認", "Confirm it's you"))
+                            .setMessage(Lang.t("アカウントを削除するには、もう一度 Google でログインしてください。",
+                                    "To delete your account, please sign in with Google again."))
+                            .setPositiveButton(Lang.t("ログイン", "Sign in"), (d, w) -> {
+                                reauthForDelete = true;
+                                signInWithGoogle();
+                            })
+                            .setNegativeButton(Lang.t("キャンセル", "Cancel"), null)
+                            .show();
+                    break;
+                default:
+                    Toast.makeText(this, Lang.t("アカウントを削除できませんでした。通信状態を確かめて、もう一度お試しください。",
+                            "Couldn't delete your account. Check your connection and try again."), Toast.LENGTH_LONG).show();
+                    break;
+            }
+        });
+    }
+
     /** ログインしていなければ匿名で入る（お気に入り馬・メモ・予想をログインなしで使えるように） */
     private void ensureGuest() {
         GuestAccount.ensure((user, success) -> {
@@ -338,6 +383,20 @@ public class MainActivity extends AppCompatActivity {
 
     private void firebaseAuthWithGoogle(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
+        if (reauthForDelete) {
+            reauthForDelete = false;
+            GuestAccount.reauthenticate(credential, (user, success) -> {
+                if (isFinishing()) return;
+                if (success) {
+                    deleteAccount();
+                } else {
+                    // 別の Google アカウントを選んだときなども、ここに来る
+                    Toast.makeText(this, Lang.t("本人確認ができませんでした。ログイン中と同じ Google アカウントを選んでください。",
+                            "Couldn't confirm it's you. Choose the Google account you're signed in with."), Toast.LENGTH_LONG).show();
+                }
+            });
+            return;
+        }
         // ログインせずに使っていたお気に入り・メモ・予想は、Google アカウントに引き継ぐ
         GuestAccount.signIn(credential, (user, success) -> {
             if (isFinishing()) return;

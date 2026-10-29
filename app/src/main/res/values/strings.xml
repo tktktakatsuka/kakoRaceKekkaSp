@@ -12,6 +12,7 @@
     <string name="login_google">Sign in with Google</string>
     <string name="login_benefit">Favorites, notes and picks work without signing in. Sign in with Google to keep them when you change phones</string>
     <string name="signed_in">Signed in</string>
+    <string name="delete_account">Delete account</string>
     <string name="logout">Sign out</string>
     <string name="race_results">Race results</string>
     <string name="see_details">Details &gt;</string>

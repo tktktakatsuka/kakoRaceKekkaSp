@@ -81,6 +81,8 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        binding.textDeleteAccount.setOnClickListener(v -> confirmDeleteAccount());
+
         // Supabaseから開催中の競馬場リストを取得
         SupabaseManager.fetchActiveCourses(new SupabaseManager.SupabaseCallback<List<String>>() {
             @Override
@@ -257,6 +259,21 @@ public class HomeFragment extends Fragment {
         for (List<SupabaseManager.RaceResult> race : races) {
             container.addView(MainRaceCard.create(inflater, container, race));
         }
+    }
+
+    /** 退会。元に戻せないので、何が消えるかを伝えてから確認する */
+    private void confirmDeleteAccount() {
+        new AlertDialog.Builder(requireContext())
+                .setTitle(Lang.t("アカウントを削除しますか？", "Delete your account?"))
+                .setMessage(Lang.t("推し馬・メモ・予想・買い目がすべて消え、元に戻せません。\nGoogle アカウントそのものは消えません。",
+                        "All your favorites, notes, picks and bets will be deleted. This can't be undone.\nYour Google account itself won't be deleted."))
+                .setPositiveButton(Lang.t("削除する", "Delete"), (dialog, which) -> {
+                    if (getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).deleteAccount();
+                    }
+                })
+                .setNegativeButton(Lang.t("キャンセル", "Cancel"), null)
+                .show();
     }
 
     /** 「ほかの推し馬」の見出しの右の「🔔 通知の設定 ›」 */

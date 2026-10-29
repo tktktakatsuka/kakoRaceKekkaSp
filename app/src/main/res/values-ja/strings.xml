@@ -12,6 +12,7 @@
     <string name="login_google">Googleでログイン</string>
     <string name="login_benefit">推し馬・メモ・予想はログインなしで使えます。Google でログインすると、機種変更しても引き継げます</string>
     <string name="signed_in">ログイン中</string>
+    <string name="delete_account">アカウントを削除</string>
     <string name="logout">ログアウト</string>
     <string name="race_results">レース結果</string>
     <string name="see_details">詳細を見る &gt;</string>
