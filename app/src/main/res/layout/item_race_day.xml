@@ -6,7 +6,7 @@
     android:layout_marginVertical="4dp"
     android:clickable="true"
     android:focusable="true"
-    app:cardCornerRadius="8dp"
+    app:cardCornerRadius="16dp"
     app:cardElevation="1dp">
 
     <LinearLayout
@@ -22,7 +22,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="88dp"
-            android:textColor="#2E7D32"
+            android:textColor="@color/oshi_primary"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -39,7 +39,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="#333333"
+                android:textColor="@color/oshi_ink"
                 android:textSize="15sp" />
 
             <!-- 補足（距離・頭数など）。使う画面だけ表示する -->
@@ -48,7 +48,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:textColor="#777777"
+                android:textColor="@color/oshi_ink_soft"
                 android:textSize="12sp"
                 android:visibility="gone" />
         </LinearLayout>
@@ -57,7 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="›"
-            android:textColor="#999999"
+            android:textColor="@color/oshi_ink_soft"
             android:textSize="20sp" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

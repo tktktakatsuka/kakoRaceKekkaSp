@@ -30,7 +30,7 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:gravity="center"
                 android:text="☆"
-                android:textColor="#BDBDBD"
+                android:textColor="@color/oshi_line"
                 android:textSize="22sp" />
 
             <!-- 自分の予想の印（タップで ◎→○→▲→△→なし。印が無い間は薄く「印」） -->
@@ -68,7 +68,7 @@
                 android:id="@+id/text_entry_jockey"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#555555"
+                android:textColor="@color/oshi_ink_soft"
                 android:textSize="13sp" />
 
             <!-- 馬メモ（タップで書く・直す。メモが無い間は薄く表示） -->
@@ -90,9 +90,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:background="#FFF59D"
+            android:background="@color/oshi_spot_to"
             android:padding="8dp"
-            android:textColor="#333333"
+            android:textColor="@color/oshi_ink"
             android:textSize="13sp"
             android:visibility="gone" />
 
@@ -102,7 +102,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:textColor="#333333"
+            android:textColor="@color/oshi_ink"
             android:textSize="14sp"
             android:visibility="gone" />
 
@@ -122,7 +122,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:textColor="#BF360C"
+            android:textColor="@color/oshi_accent"
             android:textSize="14sp"
             android:textStyle="bold"
             android:visibility="gone" />
