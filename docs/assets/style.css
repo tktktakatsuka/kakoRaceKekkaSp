@@ -1,10 +1,10 @@
 :root {
-  --bg: #f4f6f3;
+  --bg: #f5f5f5;
   --card: #ffffff;
-  --text: #1d2420;
-  --muted: #66706a;
-  --line: #e2e7e3;
-  --brand: #2e7d32;
+  --text: #1b1b1b;
+  --muted: #757575;
+  --line: #e0e0e0;
+  --brand: #4caf50;
   --brand-ink: #ffffff;
   --accent: #fbc02d;
   --grade: #c62828;
@@ -17,7 +17,7 @@
     --text: #e6ebe7;
     --muted: #9aa59e;
     --line: #2c3530;
-    --brand: #43a047;
+    --brand: #4caf50;
     --win: #3a3420;
   }
 }
@@ -334,3 +334,182 @@ h1.sec { scroll-margin-top: 64px; margin-top: 24px; }
 }
 :root[data-theme="standard"] .oshi, :root:not([data-theme]) .oshi { border-top: 4px solid var(--brand); }
 @media (prefers-reduced-motion: reduce) { .door:active, a.hero.spot:active { transform: none; } }
+
+/* ==========================================================
+   Android アプリ（推し馬ノート）に見た目を寄せる
+   緑の上部バーに画面の名前、下のメニューは ホーム／推し馬／出走表／結果、
+   カードは角丸16・影つき、次走はオレンジ、1着は赤（アプリの色をそのまま使う）
+   ========================================================== */
+:root { --green-dark: #2e7d32; --orange: #e65100; --red: #c62828; --cream: #fff8e1; --shadow: 0 1px 3px rgba(0, 0, 0, .12), 0 1px 2px rgba(0, 0, 0, .08); }
+@media (prefers-color-scheme: dark) { :root { --green-dark: #81c784; --orange: #ffb74d; --red: #ef9a9a; --cream: #2d2a1e; } }
+
+/* 上のバー */
+.top { min-height: 56px; padding: calc(env(safe-area-inset-top) + 8px) 16px 8px; gap: 20px; box-shadow: 0 2px 4px rgba(0, 0, 0, .18); }
+.top .ttl { font-size: 20px; font-weight: 500; letter-spacing: .02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.top .back { display: flex; width: 32px; height: 32px; margin-left: -6px; align-items: center; justify-content: center; color: inherit; }
+.top .back svg { width: 24px; height: 24px; fill: currentColor; }
+
+/* 下のメニュー（アプリの BottomNavigationView と同じ4つ） */
+.tabbar { grid-template-columns: repeat(4, 1fr); box-shadow: 0 -1px 4px rgba(0, 0, 0, .1); }
+.tabbar a { font-size: 12px; font-weight: 500; padding: 8px 2px 6px; }
+.tabbar a .ic { width: 24px; height: 24px; fill: currentColor; border-radius: 0; background: none; }
+.tabbar a.on { color: var(--brand); font-weight: 700; }
+.tabbar a.on .ic { background: none; transform: none; }
+
+/* カードの見た目をアプリと同じに（枠線なし・影・角丸16） */
+.card { border: 0; border-radius: 16px; box-shadow: var(--shadow); }
+h2.green, .sec-head h2 { color: var(--green-dark); font-size: 16px; }
+.small { color: var(--muted); }
+
+/* 緑のボタン（アプリの「＋ 馬を探して推し馬にする」） */
+.gbtn {
+  display: block; text-align: center; text-decoration: none; font-weight: 700; font-size: 15px;
+  padding: 13px; margin: 8px 0 12px; border-radius: 12px; background: var(--brand); color: #fff; box-shadow: var(--shadow);
+}
+
+/* 馬のアイコン（丸の中に絵文字。選んでいなければ馬の顔） */
+.ava {
+  flex: none; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%;
+  background: #e8f5e9; overflow: hidden; line-height: 1;
+}
+.ava img { width: 100%; height: 100%; object-fit: cover; }
+.ava.sm { width: 36px; height: 36px; font-size: 18px; }
+.ava.md { width: 48px; height: 48px; font-size: 24px; }
+.ava.lg { width: 60px; height: 60px; font-size: 30px; }
+
+/* 背景（アプリの CardStyles と同じ10色。左上→右下のグラデーション） */
+.bg-white { background: var(--card); }
+.bg-cream { background: var(--cream); }
+.bg-sakura { background: linear-gradient(135deg, #fff0f5, #f8bbd0); }
+.bg-wakakusa { background: linear-gradient(135deg, #f9fbe7, #c5e1a5); }
+.bg-sora { background: linear-gradient(135deg, #f1f8ff, #bbdefb); }
+.bg-yuyake { background: linear-gradient(135deg, #fff8e1, #ffcc80); }
+.bg-kin { background: linear-gradient(135deg, #fffde7, #ffe082); }
+.bg-fuji { background: linear-gradient(135deg, #faf5ff, #e1bee7); }
+.bg-mint { background: linear-gradient(135deg, #f0fbf9, #b2dfdb); }
+.bg-momiji { background: linear-gradient(135deg, #fff5f2, #ffab91); }
+.bg-kiri { background: linear-gradient(135deg, #ffffff, #e0e0e0); }
+/* 色つきの背景の上は、暗いテーマでも黒い字にする */
+[class*="bg-"]:not(.bg-white):not(.bg-cream) { color: #1b1b1b; }
+[class*="bg-"]:not(.bg-white):not(.bg-cream) .small, [class*="bg-"]:not(.bg-white):not(.bg-cream) .pv { color: #555; }
+[class*="bg-"]:not(.bg-white):not(.bg-cream) .nx { color: #e65100; }
+
+/* ホーム：次に走る推し馬（主役のカード） */
+.spot-card {
+  display: flex; gap: 14px; align-items: center; text-decoration: none; padding: 20px 16px;
+  border-radius: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, .14); margin: 4px 0 16px;
+}
+.sc-body { flex: 1; min-width: 0; }
+.spot-card p { margin: 0; }
+.spot-card .lead { font-size: 12px; font-weight: 700; color: var(--green-dark); }
+.spot-card .nm { display: block; font-size: 22px; font-weight: 700; margin: 2px 0 4px; text-decoration: none; }
+.nx { display: block; color: var(--orange); font-weight: 700; text-decoration: none; font-size: 15px; }
+.nx span { font-weight: 400; font-size: 14px; }
+.nx .grade { font-weight: 700; }
+.pv { display: block; color: var(--muted); font-size: 13px; margin-top: 4px; text-decoration: none; }
+.big-rank { font-size: 26px; font-weight: 800; }
+.big-rank.win { color: var(--red); }
+
+/* 推し馬がいないときの案内（アプリと同じうすい緑） */
+.onboard { background: #e8f5e9; color: #1b1b1b; border-radius: 16px; padding: 18px 16px 4px; margin: 4px 0 16px; box-shadow: var(--shadow); }
+.onboard p { margin: 0 0 10px; font-size: 13px; color: #333; }
+.onboard .nm { font-size: 18px; font-weight: 700; color: #1b5e20; }
+
+/* ホーム：ほかの推し馬（横に流れる小さいカード） */
+.sec-head { display: flex; align-items: baseline; justify-content: space-between; margin: 8px 0 0; }
+.sec-head h2 { margin: 12px 0 8px; }
+.sec-head a { font-size: 13px; font-weight: 700; color: var(--green-dark); text-decoration: none; }
+.strip { display: flex; gap: 10px; overflow-x: auto; padding: 2px 2px 10px; margin: 0 -16px; padding-left: 16px; scroll-snap-type: x mandatory; }
+.strip::after { content: ""; flex: 0 0 6px; }
+.mini {
+  flex: 0 0 132px; scroll-snap-align: start; display: flex; flex-direction: column; gap: 2px; padding: 12px;
+  border-radius: 16px; text-decoration: none; box-shadow: var(--shadow); min-height: 150px;
+}
+.mini b { font-size: 15px; margin-top: 8px; line-height: 1.3; }
+.mini .nx-l, .nx-l { color: var(--orange); font-size: 11px; font-weight: 700; margin: 0; }
+.nx-l.blue { color: #1565c0; }
+.mini .nx-d { color: var(--orange); font-weight: 700; font-size: 14px; }
+.mini.add { background: var(--card); border: 2px dashed var(--line); box-shadow: none; justify-content: center; align-items: center; text-align: center; }
+.mini.add .ava { background: var(--bg); color: var(--brand); font-size: 22px; font-weight: 700; }
+
+/* メインレース（格ごとの色の見出し＋1〜3着。アプリの MainRaceCard と同じ色） */
+.mrace { display: block; text-decoration: none; background: var(--card); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); margin: 8px 0 14px; }
+.mr-head { padding: 14px 16px; color: #fff; background: linear-gradient(135deg, #37474f, #607d8b); }
+.mr-head p { margin: 0; font-size: 13px; opacity: .95; }
+.mr-head .mr-name { font-size: 24px; font-weight: 800; opacity: 1; margin: 2px 0; }
+.mg1 { background: linear-gradient(135deg, #0d47a1, #1e88e5); }
+.mg2 { background: linear-gradient(135deg, #b71c1c, #e53935); }
+.mg3 { background: linear-gradient(135deg, #1b5e20, #43a047); }
+.chip { display: inline-block; font-size: 12px; font-weight: 800; padding: 2px 10px; border-radius: 12px; margin-right: 8px; background: #fff; }
+.chip.g1 { background: #ffd54f; color: #3e2723; }
+.chip.g2 { color: #b71c1c; }
+.chip.g3 { color: #1b5e20; }
+.mr-rows { padding: 4px 16px; }
+.mr-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-top: 1px solid var(--line); }
+.mr-row:first-child { border-top: 0; }
+.mr-h { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.mr-h b { font-size: 15px; }
+.mr-odds { font-size: 14px; font-weight: 700; white-space: nowrap; }
+.mr-odds.gold { color: #b8860b; }
+.mr-more { margin: 0; padding: 10px 16px 12px; text-align: right; font-size: 13px; font-weight: 700; color: var(--green-dark); border-top: 1px solid var(--line); }
+.medal {
+  display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; flex: none;
+  border-radius: 50%; font-size: 13px; font-weight: 700; background: #eeeeee; color: #555;
+}
+.medal.m1 { background: #d4a017; color: #fff; }
+.medal.m2 { background: #9e9e9e; color: #fff; }
+.medal.m3 { background: #b0703c; color: #fff; }
+.mr-row .waku { min-width: 1.8em; padding: 1px 0; }
+
+/* レース：上のカード */
+.race-head { padding: 14px 16px; }
+.race-head h1 { margin: 0 0 2px; font-size: 19px; }
+.race-head p { margin: 0; }
+
+/* 推し馬ページのカード（アプリの item_favorite_horse） */
+.oshi { border: 0 !important; border-radius: 16px; padding: 12px 6px 10px 14px; margin: 10px 0; box-shadow: var(--shadow); }
+.o-row { display: flex; gap: 12px; align-items: center; }
+.o-body { flex: 1; min-width: 0; }
+.o-name { display: block; font-size: 18px; font-weight: 700; text-decoration: none; margin-bottom: 2px; }
+.o-side { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.ic-btn { font: inherit; font-size: 18px; width: 40px; height: 40px; border: 0; background: none; cursor: pointer; border-radius: 50%; }
+.o-side .fav { width: 40px; height: 40px; font-size: 20px; }
+.oshi .memo { margin-top: 10px; width: calc(100% - 8px); background: rgba(255, 255, 255, .7); color: #1b1b1b; }
+.oshi .memo-foot { padding-right: 8px; }
+.deco { margin: 10px 8px 0 0; padding: 10px; border-radius: 12px; background: rgba(255, 255, 255, .85); color: #1b1b1b; }
+.deco .small { margin: 0 0 6px; }
+.pick { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.pick button { font: inherit; cursor: pointer; border: 2px solid transparent; border-radius: 50%; padding: 0; }
+.pick .pick-ic { background: none; }
+.pick-ic .ava.sm { width: 40px; height: 40px; font-size: 20px; }
+.pick-bg { width: 44px; height: 44px; font-size: 10px !important; color: #555 !important; box-shadow: inset 0 0 0 1px #ddd; }
+.pick .on { border-color: var(--green-dark); }
+
+/* 着せ替え・シェア画像（たたんでおく） */
+details.dress { margin-top: 16px; }
+details.dress summary { font-weight: 700; cursor: pointer; padding: 4px 0; }
+details.dress .preview { margin-top: 6px; }
+
+/* 馬カルテ（アプリと同じ深緑のカード） */
+.karte {
+  margin: 4px 0 12px; padding: 18px 16px 16px; border-radius: 20px; color: #fff;
+  background: radial-gradient(circle at 90% 80%, rgba(255, 255, 255, .08) 0 30%, transparent 31%), linear-gradient(135deg, #1b5e20, #2e7d32);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .2);
+}
+.k-head { display: flex; gap: 14px; align-items: center; }
+.k-head .ava { background: #fff; }
+.k-head h1 { margin: 0; font-size: 24px; }
+.k-lead { margin: 0; font-size: 12px; color: #ffd54f; font-weight: 700; }
+.k-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 16px 0 12px; }
+.k-stats div { background: rgba(255, 255, 255, .14); border-radius: 12px; padding: 10px 2px; text-align: center; }
+.k-stats b { display: block; font-size: 22px; }
+.k-stats span { font-size: 11px; opacity: .85; }
+.k-recent { display: flex; align-items: center; gap: 6px; margin: 0 0 12px; font-size: 13px; }
+.k-recent .medal:not(.m1):not(.m2):not(.m3) { background: #fff; color: #333; }
+.karte .fav.big { display: block; width: 100%; margin: 0; padding: 10px; background: rgba(255, 255, 255, .12); color: #fff; border-color: rgba(255, 255, 255, .6); }
+.karte .fav.big.on { background: rgba(255, 255, 255, .12); color: #fff; }
+.nextcard, .memocard { display: block; text-decoration: none; padding: 12px 16px; }
+.nextcard { background: var(--cream); }
+.nextcard p, .memocard p { margin: 2px 0; }
+.nextcard .nm { font-size: 16px; font-weight: 700; }
+.nextcard .link { color: var(--green-dark); font-weight: 700; font-size: 13px; }

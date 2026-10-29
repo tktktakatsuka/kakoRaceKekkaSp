@@ -158,7 +158,7 @@ function favButton(name, big = false) {
   const on = isFav(name);
   return `<button type="button" class="fav${big ? ' big' : ''}${on ? ' on' : ''}" data-fav="${esc(name)}" aria-pressed="${on}">${favText(on, big)}</button>`;
 }
-const favText = (on, big) => (big ? (on ? '★ 推し馬に登録中' : '☆ 推し馬に登録') : (on ? '★' : '☆'));
+const favText = (on, big) => (big ? (on ? '★ 推し馬として応援中' : '☆ 推し馬にする') : (on ? '★' : '☆'));
 // ボタンが押されたら、同じ馬のボタンと行の色をまとめて切り替える
 app.addEventListener('click', e => {
   const btn = e.target.closest('[data-fav]');
@@ -174,6 +174,38 @@ app.addEventListener('click', e => {
     b.closest('tr')?.classList.toggle('fav-row', on);
   }
 });
+
+// ---------- 推し馬カードの飾り（アプリと同じアイコン12種・背景10種。この iPhone に保存） ----------
+
+const CARD_ICONS = ['', '🏇', '🐴', '🦄', '🏆', '👑', '⭐', '❤️', '🍀', '🌸', '🔥', '🌈'];
+const CARD_BGS = [['', '標準'], ['sakura', '桜'], ['wakakusa', '若草'], ['sora', '空'], ['yuyake', '夕焼け'], ['kin', '金'],
+  ['fuji', '藤'], ['mint', 'ミント'], ['momiji', '紅葉'], ['kiri', '霧']];
+const STYLE_KEY = 'cardStyles';
+function cardStyles() {
+  try {
+    const m = JSON.parse(localStorage.getItem(STYLE_KEY) || '{}');
+    return m && typeof m === 'object' && !Array.isArray(m) ? m : {};
+  } catch (e) {
+    return {};
+  }
+}
+function styleOf(name) {
+  const st = cardStyles()[name] || {};
+  return {
+    icon: CARD_ICONS.includes(st.icon) ? st.icon : '',
+    bg: CARD_BGS.some(([k]) => k === st.bg) ? st.bg : '',
+  };
+}
+function saveStyle(name, st) {
+  const m = cardStyles();
+  if (st.icon || st.bg) m[name] = st; else delete m[name];
+  try { localStorage.setItem(STYLE_KEY, JSON.stringify(m)); } catch (e) { /* 保存できない環境では、このページを閉じるまでだけ */ }
+}
+// 馬のアイコン（選んでいなければ馬の顔）。size は sm / md / lg
+const avatarOf = (icon, size) => `<span class="ava ${size}" aria-hidden="true">${icon ? esc(icon) : '<img src="assets/icon-192.png?v=11" alt="">'}</span>`;
+const avatar = (name, size = 'md') => avatarOf(styleOf(name).icon, size);
+// 背景のクラス。選んでいなければ fallback（今週走る馬はクリーム、ほかは白。アプリと同じ）
+const bgClass = (name, fallback) => `bg-${styleOf(name).bg || fallback}`;
 
 // 表の上に出す、色や横棒の意味の説明
 // withOdds が false（オッズ発売前）なら、☆の説明だけ出す
@@ -241,7 +273,7 @@ function raceList(races, extra) {
     </a></li>`).join('')}</ul>`;
 }
 
-// ---------- トップ：今週の出馬表 ----------
+// ---------- 推し馬の次走（ホーム・推し馬ページ） ----------
 
 // 推し馬それぞれの、いちばん近い出走予定（馬名→出馬表の1行）
 async function favNextRuns(list, today) {
@@ -254,22 +286,6 @@ async function favNextRuns(list, today) {
   for (const r of runs) if (!next.has(r.horse_name)) next.set(r.horse_name, r);
   return next;
 }
-const nextRunHtml = r => (r
-  ? `<a href="${raceUrl(r.kaisaibi, r.kaisaijo, r.race_no)}">${dateLabel(r.kaisaibi)} ${esc(r.kaisaijo)}${r.race_no}R ${titleHtml(listTitle(r.race_title))}</a>`
-  : '<span class="small">今週の出走予定なし</span>');
-
-// 推し馬の今週の出走予定。推し馬がいなければ登録のしかたを案内する
-async function favSection(today) {
-  const list = favs();
-  if (!list.length) {
-    return '<div class="card hint">☆ 推し馬を登録すると、ここに今週の出走予定が出ます。出馬表や馬のページで馬名の横の ☆ を押してください。</div>';
-  }
-  const next = await favNextRuns(list, today);
-  const rows = list.map(name => `<li><span class="fav on">★</span> ${horseLink(name)}<br>${nextRunHtml(next.get(name))}</li>`).join('');
-  return `<h2>${esc(currentMark())} 推し馬の出走予定</h2><div class="card"><ul class="favs">${rows}</ul>
-    <a class="more" href="fav.html">メモ・着せ替え・シェアは推し馬ページへ ›</a></div>`;
-}
-
 // あと何日か（今日なら「今日」）
 function daysLeft(d, today) {
   const t = v => Date.UTC(+v.slice(0, 4), +v.slice(4, 6) - 1, +v.slice(6, 8));
@@ -283,47 +299,155 @@ function mainRace(races) {
     .sort((a, b) => gradeOf(a.race_title) - gradeOf(b.race_title) || a.kaisaibi.localeCompare(b.kaisaibi))[0] || null;
 }
 
-// トップのいちばん上：今週の主役のレースと、「今週のレース」「レース結果」への大きな入り口
-function homeTop(races, today, latest) {
-  const main = mainRace(races);
-  const days = [...new Set(races.map(r => r.kaisaibi))];
-  let html = '';
-  if (main) {
-    const g = gradeOf(main.race_title);
-    html += `<a class="hero spot g${g}" href="${raceUrl(main.kaisaibi, main.kaisaijo, main.race_no)}">
-      <p class="when"><span class="tag">今週の主役</span> ${esc(daysLeft(main.kaisaibi, today))}</p>
-      <h1>${titleHtml(main.race_title)}</h1>
-      <p class="when">${dateLabel(main.kaisaibi)} ${esc(main.kaisaijo)}${main.race_no}R ${esc(startTime(main.race_info))}発走 ${esc(courseLabel(main.race_info))}</p>
-      <span class="go">出馬表を見る ›</span>
-    </a>`;
+// 上の緑のバーの題名（レース・馬のページは中身に合わせて変える）
+function setBarTitle(text) {
+  const el = document.querySelector('.top .ttl');
+  if (el) el.textContent = text;
+}
+function longDate(d) {
+  return `${d.slice(0, 4)}年${d.slice(4, 6)}月${d.slice(6, 8)}日${dateLabel(d).replace(/^[\d/]+/, '')}`;
+}
+
+// ---------- ホーム（アプリと同じ：次に走る推し馬を主役に、ほかの推し馬、メインレース） ----------
+
+// 推し馬それぞれの前走（一番新しい結果）
+async function favLastRuns(list) {
+  if (!list.length) return {};
+  return lastRuns(list, '99999999');
+}
+const prevLine = r => (r ? `前走 ${dateLabel(r.kaisaibi)} ${esc(r.kaisaijo)}${r.race_no ? `${r.race_no}R` : ''} ${esc(r.rank)}着${r.popular ? `（${esc(r.popular)}人気）` : ''}` : '');
+
+// 主役にする馬：今週走る馬のうち一番早く走る馬。いなければ一番最近走った馬
+function pickSpotlight(list, next, last) {
+  const upcoming = list.filter(n => next.get(n))
+    .sort((a, b) => {
+      const x = next.get(a), y = next.get(b);
+      return x.kaisaibi.localeCompare(y.kaisaibi) || startTime(x.race_info).padStart(5, '0').localeCompare(startTime(y.race_info).padStart(5, '0'));
+    });
+  if (upcoming.length) return { name: upcoming[0], kind: 'next' };
+  const ran = list.filter(n => last[n]).sort((a, b) => last[b].kaisaibi.localeCompare(last[a].kaisaibi));
+  return ran.length ? { name: ran[0], kind: 'last' } : { name: list[0], kind: 'none' };
+}
+
+function spotlightCard(pick, next, last) {
+  const { name, kind } = pick;
+  const n = next.get(name), l = last[name];
+  let body = '';
+  if (kind === 'next') {
+    body = `<p class="lead">▶ 次に走る推し馬</p><a class="nm" href="${horseUrl(name)}">${esc(name)} ›</a>
+      <a class="nx" href="${raceUrl(n.kaisaibi, n.kaisaijo, n.race_no)}">▶ ${dateLabel(n.kaisaibi)} ${esc(n.kaisaijo)}${n.race_no}R ${esc(startTime(n.race_info))}<br>
+        <span>${titleHtml(listTitle(n.race_title))}${courseLabel(n.race_info) ? `（${esc(courseLabel(n.race_info))}）` : ''}</span></a>
+      ${l ? `<p class="pv">${prevLine(l)}</p>` : ''}`;
+  } else if (kind === 'last') {
+    body = `<p class="lead">★ 最近走った推し馬</p><a class="nm" href="${horseUrl(name)}">${esc(name)} ›</a>
+      <p class="big-rank${l.rank === '1' ? ' win' : ''}">${esc(l.rank)}着${l.rank === '1' ? '！' : ''}</p>
+      <p class="pv">${dateLabel(l.kaisaibi)} ${esc(l.kaisaijo)} ${titleHtml(listTitle(l.race_title))}${l.popular ? `（${esc(l.popular)}人気）` : ''}</p>
+      <p class="pv">次の出走が決まったら、ここに出ます</p>`;
+  } else {
+    body = `<p class="lead">★ 推し馬</p><a class="nm" href="${horseUrl(name)}">${esc(name)} ›</a><p class="pv">次の出走が決まったら、ここに出ます</p>`;
   }
-  html += `<div class="doors">
-    <a class="door week" href="#week"><span class="ic">🏇</span><b>今週のレース</b>
-      <span>${races.length ? `${days.map(dateLabel).join('・')}<br>全${races.length}レース` : '木曜ごろに出ます'}</span></a>
-    <a class="door result" href="${latest ? `results.html?d=${latest}` : 'results.html'}"><span class="ic">🏁</span><b>レース結果</b>
-      <span>${latest ? `${dateLabel(latest)}の結果<br>払い戻しも` : '直近の結果'}</span></a>
+  // 中にレースへのリンクがあるので、カード全体はリンクにせず、アイコンと馬名から馬カルテへ
+  return `<div class="spot-card ${bgClass(name, kind === 'next' ? 'cream' : 'white')}">
+    <a href="${horseUrl(name)}" aria-hidden="true" tabindex="-1">${avatar(name, 'lg')}</a><div class="sc-body">${body}</div></div>`;
+}
+
+function onboardingCard() {
+  return `<div class="onboard">
+    <p class="nm">推し馬を見つけよう</p>
+    <p>出走表で馬名の横の ☆ を押すと、推し馬になります。次に走る日や結果がホームのいちばん上に出ます。</p>
+    <a class="gbtn" href="entries.html">今週の重賞に出る馬から選ぶ</a>
   </div>`;
-  return html;
+}
+
+function stripCard(name, n, l) {
+  const line = n
+    ? `<span class="nx-l">▶ 次走</span><span class="nx-d">${dateLabel(n.kaisaibi)}</span><span class="small">${esc(n.kaisaijo)}${n.race_no}R</span>`
+    : l ? `<span class="small">前走 ${dateLabel(l.kaisaibi)}<br>${esc(l.rank)}着</span>` : '<span class="small">出走予定なし</span>';
+  return `<a class="mini ${bgClass(name, n ? 'cream' : 'white')}" href="${horseUrl(name)}">${avatar(name, 'sm')}<b>${esc(name)}</b>${line}</a>`;
+}
+
+// 最新の開催日の 11R（その日のメインレース）を、格の高い順に
+async function mainRaces(days) {
+  const d = days[0]?.kaisaibi;
+  if (!d) return { d: null, races: [] };
+  const rows = await query('race_results',
+    `select=kaisaibi,kaisaijo,race_no,race_title,hassou_time,rank,horse_name,horse_number,waku,popular,jockey,win_odds&kaisaibi=eq.${d}&race_no=eq.11&order=id.asc`,
+    settled(d) ? 12 * HOUR : 3 * MINUTE).catch(() => []);
+  const byCourse = new Map();
+  for (const r of rows) {
+    if (!byCourse.has(r.kaisaijo)) byCourse.set(r.kaisaijo, []);
+    byCourse.get(r.kaisaijo).push(r);
+  }
+  const races = [...byCourse.values()].sort((a, b) =>
+    (gradeOf(a[0].race_title) || 9) - (gradeOf(b[0].race_title) || 9) || courseSort(a[0].kaisaijo, b[0].kaisaijo));
+  return { d, races };
+}
+
+function mainRaceCard(rows) {
+  const first = rows[0];
+  const g = gradeOf(first.race_title);
+  const top = [1, 2, 3].map(k => rows.find(r => r.rank === String(k))).filter(Boolean);
+  return `<a class="mrace" href="results.html?d=${first.kaisaibi}&c=${enc(first.kaisaijo)}">
+    <div class="mr-head mg${g || 0}">
+      <p>${g ? `<span class="chip g${g}">G${g}</span>` : ''}${esc(first.kaisaijo)}11R</p>
+      <p class="mr-name">${esc(listTitle(first.race_title).replace(GRADE, '').trim())}</p>
+      ${courseLabel(first.hassou_time) ? `<p class="mr-meta">${esc(courseLabel(first.hassou_time))}${startTime(first.hassou_time) ? `・${esc(startTime(first.hassou_time))}発走` : ''}</p>` : ''}
+    </div>
+    <div class="mr-rows">${top.map(r => `<div class="mr-row">
+      <span class="medal m${r.rank}">${esc(r.rank)}</span>${waku(r.waku) ? `<span class="waku w${esc(r.waku)}">${esc(r.horse_number)}</span>` : ''}
+      <span class="mr-h"><b>${esc(r.horse_name)}</b><span class="small">${[r.popular && `${esc(r.popular)}番人気`, esc(r.jockey || '')].filter(Boolean).join('・')}</span></span>
+      <span class="mr-odds${r.rank === '1' ? ' gold' : ''}">${r.win_odds ? `${esc(r.win_odds)}倍` : ''}</span></div>`).join('')}</div>
+    <p class="mr-more">${esc(first.kaisaijo)}のレース結果をもっとみる ›</p>
+  </a>`;
 }
 
 async function renderHome() {
   const today = todayJst();
-  const [entries, days] = await Promise.all([
-    queryAll('race_entries',
-      `select=kaisaibi,kaisaijo,race_no,race_title,race_info&kaisaibi=gte.${today}&order=kaisaibi.asc,kaisaijo.asc,race_no.asc,id.asc`),
-    raceDays().catch(() => []),
-  ]);
-  const races = groupRaces(entries);
-  let html = homeTop(races, today, days[0]?.kaisaibi);
-  html += await favSection(today);
-  html += '<h1 id="week" class="sec">🏇 今週のレース</h1>';
-
-  if (!races.length) {
-    html += '<p class="notice">今週の出馬表はまだ出ていません（例年、木曜ごろに出ます）。</p>';
+  const list = favs();
+  const [next, last, days] = await Promise.all([favNextRuns(list, today), favLastRuns(list), raceDays().catch(() => [])]);
+  let html = '';
+  if (!list.length) {
+    html += onboardingCard();
   } else {
-    const graded = races.filter(r => isGraded(r.race_title));
+    const pick = pickSpotlight(list, next, last);
+    html += spotlightCard(pick, next, last);
+    const others = list.filter(n => n !== pick.name);
+    html += `<div class="sec-head"><h2>★ ほかの推し馬</h2><a href="fav.html">すべて見る ›</a></div>
+      <div class="strip">${others.map(n => stripCard(n, next.get(n), last[n])).join('')}
+        <a class="mini add" href="entries.html"><span class="ava sm">＋</span><b>馬を追加</b><span class="small">出走表から選ぶ</span></a></div>`;
+  }
+  const main = await mainRaces(days);
+  if (main.races.length) {
+    html += `<h2 class="green">${longDate(main.d)}のメインレース</h2>${main.races.map(mainRaceCard).join('')}`;
+  }
+  app.innerHTML = html + cta();
+}
+
+// ---------- 出走表：今週の全レース ----------
+
+async function renderEntries() {
+  const today = todayJst();
+  const entries = await queryAll('race_entries',
+    `select=kaisaibi,kaisaijo,race_no,race_title,race_info&kaisaibi=gte.${today}&order=kaisaibi.asc,kaisaijo.asc,race_no.asc,id.asc`);
+  const races = groupRaces(entries);
+  let html = '';
+  if (!races.length) {
+    html += '<p class="notice">今週の出走表はまだ出ていません（例年、木曜ごろに出ます）。</p>';
+  } else {
+    const main = mainRace(races);
+    if (main) {
+      const g = gradeOf(main.race_title);
+      html += `<a class="mrace" href="${raceUrl(main.kaisaibi, main.kaisaijo, main.race_no)}">
+        <div class="mr-head mg${g}">
+          <p><span class="chip g${g}">G${g}</span>今週の主役　${esc(daysLeft(main.kaisaibi, today))}</p>
+          <p class="mr-name">${esc(main.race_title.replace(GRADE, '').trim())}</p>
+          <p class="mr-meta">${dateLabel(main.kaisaibi)} ${esc(main.kaisaijo)}${main.race_no}R ${esc(startTime(main.race_info))}発走 ${esc(courseLabel(main.race_info))}</p>
+        </div>
+        <p class="mr-more">出走表を見る ›</p></a>`;
+    }
+    const graded = races.filter(r => isGraded(r.race_title) && r !== main);
     if (graded.length) {
-      html += '<h2>重賞</h2>' + graded.map(r => `
+      html += '<h2 class="green">今週の重賞</h2>' + graded.map(r => `
         <a class="card graded g${gradeOf(r.race_title)}" href="${raceUrl(r.kaisaibi, r.kaisaijo, r.race_no)}">
           <div class="name">${titleHtml(r.race_title)}</div>
           <div class="meta">${dateLabel(r.kaisaibi)} ${esc(r.kaisaijo)}${r.race_no}R ${esc(startTime(r.race_info))}発走 ${esc(courseLabel(r.race_info))}</div>
@@ -333,13 +457,12 @@ async function renderHome() {
     for (const day of days) {
       const ofDay = races.filter(r => r.kaisaibi === day);
       for (const course of [...new Set(ofDay.map(r => r.kaisaijo))]) {
-        html += `<h2>${dateLabel(day)} ${esc(course)}</h2>
+        html += `<h2 class="green">${dateLabel(day)} ${esc(course)}</h2>
           <div class="card">${raceList(ofDay.filter(r => r.kaisaijo === course))}</div>`;
       }
     }
   }
-  html += '<a class="bigbtn" href="results.html">🏁 直近のレース結果を見る</a>';
-  app.innerHTML = html + cta();
+  app.innerHTML = html + cta('今週の出走表');
 }
 
 // ---------- レース：出馬表・結果・払い戻し ----------
@@ -364,11 +487,10 @@ async function renderRace() {
   const info = head.race_info || head.hassou_time || '';
   document.title = `${title} ${results.length ? '結果' : '出馬表'} | 推し馬ノート`;
 
-  const g = gradeOf(title);
-  let html = `<div class="hero${g ? ` g${g}` : ''}">
-    <p class="when">${fullDate(d)} ${esc(c)}${r}R</p>
+  setBarTitle(`${longDate(d)} ${c}${r}R`);
+  let html = `<div class="card race-head">
     <h1>${titleHtml(title)}</h1>
-    <p class="when">${esc([startTime(info) && `${startTime(info)}発走`, courseLabel(info)].filter(Boolean).join('　'))}</p>
+    <p class="small">${esc([startTime(info) && `${startTime(info)}発走`, courseLabel(info)].filter(Boolean).join('　'))}</p>
   </div>`;
 
   const tab = p.get('tab') || (results.length ? 'result' : 'card');
@@ -402,7 +524,7 @@ async function lastRuns(names, before) {
   if (!list.length) return {};
   const inList = list.map(n => `"${n.replace(/"/g, '')}"`).join(',');
   const rows = await query('race_results',
-    `select=horse_name,kaisaibi,kaisaijo,race_title,rank&horse_name=in.(${enc(inList)})&kaisaibi=lt.${before}&order=kaisaibi.desc&limit=${list.length * 4}`, HOUR)
+    `select=horse_name,kaisaibi,kaisaijo,race_no,race_title,rank,popular&horse_name=in.(${enc(inList)})&kaisaibi=lt.${before}&order=kaisaibi.desc&limit=${list.length * 4}`, HOUR)
     .catch(() => []);
   const last = {};
   for (const row of rows) if (!last[row.horse_name]) last[row.horse_name] = row;
@@ -468,9 +590,7 @@ async function renderResults() {
   for (const row of rows) if (row.rank === '1' && !winners[row.race_no]) winners[row.race_no] = row;
 
   const go = (dd, cc) => `results.html?d=${dd}&c=${enc(cc)}`;
-  let html = `<div class="hero"><p class="when">🏁 レース結果</p><h1>${fullDate(d)} ${esc(c)}</h1>
-    <p class="when">レースを押すと、着順と払い戻しが見られます</p></div>
-    <p><select id="date" aria-label="開催日">${dates.map(x => `<option value="${x}" ${x === d ? 'selected' : ''}>${x.slice(0, 4)}/${dateLabel(x)}</option>`).join('')}</select></p>
+  let html = `<p><select id="date" aria-label="開催日">${dates.map(x => `<option value="${x}" ${x === d ? 'selected' : ''}>${x.slice(0, 4)}/${dateLabel(x)}</option>`).join('')}</select></p>
     <div class="tabs">${courses.map(x => `<a href="${go(d, x)}" class="${x === c ? 'on' : ''}">${esc(x)}</a>`).join('')}</div>
     <div class="card">${raceList(races, r => {
       const w = winners[r.race_no];
@@ -496,31 +616,42 @@ async function renderHorse() {
     query('race_results', `select=kaisaibi,kaisaijo,race_no,race_title,hassou_time,rank,popular,win_odds,jockey,time,nobori,age,weight&horse_name=eq.${enc(name)}&order=kaisaibi.desc&limit=300`, HOUR),
     query('race_entries', `select=kaisaibi,kaisaijo,race_no,race_title,race_info,horse_number,jockey&horse_name=eq.${enc(name)}&kaisaibi=gte.${todayJst()}&order=kaisaibi.asc&limit=5`).catch(() => []),
   ]);
-  let html = `<div class="hero"><p class="when">競走馬</p><h1>${esc(name)}</h1>
-    <p class="when">${esc(runs[0]?.age || '')}</p>${favButton(name, true)}</div>`;
+  setBarTitle(name);
+  // 着順が数字のレースだけを数える（取消・除外などは外す）
+  const ranked = runs.filter(x => /^\d+$/.test(x.rank || ''));
+  const n = k => ranked.filter(x => Number(x.rank) === k).length;
+  const [w, s, t] = [n(1), n(2), n(3)];
+  const pct = v => (ranked.length ? `${Math.round((v / ranked.length) * 100)}%` : '-');
+  // 近走の着順の丸（新しい順に5走。1〜3着は金銀銅）
+  const recent = runs.slice(0, 5).map(x => `<span class="medal${/^[123]$/.test(x.rank) ? ` m${x.rank}` : ''}">${esc(x.rank)}</span>`).join('');
+  let html = `<div class="karte">
+    <div class="k-head">${avatar(name, 'lg')}<div>
+      ${isFav(name) ? '<p class="k-lead">★ 推し馬</p>' : ''}<h1>${esc(name)}</h1>
+      ${runs[0]?.age ? `<p class="k-lead">${esc(runs[0].age)}</p>` : ''}</div></div>
+    <div class="k-stats">
+      <div><b>${ranked.length}</b><span>出走</span></div><div><b>${w}</b><span>勝利</span></div>
+      <div><b>${pct(w + s)}</b><span>連対率</span></div><div><b>${pct(w + s + t)}</b><span>複勝率</span></div>
+    </div>
+    ${recent ? `<p class="k-recent">近走 ${recent}</p>` : ''}
+    ${favButton(name, true)}
+  </div>`;
 
-  if (next.length) {
-    html += '<h2>出走予定</h2>' + next.map(e => `
-      <a class="card graded g${gradeOf(e.race_title)}" href="${raceUrl(e.kaisaibi, e.kaisaijo, e.race_no)}">
-        <div class="name">${titleHtml(e.race_title)}</div>
-        <div class="meta">${dateLabel(e.kaisaibi)} ${esc(e.kaisaijo)}${e.race_no}R ${esc(courseLabel(e.race_info))}${e.jockey ? ` / ${esc(e.jockey)}` : ''}</div>
-      </a>`).join('');
+  html += next.map(e => `
+    <a class="card nextcard" href="${raceUrl(e.kaisaibi, e.kaisaijo, e.race_no)}">
+      <p class="nx-l">📅 次走</p>
+      <p class="nm">${dateLabel(e.kaisaibi)} ${esc(e.kaisaijo)}${e.race_no}R ${titleHtml(listTitle(e.race_title))}</p>
+      <p class="small">${[courseLabel(e.race_info), e.jockey].filter(Boolean).map(esc).join('　')}</p>
+      <p class="link">出走表を見る ›</p></a>`).join('');
+  const memo = memoOf(name);
+  if (isFav(name) || memo) {
+    html += `<a class="card memocard" href="fav.html"><p class="nx-l blue">📝 メモ</p>
+      <p class="small">${memo ? esc(memo) : '気づいたことをメモしておけます（推し馬ページで書く）'}</p></a>`;
   }
 
   if (!runs.length) {
     html += '<p class="notice">この馬の過去のレース結果はまだありません。</p>';
   } else {
-    // 着順が数字のレースだけを数える（取消・除外などは外す）
-    const ranked = runs.filter(x => /^\d+$/.test(x.rank || ''));
-    const n = k => ranked.filter(x => Number(x.rank) === k).length;
-    const [w, s, t] = [n(1), n(2), n(3)];
-    const pct = v => (ranked.length ? `${Math.round((v / ranked.length) * 100)}%` : '-');
-    html += `<h2>成績</h2><div class="stats">
-      <div><b>${w}-${s}-${t}-${ranked.length - w - s - t}</b><span>成績（${ranked.length}戦）</span></div>
-      <div><b>${pct(w)}</b><span>勝率</span></div>
-      <div><b>${pct(w + s + t)}</b><span>複勝率</span></div>
-    </div>
-    <h2>過去のレース</h2>
+    html += `<h2 class="green">過去のレース</h2>
     <div class="card"><ul class="runs">${runs.slice(0, 60).map(x => `
       <li><a href="${raceUrl(x.kaisaibi, x.kaisaijo, x.race_no)}">
         ${rankBadge(x.rank)}
@@ -537,7 +668,7 @@ async function renderHorse() {
 // 着せ替え。CSS の [data-theme] と、シェア画像の色（bg は上→下のグラデーション）。meta は theme.js と同じ色
 const THEMES = {
   // deco: シェア画像の飾り（turf=芝のしま、petal=花びら、sparkle=きらきら、frame=金の額縁、stripe=勝負服のたすき）
-  standard: { meta: '#2e7d32', label: 'スタンダード', bg: ['#1b5e20', '#43a047'], ink: '#ffffff', accent: '#fbc02d', card: 'rgba(255,255,255,.14)', deco: 'turf' },
+  standard: { meta: '#4CAF50', label: 'スタンダード', bg: ['#1b5e20', '#43a047'], ink: '#ffffff', accent: '#fbc02d', card: 'rgba(255,255,255,.14)', deco: 'turf' },
   sakura: { meta: '#e75480', label: 'さくら（かわいい）', bg: ['#ffd1e1', '#ff8fb8'], ink: '#5a1030', accent: '#ffffff', card: 'rgba(255,255,255,.55)', deco: 'petal' },
   yume: { meta: '#9b6bd6', label: 'ゆめかわ', bg: ['#c9b6ff', '#9fe3f0'], ink: '#3a2766', accent: '#ffffff', card: 'rgba(255,255,255,.5)', deco: 'sparkle' },
   noir: { meta: '#0d0d0f', label: 'ブラック×ゴールド（かっこいい）', bg: ['#000000', '#2a2a30'], ink: '#f3e2a9', accent: '#d4af37', card: 'rgba(212,175,55,.12)', deco: 'frame' },
@@ -739,37 +870,62 @@ async function renderFav() {
   const list = favs();
   const next = await favNextRuns(list, todayJst());
   const theme = currentTheme();
-  let html = `<div class="hero fav-hero"><p class="when">推し馬ページ</p>
-    <h1><span id="mark">${esc(currentMark())}</span> <span id="title">${esc(favTitle())}</span></h1>
-    <p class="when">${list.length}頭を応援中</p></div>`;
+  const last = await favLastRuns(list);
+  let html = '<a class="gbtn" href="entries.html">＋ 馬を探して推し馬にする</a>';
 
-  html += `<h2>着せ替え</h2><div class="card dress">
+  // アプリと同じ並び：今週走る馬が先、そのあとほかの馬
+  const card = name => {
+    const n = next.get(name), l = last[name];
+    const st = styleOf(name);
+    return `
+      <div class="oshi ${bgClass(name, n ? 'cream' : 'white')}" data-card="${esc(name)}">
+        <div class="o-row">
+          <span data-ava="${esc(name)}">${avatar(name)}</span>
+          <div class="o-body">
+            <a class="o-name" href="${horseUrl(name)}">${esc(name)} ›</a>
+            ${n ? `<a class="nx" href="${raceUrl(n.kaisaibi, n.kaisaijo, n.race_no)}">▶ ${dateLabel(n.kaisaibi)} ${esc(n.kaisaijo)}${n.race_no}R<br><span>${titleHtml(listTitle(n.race_title))}${courseLabel(n.race_info) ? `（${esc(courseLabel(n.race_info))}）` : ''}</span></a>` : ''}
+            ${l ? `<a class="pv" href="${raceUrl(l.kaisaibi, l.kaisaijo, l.race_no || 1)}">${prevLine(l)} ›</a>` : '<p class="pv">まだ結果がありません</p>'}
+          </div>
+          <div class="o-side">
+            <button type="button" class="ic-btn" data-deco="${esc(name)}" aria-label="カードを飾る" aria-expanded="false">🎨</button>
+            ${favButton(name)}
+          </div>
+        </div>
+        <div class="deco" data-deco-panel="${esc(name)}" hidden>
+          <p class="small">アイコン</p>
+          <div class="pick">${CARD_ICONS.map(ic => `<button type="button" class="pick-ic${ic === st.icon ? ' on' : ''}" data-pick-icon="${esc(ic)}" data-for="${esc(name)}">${avatarOf(ic, 'sm')}</button>`).join('')}</div>
+          <p class="small">背景</p>
+          <div class="pick">${CARD_BGS.map(([k, label]) => `<button type="button" class="pick-bg bg-${k || 'white'}${k === st.bg ? ' on' : ''}" data-pick-bg="${k}" data-for="${esc(name)}">${esc(label)}</button>`).join('')}</div>
+        </div>
+        <textarea class="memo" data-memo="${esc(name)}" maxlength="${MEMO_MAX}" rows="2" placeholder="📝 メモ（例：次は東京2400mで巻き返す！）">${esc(memoOf(name))}</textarea>
+        <div class="memo-foot"><span class="small" data-count="${esc(name)}">${[...memoOf(name)].length}/${MEMO_MAX}</span>
+          <button type="button" class="pill x" data-share-x="${esc(name)}">Xでシェア</button>
+          <button type="button" class="pill" data-share-img="${esc(name)}">画像でシェア</button></div>
+      </div>`;
+  };
+  if (!list.length) {
+    html += '<div class="onboard"><p class="nm">まだ推し馬がいません</p><p>出走表や馬のページで馬名の横の ☆ を押すと、ここに並びます。</p></div>';
+  } else {
+    const running = list.filter(n => next.get(n));
+    const rest = list.filter(n => !next.get(n));
+    if (running.length) html += `<h2 class="green">今週出走（${running.length}頭）</h2>${running.map(card).join('')}`;
+    if (rest.length) html += `<h2 class="green">${running.length ? 'ほかの推し馬' : '推し馬'}（${rest.length}頭）</h2>${rest.map(card).join('')}`;
+    html += `<div class="sharebar">
+      <button type="button" class="btn x" data-share-list="x">推し馬リストをXでシェア</button>
+      <button type="button" class="btn" data-share-list="img">リストを画像でシェア</button></div>`;
+  }
+
+  html += `<details class="card dress"><summary>🎨 ページの着せ替え・シェア画像</summary>
+    <p class="small">ページ全体の色</p>
     <div class="themes">${Object.entries(THEMES).map(([k, t]) => `
       <button type="button" class="swatch sw-${k}${k === theme ? ' on' : ''}" data-theme-pick="${k}" aria-pressed="${k === theme}">${esc(t.label)}</button>`).join('')}</div>
     <p class="small">推しマーク</p>
     <div class="marks">${MARKS.map(m => `<button type="button" class="mark${m === currentMark() ? ' on' : ''}" data-mark-pick="${esc(m)}">${esc(m)}</button>`).join('')}</div>
     <label class="small" for="favTitle">ページの名前（${TITLE_MAX}文字まで）</label>
     <input id="favTitle" class="text" maxlength="${TITLE_MAX}" value="${esc(load('favTitle') || '')}" placeholder="わたしの推し馬">
-  </div>`;
-  if (list.length) html += '<h2>シェア画像のプレビュー</h2><div class="preview" id="preview"></div>';
-
-  if (!list.length) {
-    html += '<div class="card hint">☆ まだ推し馬がいません。出馬表や馬のページで馬名の横の ☆ を押すと、ここにメモ欄とシェアボタンが出ます。</div>';
-  } else {
-    html += `<div class="sharebar">
-      <button type="button" class="btn x" data-share-list="x">推し馬リストをXでシェア</button>
-      <button type="button" class="btn" data-share-list="img">リストを画像でシェア</button></div>`;
-    html += list.map(name => `
-      <div class="card oshi">
-        <div class="oshi-head">${horseLink(name)} ${favButton(name)}</div>
-        <div class="small">${nextRunHtml(next.get(name))}</div>
-        <textarea class="memo" data-memo="${esc(name)}" maxlength="${MEMO_MAX}" rows="3" placeholder="メモ（例：次は東京2400mで巻き返す！）">${esc(memoOf(name))}</textarea>
-        <div class="memo-foot"><span class="small" data-count="${esc(name)}">${[...memoOf(name)].length}/${MEMO_MAX}</span>
-          <button type="button" class="pill x" data-share-x="${esc(name)}">Xでシェア</button>
-          <button type="button" class="pill" data-share-img="${esc(name)}">画像でシェア</button></div>
-      </div>`).join('');
-    html += '<p class="small">メモ・着せ替えはこの iPhone の中だけに保存されます（ほかの人には見えません。シェアしたときだけ公開されます）。</p>';
-  }
+    ${list.length ? '<p class="small">シェア画像のプレビュー</p><div class="preview" id="preview"></div>' : ''}
+  </details>
+  <p class="small">推し馬・メモ・飾りはこの iPhone の中だけに保存されます（ほかの人には見えません。シェアしたときだけ公開されます）。</p>`;
   app.innerHTML = html + cta();
 
   const sel = (attr, v) => [...app.querySelectorAll(`[${attr}]`)].find(el => el.getAttribute(attr) === v);
@@ -796,7 +952,6 @@ async function renderFav() {
       if (c) c.textContent = `${[...e.target.value].length}/${MEMO_MAX}`;
     } else if (e.target.id === 'favTitle') {
       store('favTitle', e.target.value.slice(0, TITLE_MAX));
-      document.getElementById('title').textContent = favTitle();
     }
     redraw();
   });
@@ -812,8 +967,24 @@ async function renderFav() {
       }
     } else if (d.markPick && MARKS.includes(d.markPick)) {
       store('favMark', d.markPick);
-      document.getElementById('mark').textContent = d.markPick;
       for (const s of app.querySelectorAll('[data-mark-pick]')) s.classList.toggle('on', s === b);
+    } else if (d.deco) {
+      const panel = sel('data-deco-panel', d.deco);
+      panel.hidden = !panel.hidden;
+      b.setAttribute('aria-expanded', String(!panel.hidden));
+    } else if (d.for && (d.pickIcon !== undefined || d.pickBg !== undefined)) {
+      // 飾りを選んだら、その場でカードに当てる
+      const name = d.for;
+      const st = styleOf(name);
+      if (d.pickIcon !== undefined && CARD_ICONS.includes(d.pickIcon)) st.icon = d.pickIcon;
+      if (d.pickBg !== undefined && CARD_BGS.some(([k]) => k === d.pickBg)) st.bg = d.pickBg;
+      saveStyle(name, st);
+      const cardEl = sel('data-card', name);
+      const fallback = next.get(name) ? 'cream' : 'white';
+      cardEl.className = `oshi ${bgClass(name, fallback)}`;
+      sel('data-ava', name).innerHTML = avatar(name);
+      for (const x of cardEl.querySelectorAll('[data-pick-icon]')) x.classList.toggle('on', x.dataset.pickIcon === st.icon);
+      for (const x of cardEl.querySelectorAll('[data-pick-bg]')) x.classList.toggle('on', x.dataset.pickBg === st.bg);
     }
     if (d.themePick || d.markPick || d.fav) redraw(); else if (d.shareX) {
       openX(shareText(d.shareX, next.get(d.shareX)), absUrl(horseUrl(d.shareX)));
@@ -828,5 +999,13 @@ async function renderFav() {
   });
 }
 
-const pages = { home: renderHome, race: renderRace, results: renderResults, horse: renderHorse, fav: renderFav };
+// 上のバーの ←：同じサイトから来たときは前の画面へ、そうでなければホームへ（アプリの戻ると同じ動き）
+document.querySelector('.top .back')?.addEventListener('click', e => {
+  if (document.referrer.startsWith(location.origin) && history.length > 1) {
+    e.preventDefault();
+    history.back();
+  }
+});
+
+const pages = { home: renderHome, entries: renderEntries, race: renderRace, results: renderResults, horse: renderHorse, fav: renderFav };
 (pages[app.dataset.page] || renderHome)().catch(showError);
