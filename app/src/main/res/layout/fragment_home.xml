@@ -100,6 +100,18 @@
                                 android:layout_height="wrap_content"
                                 android:text="@string/signed_in"
                                 android:textSize="12sp" />
+
+                            <!-- 退会。押し間違えないよう、目立たない文字のリンクにする -->
+                            <TextView
+                                android:id="@+id/text_delete_account"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:minHeight="32dp"
+                                android:gravity="center_vertical"
+                                android:text="@string/delete_account"
+                                android:textColor="#888888"
+                                android:textSize="12sp" />
                         </LinearLayout>
 
                         <Button

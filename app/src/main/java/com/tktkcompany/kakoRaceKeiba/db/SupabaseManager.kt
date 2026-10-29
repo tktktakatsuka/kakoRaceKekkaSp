@@ -218,6 +218,17 @@ object SupabaseManager {
         }
     }
 
+    /** そのユーザーのお気に入りをすべて消す（退会のとき） */
+    @JvmStatic
+    fun removeAllFavorites(uid: String, callback: SupabaseCallback<Boolean>) {
+        launchWithCallback("remove all favorites", callback) { currentClient ->
+            currentClient.from("favorite_horses").delete {
+                filter { eq("firebase_uid", uid) }
+            }
+            true
+        }
+    }
+
     @JvmStatic
     fun fetchFavorites(uid: String, callback: SupabaseCallback<List<String>>) {
         launchWithCallback("fetch favorites", callback) { currentClient ->
