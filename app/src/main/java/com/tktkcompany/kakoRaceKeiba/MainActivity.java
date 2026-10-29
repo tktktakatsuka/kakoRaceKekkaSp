@@ -39,6 +39,8 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.tktkcompany.kakoRaceKeiba.ads.AdFree;
 import com.tktkcompany.kakoRaceKeiba.auth.GuestAccount;
+import com.tktkcompany.kakoRaceKeiba.ui.welcome.Welcome;
+import com.tktkcompany.kakoRaceKeiba.ui.welcome.WelcomeActivity;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -166,7 +168,12 @@ public class MainActivity extends AppCompatActivity {
         // 通知チャンネル作成と通知権限のリクエスト
         NotificationHelper.createChannels(this);
         if (savedInstanceState == null) {
-            requestNotificationPermissionIfNeeded();
+            // 初めて入れた人にはウェルカム画面を出し、閉じたあとで通知の許可を聞く（お知らせの楽しさを見せてから）
+            if (Welcome.shouldShow(this)) {
+                welcomeLauncher.launch(new Intent(this, WelcomeActivity.class));
+            } else {
+                requestNotificationPermissionIfNeeded();
+            }
         }
 
         // お気に入り馬の結果チェックを定期実行
@@ -247,6 +254,9 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         return navController.navigateUp() || super.onSupportNavigateUp();
     }
+
+    private final ActivityResultLauncher<Intent> welcomeLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result -> requestNotificationPermissionIfNeeded());
 
     private void requestNotificationPermissionIfNeeded() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU

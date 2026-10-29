@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ウェルカム画面の背景。アプリと同じ、やさしい黄緑（白に近い色から淡い黄緑へ） -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:angle="285"
+        android:startColor="#F8FBF2"
+        android:centerColor="#EEF6E2"
+        android:endColor="#DCEDC8" />
+</shape>
