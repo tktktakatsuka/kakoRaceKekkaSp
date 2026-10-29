@@ -182,7 +182,7 @@ public class NotificationsFragment extends Fragment {
                 boolean isHeaderSet = false;
                 dateText.setText(joName + "   " + WeekendDays.formatWithDayOfWeek(date));
                 dateText.setPadding(16, 12, 16, 12);
-                dateText.setTextColor(0xFF2E7D32);
+                dateText.setTextColor(0xFF4E7A27);
                 dateText.setTypeface(dateText.getTypeface(), android.graphics.Typeface.BOLD);
 
                 // 取り込みが2回動いた日は同じレースが2行入っているので、レース番号ごとに1行にする
@@ -241,7 +241,7 @@ public class NotificationsFragment extends Fragment {
 
     private TableRow createHeaderRow(TrendCategory category) {
         TableRow row = new TableRow(getContext());
-        row.setBackgroundColor(0xFF388E3C);
+        row.setBackgroundColor(0xFF4E7A27);
         String[] headers;
         if (category == TrendCategory.HARAIMODOSI) {
             headers = Lang.ja() ? new String[]{"レース", "条件", "馬場・天候", "荒れ", "単勝", "馬連", "３連単"}
@@ -271,11 +271,11 @@ public class NotificationsFragment extends Fragment {
         TableRow row = new TableRow(getContext());
         // 1行おきに背景色を変えて、横に長い表でも行を追いやすくする
         if (table.getChildCount() % 2 == 0) {
-            row.setBackgroundColor(0xFFF5F5F5);
+            row.setBackgroundColor(0xFFF8FBF2);
         }
         // レース番号とレース名を1列にまとめて列数を減らす
         TextView race = createTextView(joinNonEmpty(trend.getRaceNum(), trend.getRaceName()));
-        race.setTextColor(0xFF2E7D32);
+        race.setTextColor(0xFF4E7A27);
         race.setTypeface(race.getTypeface(), android.graphics.Typeface.BOLD);
         row.addView(race);
         TextView course = createTextView(distance);
@@ -311,9 +311,9 @@ public class NotificationsFragment extends Fragment {
     /** 1〜3着のセル。「1着」は赤、2・3着は緑の帯を左に付け、人気（①②…）が5番人気以下なら目立たせる */
     private TextView placeView(int place, String ban, String value) {
         TextView tv = createTextView(joinNonEmpty(withBan(ban), value));
-        int color = place == 1 ? 0xFFC62828 : 0xFF2E7D32;
+        int color = place == 1 ? 0xFF4A7A1E : 0xFF4E7A27;
         GradientDrawable bg = new GradientDrawable();
-        bg.setStroke(2, 0xFFE0E0E0);
+        bg.setStroke(2, 0xFFDDE8CC);
         GradientDrawable mark = new GradientDrawable();
         mark.setColor(color);
         android.graphics.drawable.LayerDrawable layer = new android.graphics.drawable.LayerDrawable(new android.graphics.drawable.Drawable[]{bg, mark});
@@ -321,7 +321,7 @@ public class NotificationsFragment extends Fragment {
         layer.setLayerWidth(1, 8);
         tv.setBackground(layer);
         if (value != null && value.matches(".*[⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱].*")) {
-            tv.setTextColor(0xFFE65100);
+            tv.setTextColor(0xFF4A7A1E);
             tv.setTypeface(tv.getTypeface(), android.graphics.Typeface.BOLD);
         }
         return tv;
@@ -331,9 +331,9 @@ public class NotificationsFragment extends Fragment {
     private TextView conditionView(String condition) {
         TextView tv = createTextView(condition);
         if (condition != null) {
-            if (condition.startsWith("不良") || condition.startsWith("重")) tv.setTextColor(0xFFC62828);
-            else if (condition.startsWith("稍")) tv.setTextColor(0xFFE65100);
-            else if (condition.startsWith("良")) tv.setTextColor(0xFF2E7D32);
+            if (condition.startsWith("不良") || condition.startsWith("重")) tv.setTextColor(0xFF4A7A1E);
+            else if (condition.startsWith("稍")) tv.setTextColor(0xFF4A7A1E);
+            else if (condition.startsWith("良")) tv.setTextColor(0xFF4E7A27);
         }
         return tv;
     }
@@ -348,7 +348,7 @@ public class NotificationsFragment extends Fragment {
         tv.setGravity(android.view.Gravity.CENTER);
         GradientDrawable bg = new GradientDrawable();
         bg.setColor(color);
-        bg.setStroke(2, 0xFFE0E0E0);
+        bg.setStroke(2, 0xFFDDE8CC);
         tv.setBackground(bg);
         return tv;
     }
@@ -360,7 +360,7 @@ public class NotificationsFragment extends Fragment {
         if (yen != null) {
             String digits = yen.replaceAll("[^0-9]", "");
             if (!digits.isEmpty() && Long.parseLong(digits) >= 10000) {
-                tv.setTextColor(0xFFC62828);
+                tv.setTextColor(0xFF4A7A1E);
                 tv.setTypeface(tv.getTypeface(), android.graphics.Typeface.BOLD);
             }
         }
@@ -382,9 +382,9 @@ public class NotificationsFragment extends Fragment {
         TextView tv = new TextView(getContext());
         tv.setText(text != null ? text : "");
         tv.setPadding(16, 10, 16, 10);
-        tv.setTextColor(0xFF333333);
+        tv.setTextColor(0xFF2F3B22);
         GradientDrawable gd = new GradientDrawable();
-        gd.setStroke(2, 0xFFE0E0E0);
+        gd.setStroke(2, 0xFFDDE8CC);
         tv.setBackground(gd);
         return tv;
     }

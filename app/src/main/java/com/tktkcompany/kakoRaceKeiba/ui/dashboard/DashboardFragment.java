@@ -190,7 +190,7 @@ public class DashboardFragment extends Fragment {
             TextView header = new TextView(requireContext());
             header.setText(joName);
             header.setTextSize(18);
-            header.setTextColor(0xFF333333);
+            header.setTextColor(0xFF2F3B22);
             header.setTypeface(header.getTypeface(), android.graphics.Typeface.BOLD);
             header.setPadding(0, 32, 0, 8);
             buttonContainer.addView(header);
@@ -217,7 +217,7 @@ public class DashboardFragment extends Fragment {
         if (date.equals(today())) {
             TextView sub = item.findViewById(R.id.text_race_day_sub);
             sub.setText(Lang.t("今日・確定したレースから速報で表示", "Today: live results as races finish"));
-            sub.setTextColor(0xFFE65100);
+            sub.setTextColor(0xFF4A7A1E);
             sub.setVisibility(View.VISIBLE);
         }
         ((TextView) item.findViewById(R.id.text_race_day_main)).setText(mainRace != null ? "11R " + mainRace : "");

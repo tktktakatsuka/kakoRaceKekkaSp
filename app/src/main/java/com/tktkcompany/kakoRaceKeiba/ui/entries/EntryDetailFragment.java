@@ -840,11 +840,11 @@ public class EntryDetailFragment extends Fragment {
             TextView badge = new TextView(requireContext());
             badge.setText(EntryForm.label(text));
             badge.setTextSize(11);
-            badge.setTextColor(caution ? 0xFF4A7A1E : 0xFF4E7A27);
+            badge.setTextColor(caution ? 0xFFB86A00 : 0xFF4E7A27);
             badge.setPadding((int) (8 * density), (int) (2 * density), (int) (8 * density), (int) (2 * density));
             GradientDrawable bg = new GradientDrawable();
             bg.setCornerRadius(10 * density);
-            bg.setStroke((int) Math.max(1, density), caution ? 0xFF4A7A1E : 0xFF7CB342);
+            bg.setStroke((int) Math.max(1, density), caution ? 0xFFB86A00 : 0xFF7CB342);
             badge.setBackground(bg);
             group.addView(badge);
         }

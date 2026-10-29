@@ -301,11 +301,11 @@ public class RaceResultsFragment extends Fragment {
     private static final int[] WAKU_TEXT = {
             0xFF222222, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
             0xFF222222, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
-    private static final int HEADER_COLOR = 0xFF388E3C;
+    private static final int HEADER_COLOR = 0xFF4E7A27;
 
     /** 見出しの次の行（1着）を白、次を薄い灰色…と交互にする */
     private static int stripeColor(int indexInTable) {
-        return indexInTable % 2 == 1 ? 0xFFFFFFFF : 0xFFF5F5F5;
+        return indexInTable % 2 == 1 ? 0xFFFFFFFF : 0xFFF8FBF2;
     }
 
     private TableRow createHeaderRow() {
@@ -328,14 +328,14 @@ public class RaceResultsFragment extends Fragment {
         TextView tv = createTextView(rank);
         tv.setGravity(android.view.Gravity.CENTER);
         if ("1".equals(rank)) {
-            tv.setTextColor(0xFFC62828);
+            tv.setTextColor(0xFF4A7A1E);
             tv.setTypeface(tv.getTypeface(), Typeface.BOLD);
         } else if ("2".equals(rank) || "3".equals(rank)) {
-            tv.setTextColor(0xFF2E7D32);
+            tv.setTextColor(0xFF4E7A27);
             tv.setTypeface(tv.getTypeface(), Typeface.BOLD);
         } else if (rank != null && !rank.matches("\\d+")) {
             // 取消・中止など
-            tv.setTextColor(0xFF9E9E9E);
+            tv.setTextColor(0xFF8A9A7E);
             tv.setText(Lang.rank(rank));
         }
         return tv;
@@ -354,7 +354,7 @@ public class RaceResultsFragment extends Fragment {
         if (index < 0 || index >= WAKU_BACKGROUND.length) return tv;
         GradientDrawable gd = new GradientDrawable();
         gd.setColor(WAKU_BACKGROUND[index]);
-        gd.setStroke(2, 0xFFE0E0E0);
+        gd.setStroke(2, 0xFFDDE8CC);
         tv.setBackground(gd);
         tv.setTextColor(WAKU_TEXT[index]);
         tv.setTypeface(tv.getTypeface(), Typeface.BOLD);
@@ -365,7 +365,7 @@ public class RaceResultsFragment extends Fragment {
         TableRow row = new TableRow(getContext());
         String horseName = result.getHorseName() != null ? result.getHorseName() : "";
         TextView favTv = createTextView("☆");
-        favTv.setTextColor(0xFF9E9E9E);
+        favTv.setTextColor(0xFF8A9A7E);
         favTv.setOnClickListener(v -> toggleFavorite(row, favTv, horseName));
         favTv.setClickable(true);
         favTv.setFocusable(true);
@@ -401,7 +401,7 @@ public class RaceResultsFragment extends Fragment {
         number.setTypeface(number.getTypeface(), Typeface.BOLD);
         row.addView(number);
         TextView name = createTextView(result.getHorseName());
-        name.setTextColor(0xFF111111);
+        name.setTextColor(0xFF2F3B22);
         name.setTypeface(name.getTypeface(), Typeface.BOLD);
         row.addView(name);
         row.addView(createTextView(result.getAge()));
@@ -410,7 +410,7 @@ public class RaceResultsFragment extends Fragment {
         popular.setGravity(android.view.Gravity.CENTER);
         // 1番人気は目立たせる
         if ("1".equals(result.getPopular())) {
-            popular.setTextColor(0xFFC62828);
+            popular.setTextColor(0xFF4A7A1E);
             popular.setTypeface(popular.getTypeface(), Typeface.BOLD);
         }
         row.addView(popular);
@@ -458,7 +458,7 @@ public class RaceResultsFragment extends Fragment {
             FirebaseManager.removeFavoriteHorse(uid, horseName);
             SupabaseManager.removeFavorite(uid, horseName);
             textView.setText("☆");
-            textView.setTextColor(0xFF9E9E9E);
+            textView.setTextColor(0xFF8A9A7E);
             TableLayout table = (TableLayout) row.getParent();
             row.setBackgroundColor(TARGET_ROW.equals(row.getTag()) ? TARGET_ROW_COLOR
                     : stripeColor(table != null ? table.indexOfChild(row) : 1));
@@ -471,9 +471,9 @@ public class RaceResultsFragment extends Fragment {
         TextView tv = new TextView(getContext());
         tv.setText(text != null ? text : "");
         tv.setPadding(16, 10, 16, 10);
-        tv.setTextColor(0xFF333333);
+        tv.setTextColor(0xFF2F3B22);
         GradientDrawable gd = new GradientDrawable();
-        gd.setStroke(2, 0xFFE0E0E0);
+        gd.setStroke(2, 0xFFDDE8CC);
         tv.setBackground(gd);
         return tv;
     }

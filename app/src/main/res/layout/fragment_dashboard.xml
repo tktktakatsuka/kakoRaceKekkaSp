@@ -40,7 +40,7 @@
                     android:background="?attr/selectableItemBackground"
                     android:padding="8dp"
                     android:text="@string/open_trends"
-                    android:textColor="#1565C0"
+                    android:textColor="@color/oshi_accent"
                     android:textSize="14sp" />
             </LinearLayout>
 
