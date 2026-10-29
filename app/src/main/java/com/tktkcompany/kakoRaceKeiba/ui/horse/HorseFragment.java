@@ -24,6 +24,9 @@ import androidx.navigation.Navigation;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.tktkcompany.kakoRaceKeiba.ui.favorite.Mitsugi;
+import com.tktkcompany.kakoRaceKeiba.ui.favorite.MitsugiLoader;
+import com.tktkcompany.kakoRaceKeiba.ui.favorite.MitsugiViews;
 import com.tktkcompany.kakoRaceKeiba.R;
 import com.tktkcompany.kakoRaceKeiba.db.SupabaseManager;
 import com.tktkcompany.kakoRaceKeiba.ui.entries.FavoriteHorseNames;
@@ -133,6 +136,14 @@ public class HorseFragment extends Fragment {
         FavoriteHorseNames.load(f -> {
             favorites = new HashSet<>(f);
             render();
+            // 推し馬なら、貢いだ金額を読む（買い目が無ければ何も出さない）
+            String key = FavoriteHorseNames.normalize(name);
+            if (f.contains(key)) {
+                MitsugiLoader.load(java.util.Collections.singleton(key), byFavorite -> {
+                    mitsugi = byFavorite.get(key);
+                    render();
+                });
+            }
         });
         HorseMemos.load(m -> {
             memos = new HashMap<>(m);
@@ -144,6 +155,9 @@ public class HorseFragment extends Fragment {
         });
     }
 
+    /** この馬に貢いだ金額。推し馬で、買い目があるときだけ */
+    @androidx.annotation.Nullable private Mitsugi.Tally mitsugi;
+
     private void render() {
         Context context = getContext();
         if (context == null || results == null || favorites == null || memos == null || predictions == null) return;
@@ -152,6 +166,11 @@ public class HorseFragment extends Fragment {
         content.addView(header(context));
         if (next != null) content.addView(nextCard(context));
         content.addView(memoCard(context));
+        if (mitsugi != null) {
+            MaterialCardView money = HorseViews.card(context, 0xFFFFFFFF);
+            HorseViews.inner(money).addView(MitsugiViews.breakdown(context, mitsugi));
+            content.addView(money);
+        }
 
         List<HorseAptitude.Group> aptitude = HorseAptitude.of(results, next);
         if (!aptitude.isEmpty()) {

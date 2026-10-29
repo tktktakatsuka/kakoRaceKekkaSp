@@ -117,6 +117,12 @@ public final class Mitsugi {
         return t.returned > t.spent;
     }
 
+    /** 「貢いだ 23,000円／回収 8,400円」 */
+    public static String moneyLabel(Tally t) {
+        return Lang.t("貢いだ " + Lang.yen(t.spent) + "／回収 " + Lang.yen(t.returned),
+                "Spent " + Lang.yen(t.spent) + " / Returned " + Lang.yen(t.returned));
+    }
+
     /** 「恩返し」 */
     public static String paidBackLabel() {
         return Lang.t("恩返し", "Paid back");

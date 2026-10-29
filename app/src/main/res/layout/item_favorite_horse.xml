@@ -40,6 +40,15 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
+            <!-- 称号のバッジと貢いだ金額（買い目のある推し馬だけ。中身は FavoriteHorsesAdapter が入れる） -->
+            <LinearLayout
+                android:id="@+id/mitsugi_box"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="vertical"
+                android:visibility="gone" />
+
             <!-- 出走予定（出馬表に名前がある時だけ表示。タップでそのレースの出走表へ） -->
             <TextView
                 android:id="@+id/text_next_entry"

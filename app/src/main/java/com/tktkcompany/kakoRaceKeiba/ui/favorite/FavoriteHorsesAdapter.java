@@ -9,6 +9,7 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -99,6 +100,14 @@ public class FavoriteHorsesAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     public void clearLatestResults() {
         this.latestResults = null;
+    }
+
+    /** 推し馬ごとの貢いだ金額（キーは FavoriteHorseNames.normalize 済みの名前）。買い目の無い馬は入らない */
+    private Map<String, Mitsugi.Tally> mitsugi = new HashMap<>();
+
+    public void setMitsugi(Map<String, Mitsugi.Tally> mitsugi) {
+        this.mitsugi = mitsugi != null ? mitsugi : new HashMap<>();
+        notifyDataSetChanged();
     }
 
     /** 今日のレースの速報（お気に入りのキー → 結果）。夜の取り込み前でも着順を出すため */
@@ -192,6 +201,15 @@ public class FavoriteHorsesAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     private void bindHorse(ViewHolder holder, String name) {
         holder.textView.setText(displayName(name) + " ›");
+        // 称号（絵文字＋名前）と貢いだ金額。買い目が無ければ出さない
+        holder.mitsugiBox.removeAllViews();
+        Mitsugi.Tally tally = mitsugi.get(com.tktkcompany.kakoRaceKeiba.ui.entries.FavoriteHorseNames.normalize(name));
+        View badge = tally != null ? MitsugiViews.badge(holder.itemView.getContext(), tally, true) : null;
+        if (badge != null) {
+            holder.mitsugiBox.addView(badge);
+            holder.mitsugiBox.addView(MitsugiViews.moneyLine(holder.itemView.getContext(), tally));
+        }
+        holder.mitsugiBox.setVisibility(badge != null ? View.VISIBLE : View.GONE);
         holder.deleteButton.setOnClickListener(v -> listener.onRemoveClick(name));
         // 馬名（カードの空いたところ）を押すと馬カルテを開く
         holder.card.setOnClickListener(v -> androidx.navigation.Navigation.findNavController(v)
@@ -327,6 +345,7 @@ public class FavoriteHorsesAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         FrameLayout avatarContainer;
         TextView decorateButton;
         TextView shareButton;
+        LinearLayout mitsugiBox;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -338,6 +357,7 @@ public class FavoriteHorsesAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             avatarContainer = itemView.findViewById(R.id.avatar_container);
             decorateButton = itemView.findViewById(R.id.btn_decorate);
             shareButton = itemView.findViewById(R.id.btn_share_win);
+            mitsugiBox = itemView.findViewById(R.id.mitsugi_box);
         }
     }
 }

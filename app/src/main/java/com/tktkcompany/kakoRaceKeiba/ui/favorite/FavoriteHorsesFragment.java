@@ -136,6 +136,11 @@ public class FavoriteHorsesFragment extends Fragment {
                 adapter.refresh();
                 loadLatestResults(new ArrayList<>(favoriteHorses));
                 loadNextEntries(new ArrayList<>(favoriteHorses));
+                java.util.Set<String> keys = new java.util.HashSet<>();
+                for (String name : favoriteHorses) keys.add(com.tktkcompany.kakoRaceKeiba.ui.entries.FavoriteHorseNames.normalize(name));
+                MitsugiLoader.load(keys, byFavorite -> {
+                    if (isAdded() && adapter != null) adapter.setMitsugi(byFavorite);
+                });
             }
 
             @Override

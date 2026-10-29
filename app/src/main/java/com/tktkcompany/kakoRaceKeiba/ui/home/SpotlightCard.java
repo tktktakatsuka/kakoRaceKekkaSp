@@ -24,6 +24,8 @@ import com.tktkcompany.kakoRaceKeiba.db.SupabaseManager;
 import com.tktkcompany.kakoRaceKeiba.share.WinShare;
 import com.tktkcompany.kakoRaceKeiba.ui.entries.EntryForm;
 import com.tktkcompany.kakoRaceKeiba.ui.favorite.CardStyles;
+import com.tktkcompany.kakoRaceKeiba.ui.favorite.Mitsugi;
+import com.tktkcompany.kakoRaceKeiba.ui.favorite.MitsugiViews;
 import com.tktkcompany.kakoRaceKeiba.ui.horse.HorseFragment;
 import com.tktkcompany.kakoRaceKeiba.ui.horse.HorseViews;
 import com.tktkcompany.kakoRaceKeiba.ui.theme.Palette;
@@ -54,7 +56,8 @@ final class SpotlightCard {
     private SpotlightCard() {
     }
 
-    static View create(Context context, Spotlight.Pick pick, Runnable onStyleChanged) {
+    /** tally は貢いだ金額（買い目が無ければ null。右上に称号、下に金額の帯を出す） */
+    static View create(Context context, Spotlight.Pick pick, @Nullable Mitsugi.Tally tally, Runnable onStyleChanged) {
         if (pick.kind == Spotlight.Kind.ONBOARDING) return onboarding(context);
         FavoritesStrip.Item item = pick.item;
         MaterialCardView card = baseCard(context);
@@ -94,6 +97,17 @@ final class SpotlightCard {
                 body.addView(name(context, item.name));
                 body.addView(text(context, Lang.t("出走予定を待っています", "Waiting for an entry"), 13, SOFT, false));
                 break;
+        }
+        if (tally != null) {
+            View badge = MitsugiViews.badge(context, tally, true);
+            if (badge != null) {
+                FrameLayout.LayoutParams p = new FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.END);
+                int m = HorseViews.dp(context, 10);
+                p.setMargins(m, m, m, m);
+                card.addView(badge, p);
+                body.addView(MitsugiViews.moneyLine(context, tally));
+            }
         }
         card.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.navigation_horse, HorseFragment.args(item.name)));
         // 長押しで、アイコンと背景を選ぶ（横並びのカード・推し馬一覧と同じ）

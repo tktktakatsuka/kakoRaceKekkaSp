@@ -23,6 +23,9 @@ import com.tktkcompany.kakoRaceKeiba.db.SupabaseManager;
 import com.tktkcompany.kakoRaceKeiba.notification.RaceStartNotices;
 import com.tktkcompany.kakoRaceKeiba.ui.entries.FavoriteHorseNames;
 import com.tktkcompany.kakoRaceKeiba.ui.favorite.CardStyles;
+import com.tktkcompany.kakoRaceKeiba.ui.favorite.Mitsugi;
+import com.tktkcompany.kakoRaceKeiba.ui.favorite.MitsugiLoader;
+import com.tktkcompany.kakoRaceKeiba.ui.favorite.MitsugiViews;
 import com.tktkcompany.kakoRaceKeiba.ui.horse.HorseFragment;
 import com.tktkcompany.kakoRaceKeiba.ui.horse.HorseViews;
 import com.tktkcompany.kakoRaceKeiba.util.Lang;
@@ -77,6 +80,8 @@ final class FavoritesStrip {
     private boolean shownLoaded;
     // 最後に読み終えた推し馬の顔ぶれ（同じなら、読み直すあいだも今のカードを出したままにする）
     @Nullable private Set<String> loadedFavorites;
+    // 推し馬ごとの貢いだ金額（読み終えるまでは空。キーは FavoriteHorseNames.normalize 済みの名前）
+    private Map<String, Mitsugi.Tally> mitsugi = new HashMap<>();
 
     FavoritesStrip(FrameLayout spotlight, View section, LinearLayout container) {
         this.spotlight = spotlight;
@@ -101,6 +106,12 @@ final class FavoritesStrip {
         // カードの飾り（アイコン・背景）を読んだら描き直す
         CardStyles.load(() -> {
             if (gen == generation) render(shown, shownLoaded);
+        });
+        // 貢いだ金額を読んだら描き直す（買い目が無ければ何も出さない）
+        MitsugiLoader.load(snapshot, byFavorite -> {
+            if (gen != generation) return;
+            mitsugi = new HashMap<>(byFavorite);
+            render(shown, shownLoaded);
         });
         String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         List<String> names = new ArrayList<>(favorites);
@@ -174,7 +185,7 @@ final class FavoritesStrip {
         Context context = container.getContext();
         Spotlight.Pick pick = loaded ? Spotlight.pick(items, LocalDateTime.now()) : null;
         spotlight.removeAllViews();
-        spotlight.addView(pick != null ? SpotlightCard.create(context, pick, () -> render(shown, shownLoaded))
+        spotlight.addView(pick != null ? SpotlightCard.create(context, pick, tallyOf(pick.item), () -> render(shown, shownLoaded))
                 : SpotlightCard.loading(context));
         section.setVisibility(pick != null && pick.kind == Spotlight.Kind.ONBOARDING ? View.GONE : View.VISIBLE);
         container.removeAllViews();
@@ -191,10 +202,24 @@ final class FavoritesStrip {
         }
     }
 
+    @Nullable
+    private Mitsugi.Tally tallyOf(@Nullable Item item) {
+        return item != null ? mitsugi.get(FavoriteHorseNames.normalize(item.name)) : null;
+    }
+
     private View card(Context context, Item item) {
         // 文字の色は主役のカードと同じ（淡い背景の上なので、夜のテーマでも昼の色）
         MaterialCardView card = baseCard(context, SpotlightCard.SPOT);
         CardStyles.applyBackground(card, item.name, SpotlightCard.SPOT);
+        // 右上に称号の絵文字だけ（小さいカードなので、称号の名前と金額は出さない）
+        Mitsugi.Tally tally = tallyOf(item);
+        View badge = tally != null ? MitsugiViews.badge(context, tally, false) : null;
+        if (badge != null) {
+            FrameLayout.LayoutParams p = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.END);
+            int m = HorseViews.dp(context, 8);
+            p.setMargins(m, m, m, m);
+            card.addView(badge, p);
+        }
         LinearLayout inner = (LinearLayout) card.getChildAt(0);
         inner.addView(CardStyles.avatar(context, item.name, 44));
 
