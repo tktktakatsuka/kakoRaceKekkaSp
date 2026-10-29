@@ -11,20 +11,20 @@
     <color name="tyairo">#8B4513</color>
     <color name="green">#4CAF50</color> <!-- 緑色 -->
     <color name="green_dark">#388E3C</color> <!-- 濃い緑色 -->
-    <!-- 推し馬ノートの色（昼）。Java からは ui/theme/Palette で読む -->
-    <color name="oshi_bg">#FFFBF1</color>
+    <!-- 推し馬ノートの色（昼。やさしい黄緑）。Java からは ui/theme/Palette で読む -->
+    <color name="oshi_bg">#F8FBF2</color>
     <color name="oshi_surface">#FFFFFF</color>
-    <color name="oshi_ink">#4A3420</color>
-    <color name="oshi_ink_soft">#7A5A38</color>
+    <color name="oshi_ink">#2F3B22</color>
+    <color name="oshi_ink_soft">#56664A</color>
     <color name="oshi_gold">#F5C542</color>
-    <color name="oshi_amber">#B86A00</color>
-    <color name="oshi_brown">#5A3A1A</color>
-    <color name="oshi_brown_light">#8B5A2B</color>
-    <color name="oshi_spot_from">#FFF6D6</color>
-    <color name="oshi_spot_to">#FFE3A0</color>
-    <color name="oshi_line">#EADFC8</color>
-    <color name="oshi_nav">#FFF6E2</color>
-    <color name="oshi_nav_active">#FFE1A0</color>
-    <color name="oshi_on_brown">#FFF3D0</color>
+    <color name="oshi_accent">#4A7A1E</color>
+    <color name="oshi_primary">#4E7A27</color>
+    <color name="oshi_primary_light">#7CB342</color>
+    <color name="oshi_spot_from">#F1F8E4</color>
+    <color name="oshi_spot_to">#DCEDC8</color>
+    <color name="oshi_line">#DDE8CC</color>
+    <color name="oshi_nav">#F1F7E7</color>
+    <color name="oshi_nav_active">#DCEDC8</color>
+    <color name="oshi_on_primary">#FFFFFF</color>
     <color name="oshi_danger">#B3261E</color>
 </resources>

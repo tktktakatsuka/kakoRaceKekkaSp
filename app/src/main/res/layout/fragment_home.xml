@@ -54,7 +54,7 @@
                             android:layout_height="wrap_content"
                             android:text="@string/login_google"
                             android:textAllCaps="false"
-                            android:textColor="@color/oshi_on_brown"
+                            android:textColor="@color/oshi_on_primary"
                             android:textSize="16sp" />
 
                         <TextView
@@ -164,7 +164,7 @@
                         android:background="?attr/selectableItemBackground"
                         android:padding="6dp"
                         android:text="@string/see_all"
-                        android:textColor="@color/oshi_amber"
+                        android:textColor="@color/oshi_accent"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -176,7 +176,7 @@
                         android:background="?attr/selectableItemBackground"
                         android:padding="6dp"
                         android:text="@string/notification_settings_link"
-                        android:textColor="@color/oshi_amber"
+                        android:textColor="@color/oshi_accent"
                         android:textSize="13sp" />
                 </LinearLayout>
 

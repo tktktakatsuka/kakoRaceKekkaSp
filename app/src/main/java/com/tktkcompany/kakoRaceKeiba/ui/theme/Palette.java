@@ -31,8 +31,8 @@ public final class Palette {
     }
 
     /** 強調（太字と合わせて使う）・文字のボタン */
-    public static int amber(Context c) {
-        return color(c, R.color.oshi_amber);
+    public static int accent(Context c) {
+        return color(c, R.color.oshi_accent);
     }
 
     /** 画面の背景 */

@@ -41,13 +41,13 @@ final class SpotlightCard {
 
     private static final Pattern START = Pattern.compile("(\\d{1,2}):(\\d{2})発走");
     // カードは淡い背景（着せ替えの背景も）の上に文字を置くので、夜のテーマでも昼の色のまま（colors.xml の oshi_* の昼の値）
-    static final int INK = 0xFF4A3420;
-    static final int SOFT = 0xFF7A5A38;
+    static final int INK = 0xFF2F3B22;
+    static final int SOFT = 0xFF56664A;
     static final int AMBER = 0xFFB86A00;
-    static final int BROWN = 0xFF5A3A1A;
-    static final int ON_BROWN = 0xFFFFF3D0;
+    static final int PRIMARY = 0xFF4E7A27;
+    static final int ON_PRIMARY = 0xFFFFFFFF;
     /** 着せ替えの背景が「標準」のときの色 */
-    static final int SPOT = 0xFFFFF6D6;
+    static final int SPOT = 0xFFF1F8E4;
     /** 読み込み中のカードと、読み込んだあとのカードの高さをそろえる（ガタつかないように） */
     private static final int MIN_HEIGHT_DP = 168;
 
@@ -129,7 +129,7 @@ final class SpotlightCard {
         }
         body.addView(text(context, line.toString(), 13, SOFT, false));
         if (win) {
-            TextView share = text(context, Lang.t("🎉 勝利をシェア", "🎉 Share the win"), 13, BROWN, true);
+            TextView share = text(context, Lang.t("🎉 勝利をシェア", "🎉 Share the win"), 13, PRIMARY, true);
             share.setBackgroundResource(R.drawable.bg_share_win);
             int ph = HorseViews.dp(context, 12), pv = HorseViews.dp(context, 6);
             share.setPadding(ph, pv, ph, pv);
@@ -155,9 +155,9 @@ final class SpotlightCard {
         inner.addView(body);
         MaterialButton button = new MaterialButton(context);
         button.setText(Lang.t("今週の重賞に出る馬から選ぶ", "Pick from this week's graded races"));
-        // カードが淡い色なので、濃い茶の塗りのボタンにする
-        button.setTextColor(ON_BROWN);
-        button.setBackgroundTintList(android.content.res.ColorStateList.valueOf(BROWN));
+        // カードが淡い色なので、黄緑の塗りのボタンにする
+        button.setTextColor(ON_PRIMARY);
+        button.setBackgroundTintList(android.content.res.ColorStateList.valueOf(PRIMARY));
         button.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.navigation_horseSearch));
         inner.addView(button, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         return card;
@@ -180,7 +180,7 @@ final class SpotlightCard {
         return title.trim();
     }
 
-    /** 「前走 10/11(日) 東京8R 1着（2人気）」。1〜3着は太字、1着は金色 */
+    /** 「前走 10/11(日) 東京8R 1着（2人気）」。1〜3着は太字、1着は金色（勝ちの色） */
     private static CharSequence resultLine(String prefix, @Nullable SupabaseManager.RaceResult r) {
         SpannableStringBuilder sb = new SpannableStringBuilder(prefix);
         if (r == null) return sb;
@@ -232,11 +232,11 @@ final class SpotlightCard {
         return card;
     }
 
-    /** 「次に走る推し馬」などの見出し。濃い茶の丸い札 */
+    /** 「次に走る推し馬」などの見出し。黄緑の丸い札 */
     static TextView chip(Context context, CharSequence s) {
-        TextView tv = text(context, s, 11, ON_BROWN, true);
+        TextView tv = text(context, s, 11, ON_PRIMARY, true);
         android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
-        bg.setColor(BROWN);
+        bg.setColor(PRIMARY);
         bg.setCornerRadius(HorseViews.dp(context, 12));
         tv.setBackground(bg);
         int ph = HorseViews.dp(context, 9), pv = HorseViews.dp(context, 3);

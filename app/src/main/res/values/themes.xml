@@ -1,11 +1,11 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- アプリのテーマ（Material 3、金色とクリーム）。色は colors.xml の oshi_*。夜は values-night で上書きする -->
     <style name="Base.Theme.MyApplication" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/oshi_brown</item>
-        <item name="colorOnPrimary">@color/oshi_on_brown</item>
+        <item name="colorPrimary">@color/oshi_primary</item>
+        <item name="colorOnPrimary">@color/oshi_on_primary</item>
         <item name="colorPrimaryContainer">@color/oshi_gold</item>
         <item name="colorOnPrimaryContainer">@color/oshi_ink</item>
-        <item name="colorSecondary">@color/oshi_amber</item>
+        <item name="colorSecondary">@color/oshi_accent</item>
         <item name="colorSecondaryContainer">@color/oshi_nav_active</item>
         <item name="colorOnSecondaryContainer">@color/oshi_ink</item>
         <item name="colorSurface">@color/oshi_surface</item>
@@ -25,6 +25,16 @@
         <item name="android:statusBarColor">@color/oshi_bg</item>
         <item name="android:navigationBarColor">@color/oshi_nav</item>
         <item name="android:windowLayoutInDisplayCutoutMode">always</item>
+        <!-- 影のあるカードに主色（茶）を重ねて灰色っぽくしない -->
+        <item name="elevationOverlayEnabled">false</item>
+        <item name="materialCardViewStyle">@style/Widget.Oshi.Card</item>
+    </style>
+
+    <!-- カードの形をそろえる（白い面、角は丸く、淡い茶の線）。画面ごとに色や角を決めているカードは、そちらが優先 -->
+    <style name="Widget.Oshi.Card" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardBackgroundColor">@color/oshi_surface</item>
+        <item name="cardCornerRadius">16dp</item>
+        <item name="strokeColor">@color/oshi_line</item>
     </style>
 
     <style name="Theme.MyApplication" parent="Base.Theme.MyApplication">

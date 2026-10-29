@@ -237,15 +237,15 @@ final class FavoritesStrip {
 
     /** 最後の「＋ 馬を追加」 */
     private View addCard(Context context) {
-        MaterialCardView card = baseCard(context, 0xFFFFF1C9);
+        MaterialCardView card = baseCard(context, 0xFFF1F8E4);
         card.setCardElevation(0);
         LinearLayout inner = (LinearLayout) card.getChildAt(0);
         inner.setGravity(Gravity.CENTER);
         inner.setMinimumHeight(HorseViews.dp(context, 150));
-        TextView plus = text(context, "＋", 34, SpotlightCard.AMBER, true);
+        TextView plus = text(context, "＋", 34, SpotlightCard.PRIMARY, true);
         plus.setGravity(Gravity.CENTER);
         inner.addView(plus);
-        TextView label = text(context, Lang.t("馬を追加", "Add a horse"), 14, SpotlightCard.BROWN, true);
+        TextView label = text(context, Lang.t("馬を追加", "Add a horse"), 14, SpotlightCard.PRIMARY, true);
         label.setGravity(Gravity.CENTER);
         inner.addView(label);
         card.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.navigation_horseSearch));

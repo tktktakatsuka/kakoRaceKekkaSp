@@ -61,9 +61,15 @@ public class PaletteContrastTest {
     }
 
     @Test
-    public void onBrownIsReadable() throws Exception {
-        assertReadable(read("values"), "oshi_on_brown", "oshi_brown");
-        assertReadable(read("values-night"), "oshi_on_brown", "oshi_brown");
+    public void onPrimaryIsReadable() throws Exception {
+        assertReadable(read("values"), "oshi_on_primary", "oshi_primary");
+        assertReadable(read("values-night"), "oshi_on_primary", "oshi_primary");
+    }
+
+    @Test
+    public void accentOnSurfaceIsReadable() throws Exception {
+        assertReadable(read("values"), "oshi_accent", "oshi_surface");
+        assertReadable(read("values-night"), "oshi_accent", "oshi_surface");
     }
 
     @Test
