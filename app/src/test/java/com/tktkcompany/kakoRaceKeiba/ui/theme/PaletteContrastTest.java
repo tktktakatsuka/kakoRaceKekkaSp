@@ -41,7 +41,10 @@ public class PaletteContrastTest {
         Map<String, Integer> day = read("values");
         Map<String, Integer> night = read("values-night");
         assertTrue(day.size() >= 15);
-        for (String name : day.keySet()) assertTrue("夜に無い: " + name, night.containsKey(name));
+        // oshi_card_* は淡いカードの上の文字なので、わざと夜に書かない（cardColorsStayTheSameAtNight）
+        for (String name : day.keySet()) {
+            if (!name.startsWith("oshi_card_")) assertTrue("夜に無い: " + name, night.containsKey(name));
+        }
     }
 
     @Test
@@ -70,6 +73,30 @@ public class PaletteContrastTest {
     public void accentOnSurfaceIsReadable() throws Exception {
         assertReadable(read("values"), "oshi_accent", "oshi_surface");
         assertReadable(read("values-night"), "oshi_accent", "oshi_surface");
+    }
+
+    /** 淡いカード（着せ替えの背景も）の上の文字は、夜も昼と同じ濃い色にする（夜に明るい文字だとカードに沈む） */
+    @Test
+    public void cardColorsStayTheSameAtNight() throws Exception {
+        Map<String, Integer> day = read("values");
+        Map<String, Integer> night = read("values-night");
+        for (String name : new String[]{"oshi_card_ink", "oshi_card_ink_soft", "oshi_card_accent"}) {
+            assertTrue("昼に無い: " + name, day.containsKey(name));
+            assertTrue("夜で変えてはいけない: " + name, !night.containsKey(name));
+        }
+        assertReadable(day, "oshi_card_ink", "oshi_spot_to");
+        assertReadable(day, "oshi_card_ink_soft", "oshi_surface");
+        assertReadable(day, "oshi_card_accent", "oshi_surface");
+    }
+
+    @Test
+    public void lightCardLayoutsUseCardColors() throws Exception {
+        for (String layout : new String[]{"item_favorite_horse", "item_entry_horse"}) {
+            String xml = new String(Files.readAllBytes(new File("src/main/res/layout/" + layout + ".xml").toPath()), StandardCharsets.UTF_8);
+            for (String themed : new String[]{"@color/oshi_ink\"", "@color/oshi_ink_soft\"", "@color/oshi_accent\""}) {
+                assertTrue(layout + " が夜に変わる色を使っている: " + themed, !xml.contains(themed));
+            }
+        }
     }
 
     @Test

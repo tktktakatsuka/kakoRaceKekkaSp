@@ -17,4 +17,8 @@
     <color name="oshi_nav_active">#DCEDC8</color>
     <color name="oshi_on_primary">#FFFFFF</color>
     <color name="oshi_danger">#B3261E</color>
+    <!-- 淡いカード（着せ替えの背景も）の上の文字。夜のテーマでも変えない（values-night には書かない） -->
+    <color name="oshi_card_ink">#2F3B22</color>
+    <color name="oshi_card_ink_soft">#56664A</color>
+    <color name="oshi_card_accent">#4A7A1E</color>
 </resources>

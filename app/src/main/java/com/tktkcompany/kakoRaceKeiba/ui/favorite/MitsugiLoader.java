@@ -40,13 +40,13 @@ public final class MitsugiLoader {
     private static final Handler MAIN = new Handler(Looper.getMainLooper());
     /** レースごとの出走馬。過去のレースは変わらないので、ずっと覚えておく */
     private static final Map<String, List<Mitsugi.Runner>> RUNNERS = Collections.synchronizedMap(new HashMap<>());
-    @Nullable private static volatile List<Bets.Bet> cachedBets;
+    private static final MitsugiCache CACHE = new MitsugiCache();
 
     private MitsugiLoader() {
     }
 
     public static void invalidate() {
-        cachedBets = null;
+        CACHE.invalidate();
     }
 
     public static void load(Set<String> favoriteKeys, Callback cb) {
@@ -54,20 +54,28 @@ public final class MitsugiLoader {
             cb.onLoaded(Collections.emptyMap());
             return;
         }
-        List<Bets.Bet> bets = cachedBets;
-        if (bets != null) {
-            count(bets, favoriteKeys, cb);
+        com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            cb.onLoaded(Collections.emptyMap());
             return;
         }
-        Bets.loadAll(loaded -> count(loaded, favoriteKeys, cb));
+        String uid = user.getUid();
+        List<Bets.Bet> bets = CACHE.get(uid);
+        long startedAt = CACHE.version();
+        if (bets != null) {
+            count(bets, uid, startedAt, favoriteKeys, cb);
+            return;
+        }
+        Bets.loadAll(loaded -> count(loaded, uid, startedAt, favoriteKeys, cb));
     }
 
-    private static void count(List<Bets.Bet> loaded, Set<String> favoriteKeys, Callback cb) {
+    private static void count(List<Bets.Bet> loaded, String uid, long startedAt, Set<String> favoriteKeys, Callback cb) {
         EXECUTOR.execute(() -> {
             Map<String, Mitsugi.Tally> result;
             try {
                 List<Bets.Bet> bets = settlePast(loaded);
-                cachedBets = bets;
+                // 読み込み中に買い目が足された・消された・利用者が変わったときは覚えない（MitsugiCache）
+                CACHE.put(uid, startedAt, bets);
                 result = Mitsugi.tally(bets, runners(bets), favoriteKeys);
             } catch (Exception e) {
                 Log.w(TAG, "load failed", e);

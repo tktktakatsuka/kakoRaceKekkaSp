@@ -650,7 +650,7 @@ public class EntryDetailFragment extends Fragment {
     private static void paintMark(TextView view, @Nullable String mark) {
         view.setText(mark != null ? mark : Lang.t("印", "Pick"));
         view.setTextSize(mark != null ? 20 : 12);
-        view.setTextColor(mark == null ? 0xFFBDBDBD : "◎".equals(mark) ? 0xFF4A7A1E : 0xFF2F3B22);
+        view.setTextColor(mark == null ? 0xFFBDBDBD : com.tktkcompany.kakoRaceKeiba.ui.theme.RaceColors.mark(mark));
     }
 
     /**
@@ -693,7 +693,7 @@ public class EntryDetailFragment extends Fragment {
             String label = Lang.t("結果 ", "Result ") + Lang.rank(rank);
             if (r.getPopular() != null) label += " (" + Lang.popularity(r.getPopular()) + ")";
             view.setText(label);
-            view.setTextColor("1".equals(rank) ? 0xFF4A7A1E : ("2".equals(rank) || "3".equals(rank)) ? 0xFF4E7A27 : 0xFF56664A);
+            view.setTextColor(rank.matches("[123]") ? com.tktkcompany.kakoRaceKeiba.ui.theme.RaceColors.rank(rank) : 0xFF56664A);
             view.setVisibility(View.VISIBLE);
             if ("◎".equals(marks.get(key))) {
                 honmeiLine = "◎" + r.getHorseName() + Lang.t("は", ": ") + Lang.rank(rank)
@@ -781,7 +781,7 @@ public class EntryDetailFragment extends Fragment {
             star.setText(fav ? "★" : "☆");
             star.setTextColor(fav ? 0xFFFFB300 : 0xFFBDBDBD);
             ((MaterialCardView) cardView)
-                    .setCardBackgroundColor(fav ? 0xFFFFF8E1 : 0xFFFFFFFF);
+                    .setCardBackgroundColor(fav ? 0xFFF1F8E4 : 0xFFFFFFFF);
         };
         paint.run();
         star.setOnClickListener(v -> {

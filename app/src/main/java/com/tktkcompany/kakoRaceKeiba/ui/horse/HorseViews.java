@@ -112,13 +112,11 @@ public final class HorseViews {
         return image;
     }
 
-    /** 着順の色（1着赤・2着青・3着緑・それ以外は黒） */
+    /** 着順の色（1着金・2着緑・3着茶・それ以外は本文の色。RaceColors と同じ） */
     public static int rankColor(String rank) {
         Integer r = HorseRecord.rank(rank);
         if (r == null) return GRAY;
-        if (r == 1) return 0xFF4A7A1E;
-        if (r == 2) return 0xFF4A7A1E;
-        if (r == 3) return GREEN;
+        if (r <= 3) return com.tktkcompany.kakoRaceKeiba.ui.theme.RaceColors.rank(String.valueOf(r));
         return TEXT;
     }
 }

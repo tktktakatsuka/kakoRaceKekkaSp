@@ -306,7 +306,7 @@ public class FavoriteHorsesAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         int from = sb.length();
         sb.append(Lang.rank(rank));
         if (rank.matches("[123]")) {
-            sb.setSpan(new ForegroundColorSpan("1".equals(rank) ? 0xFF4A7A1E : 0xFF4E7A27), from, sb.length(),
+            sb.setSpan(new ForegroundColorSpan(com.tktkcompany.kakoRaceKeiba.ui.theme.RaceColors.rank(rank)), from, sb.length(),
                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             sb.setSpan(new StyleSpan(Typeface.BOLD), from, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
