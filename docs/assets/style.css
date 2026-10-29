@@ -324,7 +324,7 @@ h1.sec { scroll-margin-top: 64px; margin-top: 24px; }
 :root[data-theme="sakura"] .oshi { border: 2px dashed #f7b6cc; }
 :root[data-theme="sakura"] .oshi-head::after, :root[data-theme="sakura"] .door.week::before { content: "🌸"; font-size: 14px; }
 :root[data-theme="sakura"] .door.week::before { position: absolute; right: 12px; bottom: 8px; opacity: .8; }
-:root[data-theme="yume"] .oshi {
+:root[data-theme="yume"] .oshi.bg-white, :root[data-theme="yume"] .oshi.bg-cream {
   border: 2px solid transparent;
   background: linear-gradient(var(--card), var(--card)) padding-box, linear-gradient(135deg, #c9b6ff, #9fe3f0) border-box;
 }

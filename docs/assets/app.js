@@ -181,7 +181,10 @@ const CARD_ICONS = ['', '🏇', '🐴', '🦄', '🏆', '👑', '⭐', '❤️',
 const CARD_BGS = [['', '標準'], ['sakura', '桜'], ['wakakusa', '若草'], ['sora', '空'], ['yuyake', '夕焼け'], ['kin', '金'],
   ['fuji', '藤'], ['mint', 'ミント'], ['momiji', '紅葉'], ['kiri', '霧']];
 const STYLE_KEY = 'cardStyles';
+// 保存できなかったときは、このページを閉じるまでここに持っておく
+let unsavedStyles = null;
 function cardStyles() {
+  if (unsavedStyles) return { ...unsavedStyles };
   try {
     const m = JSON.parse(localStorage.getItem(STYLE_KEY) || '{}');
     return m && typeof m === 'object' && !Array.isArray(m) ? m : {};
@@ -199,10 +202,14 @@ function styleOf(name) {
 function saveStyle(name, st) {
   const m = cardStyles();
   if (st.icon || st.bg) m[name] = st; else delete m[name];
-  try { localStorage.setItem(STYLE_KEY, JSON.stringify(m)); } catch (e) { /* 保存できない環境では、このページを閉じるまでだけ */ }
+  try {
+    localStorage.setItem(STYLE_KEY, JSON.stringify(m));
+  } catch (e) {
+    unsavedStyles = m; // 保存できない環境では、このページを閉じるまでだけ
+  }
 }
 // 馬のアイコン（選んでいなければ馬の顔）。size は sm / md / lg
-const avatarOf = (icon, size) => `<span class="ava ${size}" aria-hidden="true">${icon ? esc(icon) : '<img src="assets/icon-192.png?v=11" alt="">'}</span>`;
+const avatarOf = (icon, size) => `<span class="ava ${size}" aria-hidden="true">${icon ? esc(icon) : '<img src="assets/icon-192.png?v=12" alt="">'}</span>`;
 const avatar = (name, size = 'md') => avatarOf(styleOf(name).icon, size);
 // 背景のクラス。選んでいなければ fallback（今週走る馬はクリーム、ほかは白。アプリと同じ）
 const bgClass = (name, fallback) => `bg-${styleOf(name).bg || fallback}`;
@@ -310,10 +317,14 @@ function longDate(d) {
 
 // ---------- ホーム（アプリと同じ：次に走る推し馬を主役に、ほかの推し馬、メインレース） ----------
 
-// 推し馬それぞれの前走（一番新しい結果）
+// 推し馬それぞれの前走（一番新しい結果）。よく走る馬に件数を取られないよう、1頭ずつ1件だけ聞く
 async function favLastRuns(list) {
-  if (!list.length) return {};
-  return lastRuns(list, '99999999');
+  const rows = await Promise.all(list.map(name => query('race_results',
+    `select=horse_name,kaisaibi,kaisaijo,race_no,race_title,rank,popular&horse_name=eq.${enc(name)}&order=kaisaibi.desc,race_no.desc&limit=1`, HOUR)
+    .catch(() => [])));
+  const last = {};
+  for (const [row] of rows) if (row) last[row.horse_name] = row;
+  return last;
 }
 const prevLine = r => (r ? `前走 ${dateLabel(r.kaisaibi)} ${esc(r.kaisaijo)}${r.race_no ? `${r.race_no}R` : ''} ${esc(r.rank)}着${r.popular ? `（${esc(r.popular)}人気）` : ''}` : '');
 
