@@ -170,7 +170,7 @@ public class FavoriteHorsesAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             float density = parent.getResources().getDisplayMetrics().density;
             header.setPadding((int) (4 * density), (int) (14 * density), 0, (int) (4 * density));
             header.setTextSize(14);
-            header.setTextColor(0xFF388E3C);
+            header.setTextColor(0xFF4E7A27);
             header.setTypeface(header.getTypeface(), Typeface.BOLD);
             header.setLayoutParams(new RecyclerView.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -208,7 +208,7 @@ public class FavoriteHorsesAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         holder.avatarContainer.addView(avatar);
 
         SupabaseManager.RaceEntry next = nextEntries.get(FavoriteHorseNames.normalize(name));
-        CardStyles.applyBackground(holder.card, name, next != null ? 0xFFFFF8E1 : 0xFFFFFFFF);
+        CardStyles.applyBackground(holder.card, name, next != null ? 0xFFF1F8E4 : 0xFFFFFFFF);
         if (next == null) {
             holder.nextEntryView.setVisibility(View.GONE);
             holder.nextEntryView.setOnClickListener(null);
@@ -288,7 +288,7 @@ public class FavoriteHorsesAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         int from = sb.length();
         sb.append(Lang.rank(rank));
         if (rank.matches("[123]")) {
-            sb.setSpan(new ForegroundColorSpan("1".equals(rank) ? 0xFFC62828 : 0xFF2E7D32), from, sb.length(),
+            sb.setSpan(new ForegroundColorSpan("1".equals(rank) ? 0xFF4A7A1E : 0xFF4E7A27), from, sb.length(),
                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             sb.setSpan(new StyleSpan(Typeface.BOLD), from, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }

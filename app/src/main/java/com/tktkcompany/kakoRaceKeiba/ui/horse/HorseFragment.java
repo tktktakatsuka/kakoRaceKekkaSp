@@ -82,7 +82,7 @@ public class HorseFragment extends Fragment {
         Context context = requireContext();
         name = getArguments() != null ? getArguments().getString(ARG_HORSE, "") : "";
         ScrollView scroll = new ScrollView(context);
-        scroll.setBackgroundColor(0xFFF5F5F5);
+        scroll.setBackgroundColor(0xFFF8FBF2);
         LinearLayout root = new LinearLayout(context);
         root.setOrientation(LinearLayout.VERTICAL);
         int pad = HorseViews.dp(context, 12);
@@ -185,7 +185,7 @@ public class HorseFragment extends Fragment {
         card.setRadius(HorseViews.dp(context, 20));
         // 深い緑のグラデーションに、右下へ大きな馬の絵をうっすら重ねる
         android.widget.FrameLayout frame = new android.widget.FrameLayout(context);
-        frame.setBackground(new GradientDrawable(GradientDrawable.Orientation.TL_BR, new int[]{0xFF0B3D20, 0xFF1B5E20, 0xFF2E7D32}));
+        frame.setBackground(new GradientDrawable(GradientDrawable.Orientation.TL_BR, new int[]{0xFF3D6420, 0xFF4E7A27, 0xFF7CB342}));
         android.widget.ImageView watermark = new android.widget.ImageView(context);
         watermark.setImageResource(R.drawable.uma);
         watermark.setAlpha(0.13f);
@@ -269,8 +269,8 @@ public class HorseFragment extends Fragment {
     private void bindFavoriteButton(MaterialButton button) {
         boolean on = favorites.contains(name);
         button.setText(on ? Lang.t("★ 推し馬として応援中", "★ Following") : Lang.t("☆ 推し馬にして、出走・結果を通知で受け取る", "☆ Follow and get notified"));
-        button.setBackgroundTintList(android.content.res.ColorStateList.valueOf(on ? 0x33FFFFFF : 0xFFFFC107));
-        button.setTextColor(on ? 0xFFFFFFFF : 0xFF3E2723);
+        button.setBackgroundTintList(android.content.res.ColorStateList.valueOf(on ? 0x33FFFFFF : 0xFFFFFFFF));
+        button.setTextColor(on ? 0xFFFFFFFF : 0xFF4E7A27);
         button.setStrokeColor(android.content.res.ColorStateList.valueOf(0x99FFFFFF));
         button.setStrokeWidth(on ? HorseViews.dp(button.getContext(), 1) : 0);
     }
@@ -302,9 +302,9 @@ public class HorseFragment extends Fragment {
     }
 
     private View nextCard(Context context) {
-        MaterialCardView card = HorseViews.card(context, 0xFFFFF8E1);
+        MaterialCardView card = HorseViews.card(context, 0xFFF1F8E4);
         LinearLayout inner = HorseViews.inner(card);
-        inner.addView(HorseViews.text(context, Lang.t("📅 次走", "📅 Next race"), 13, 0xFFE65100, true));
+        inner.addView(HorseViews.text(context, Lang.t("📅 次走", "📅 Next race"), 13, 0xFF4A7A1E, true));
         inner.addView(HorseViews.text(context, HorseSearchFragment.raceLabel(next.getKaisaibi(), next.getKaisaijo(), next.getRaceNo(),
                 next.getRaceTitle()), 17, HorseViews.TEXT, true));
         String info = next.getHorseNumber() != null ? Lang.t(next.getHorseNumber() + "番・", "No. " + next.getHorseNumber() + " · ") : "";
@@ -331,7 +331,7 @@ public class HorseFragment extends Fragment {
         }
         if (next != null) {
             TextView note = HorseViews.text(context, Lang.t("★次走 … 次のレースと同じ条件", "★Next … same condition as the next race"),
-                    11, 0xFFE65100, false);
+                    11, 0xFF4A7A1E, false);
             note.setPadding(0, HorseViews.dp(context, 10), 0, 0);
             inner.addView(note);
         }
@@ -347,14 +347,14 @@ public class HorseFragment extends Fragment {
         if (row.matchesNext) {
             GradientDrawable bg = new GradientDrawable();
             bg.setCornerRadius(HorseViews.dp(context, 8));
-            bg.setColor(0xFFFFF8E1);
+            bg.setColor(0xFFF1F8E4);
             line.setBackground(bg);
         }
 
         LinearLayout labels = new LinearLayout(context);
         labels.setOrientation(LinearLayout.VERTICAL);
         TextView label = HorseViews.text(context, (row.matchesNext ? "★" : "") + row.label, 14,
-                row.matchesNext ? 0xFFE65100 : HorseViews.TEXT, true);
+                row.matchesNext ? 0xFF4A7A1E : HorseViews.TEXT, true);
         labels.addView(label);
         labels.addView(HorseViews.text(context, row.record(), 11, HorseViews.GRAY, false));
         line.addView(labels, new LinearLayout.LayoutParams(HorseViews.dp(context, 110), ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -363,12 +363,12 @@ public class HorseFragment extends Fragment {
         android.widget.FrameLayout bar = new android.widget.FrameLayout(context);
         GradientDrawable track = new GradientDrawable();
         track.setCornerRadius(HorseViews.dp(context, 5));
-        track.setColor(0xFFEEEEEE);
+        track.setColor(0xFFDDE8CC);
         bar.setBackground(track);
         View fill = new View(context);
         GradientDrawable fillBg = new GradientDrawable();
         fillBg.setCornerRadius(HorseViews.dp(context, 5));
-        fillBg.setColor(row.top3Rate() >= 50 ? 0xFF2E7D32 : 0xFF81C784);
+        fillBg.setColor(row.top3Rate() >= 50 ? 0xFF4E7A27 : 0xFFC5E1A5);
         fill.setBackground(fillBg);
         bar.addView(fill, new android.widget.FrameLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT));
         LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(0, HorseViews.dp(context, 10), 1);
@@ -413,7 +413,7 @@ public class HorseFragment extends Fragment {
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setGravity(Gravity.CENTER_VERTICAL);
         row.setPadding(0, HorseViews.dp(context, 4), 0, HorseViews.dp(context, 4));
-        row.addView(HorseViews.text(context, m.mark, 20, 0xFFC62828, true));
+        row.addView(HorseViews.text(context, m.mark, 20, 0xFF4A7A1E, true));
         TextView label = HorseViews.text(context, "  " + WeekendDays.formatShort(m.race.date) + " " + Lang.race(m.race.course, m.race.raceNo),
                 14, HorseViews.TEXT, false);
         row.addView(label, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
@@ -452,7 +452,7 @@ public class HorseFragment extends Fragment {
 
     private View divider(Context context) {
         View line = new View(context);
-        line.setBackgroundColor(0xFFEEEEEE);
+        line.setBackgroundColor(0xFFDDE8CC);
         line.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Math.max(1, HorseViews.dp(context, 1))));
         return line;
     }

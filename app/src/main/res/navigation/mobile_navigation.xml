@@ -26,7 +26,6 @@
         android:id="@+id/navigation_dashboard"
         android:name="com.tktkcompany.kakoRaceKeiba.ui.dashboard.DashboardFragment"
         android:label="@string/title_dashboard"
-        android:textColor="@color/tyairo"
         tools:layout="@layout/fragment_dashboard">
         <action
             android:id="@+id/action_fragmentB_to_fragmentC"
@@ -43,7 +42,6 @@
         android:id="@+id/navigation_raceResults"
         android:name="com.tktkcompany.kakoRaceKeiba.ui.raceResult.RaceResultsFragment"
         android:label="@string/race_results"
-        android:textColor="@color/tyairo"
         tools:layout="@layout/fragment_raceresults" />
 
     <fragment

@@ -67,7 +67,7 @@ public class HorseSearchFragment extends Fragment {
         root.setOrientation(LinearLayout.VERTICAL);
         int pad = HorseViews.dp(context, 12);
         root.setPadding(pad, pad, pad, 0);
-        root.setBackgroundColor(0xFFF5F5F5);
+        root.setBackgroundColor(0xFFF8FBF2);
 
         MaterialCardView box = HorseViews.card(context, 0xFFFFFFFF);
         input = new EditText(context);
@@ -251,8 +251,8 @@ public class HorseSearchFragment extends Fragment {
         grade.setPadding(padH, padV, padH, padV);
         android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
         bg.setCornerRadius(HorseViews.dp(context, 10));
-        bg.setColor(race.grade == com.tktkcompany.kakoRaceKeiba.ui.home.MainRaces.G1 ? 0xFF1565C0
-                : race.grade == com.tktkcompany.kakoRaceKeiba.ui.home.MainRaces.G2 ? 0xFFC62828 : 0xFF2E7D32);
+        bg.setColor(race.grade == com.tktkcompany.kakoRaceKeiba.ui.home.MainRaces.G1 ? 0xFF4A7A1E
+                : race.grade == com.tktkcompany.kakoRaceKeiba.ui.home.MainRaces.G2 ? 0xFF4A7A1E : 0xFF4E7A27);
         grade.setBackground(bg);
         head.addView(grade);
         TextView title = HorseViews.text(context, "  " + race.title, 16, HorseViews.TEXT, true);
@@ -278,8 +278,8 @@ public class HorseSearchFragment extends Fragment {
         Runnable paint = () -> {
             boolean on = favorites.contains(FavoriteHorseNames.normalize(horse));
             chip.setText((on ? "★ " : "☆ ") + horse + (badge != null ? "  " + badge : ""));
-            chip.setChipBackgroundColor(android.content.res.ColorStateList.valueOf(on ? 0xFFFFECB3 : 0xFFF5F5F5));
-            chip.setTextColor(on ? 0xFF5D4037 : HorseViews.TEXT);
+            chip.setChipBackgroundColor(android.content.res.ColorStateList.valueOf(on ? 0xFFFFECB3 : 0xFFF8FBF2));
+            chip.setTextColor(on ? 0xFF56664A : HorseViews.TEXT);
         };
         paint.run();
         chip.setOnClickListener(v -> {
@@ -309,7 +309,7 @@ public class HorseSearchFragment extends Fragment {
     }
 
     private View row(Context context, HorseSearch.Hit hit) {
-        MaterialCardView card = HorseViews.card(context, hit.next != null ? 0xFFFFF8E1 : 0xFFFFFFFF);
+        MaterialCardView card = HorseViews.card(context, hit.next != null ? 0xFFF1F8E4 : 0xFFFFFFFF);
         LinearLayout inner = HorseViews.inner(card);
         inner.setOrientation(LinearLayout.HORIZONTAL);
         inner.setGravity(Gravity.CENTER_VERTICAL);

@@ -44,7 +44,7 @@
             android:gravity="center"
             android:padding="24dp"
             android:text="@string/no_favorites"
-            android:textColor="#777777"
+            android:textColor="@color/oshi_ink_soft"
             android:visibility="gone" />
 
         <ProgressBar

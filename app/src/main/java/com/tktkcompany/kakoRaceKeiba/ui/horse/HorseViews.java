@@ -11,9 +11,9 @@ import com.google.android.material.card.MaterialCardView;
 /** 馬を探す画面・馬カルテで使う、カードと文字の部品 */
 public final class HorseViews {
 
-    static final int GREEN = 0xFF2E7D32;
-    static final int GRAY = 0xFF757575;
-    static final int TEXT = 0xFF212121;
+    static final int GREEN = 0xFF4E7A27;
+    static final int GRAY = 0xFF56664A;
+    static final int TEXT = 0xFF2F3B22;
 
     private HorseViews() {
     }
@@ -79,8 +79,8 @@ public final class HorseViews {
             tv.setText(rank != null ? rank.trim() : "-");
             tv.setTextSize(sizeDp * 0.26f);
             tv.setTextColor(GRAY);
-            circle.setColor(0xFFF5F5F5);
-            circle.setStroke(Math.max(1, dp(context, 1)), 0xFFE0E0E0);
+            circle.setColor(0xFFF8FBF2);
+            circle.setStroke(Math.max(1, dp(context, 1)), 0xFFDDE8CC);
         } else {
             tv.setText(String.valueOf(r));
             tv.setTextSize(sizeDp * 0.4f);
@@ -89,7 +89,7 @@ public final class HorseViews {
                 circle.setColor(medal[r - 1]);
                 tv.setTextColor(0xFFFFFFFF);
             } else {
-                circle.setColor(0xFFECEFF1);
+                circle.setColor(0xFFF8FBF2);
                 tv.setTextColor(0xFF455A64);
             }
         }
@@ -106,7 +106,7 @@ public final class HorseViews {
         image.setPadding(pad, pad, pad, pad);
         android.graphics.drawable.GradientDrawable circle = new android.graphics.drawable.GradientDrawable();
         circle.setShape(android.graphics.drawable.GradientDrawable.OVAL);
-        circle.setColor(0xFFE8F5E9);
+        circle.setColor(0xFFF1F8E4);
         image.setBackground(circle);
         image.setLayoutParams(new LinearLayout.LayoutParams(size, size));
         return image;
@@ -116,8 +116,8 @@ public final class HorseViews {
     public static int rankColor(String rank) {
         Integer r = HorseRecord.rank(rank);
         if (r == null) return GRAY;
-        if (r == 1) return 0xFFC62828;
-        if (r == 2) return 0xFF1565C0;
+        if (r == 1) return 0xFF4A7A1E;
+        if (r == 2) return 0xFF4A7A1E;
         if (r == 3) return GREEN;
         return TEXT;
     }

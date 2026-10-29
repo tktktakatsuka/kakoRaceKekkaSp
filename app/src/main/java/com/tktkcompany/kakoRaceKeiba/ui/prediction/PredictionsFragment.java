@@ -125,7 +125,7 @@ public class PredictionsFragment extends Fragment {
         TextView header = new TextView(requireContext());
         header.setText(Lang.t("🎫 記録した買い目", "🎫 Logged bets"));
         header.setTextSize(18);
-        header.setTextColor(0xFF333333);
+        header.setTextColor(0xFF2F3B22);
         header.setTypeface(header.getTypeface(), Typeface.BOLD);
         header.setPadding(0, 32, 0, 8);
         binding.entriesContainer.addView(header);
@@ -139,7 +139,7 @@ public class PredictionsFragment extends Fragment {
                 int from = text.length();
                 text.append(b.payout > 0 ? Lang.t("的中 ", "Won ") + Lang.yen(b.payout) : Lang.t("はずれ", "Lost"));
                 if (b.payout > 0) {
-                    text.setSpan(new ForegroundColorSpan(0xFFC62828), from, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    text.setSpan(new ForegroundColorSpan(0xFF4A7A1E), from, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     text.setSpan(new StyleSpan(Typeface.BOLD), from, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
             } else {
@@ -147,7 +147,7 @@ public class PredictionsFragment extends Fragment {
             }
             row.setText(text);
             row.setTextSize(13);
-            row.setTextColor(0xFF333333);
+            row.setTextColor(0xFF2F3B22);
             row.setPadding(8, 10, 8, 10);
             binding.entriesContainer.addView(row);
         }
@@ -225,7 +225,7 @@ public class PredictionsFragment extends Fragment {
         }
         if (lead.length() == 0) lead.append(Lang.t("結果が出たら、ここに◎の成績を出します", "Once results are in, your ◎ record appears here"));
         binding.textEntriesLead.setText(lead);
-        binding.textEntriesLead.setTextColor(0xFF333333);
+        binding.textEntriesLead.setTextColor(0xFF2F3B22);
 
         LayoutInflater inflater = getLayoutInflater();
         binding.entriesContainer.removeAllViews();
@@ -236,7 +236,7 @@ public class PredictionsFragment extends Fragment {
                 TextView header = new TextView(requireContext());
                 header.setText(WeekendDays.formatShort(race.date));
                 header.setTextSize(18);
-                header.setTextColor(0xFF333333);
+                header.setTextColor(0xFF2F3B22);
                 header.setTypeface(header.getTypeface(), Typeface.BOLD);
                 header.setPadding(0, 32, 0, 8);
                 binding.entriesContainer.addView(header);
@@ -263,7 +263,7 @@ public class PredictionsFragment extends Fragment {
                 if (sb.length() > 0) sb.append("　");
                 int from = sb.length();
                 sb.append(mark);
-                sb.setSpan(new ForegroundColorSpan("◎".equals(mark) ? 0xFFC62828 : 0xFF1565C0), from, sb.length(),
+                sb.setSpan(new ForegroundColorSpan("◎".equals(mark) ? 0xFF4A7A1E : 0xFF4A7A1E), from, sb.length(),
                         Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 sb.append(e.getKey());
                 String rank = ranks != null ? ranks.get(e.getKey()) : null;
@@ -271,7 +271,7 @@ public class PredictionsFragment extends Fragment {
                     from = sb.length();
                     sb.append(" ").append(Lang.rank(rank));
                     if (rank.matches("[123]")) {
-                        sb.setSpan(new ForegroundColorSpan("1".equals(rank) ? 0xFFC62828 : 0xFF2E7D32), from, sb.length(),
+                        sb.setSpan(new ForegroundColorSpan("1".equals(rank) ? 0xFF4A7A1E : 0xFF4E7A27), from, sb.length(),
                                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                         sb.setSpan(new StyleSpan(Typeface.BOLD), from, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     }
