@@ -8,8 +8,7 @@
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.tktkcompany.kakoRaceKeiba.ui.home.HomeFragment"
-        android="@color/tyairo"
-        android:label="@string/title_home"
+        android:label="@string/brand_name"
         tools:layout="@layout/fragment_home" >
         <action
             android:id="@+id/action_navigation_home_to_navigation_raceResults"

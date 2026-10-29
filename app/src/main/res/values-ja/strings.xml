@@ -1,6 +1,8 @@
 <resources>
     <!-- 日本語（端末の言語が日本語のとき）。それ以外は values（英語） -->
     <string name="app_name">競馬　過去レース結果</string>
+    <!-- 上の帯などに出すアプリの名前（ホーム画面のアイコンの名前 app_name とは別） -->
+    <string name="brand_name">推し馬ノート</string>
     <string name="title_home">ホーム</string>
     <string name="title_dashboard">レース一覧</string>
     <string name="title_notifications">レース傾向分析</string>

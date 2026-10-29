@@ -144,7 +144,12 @@ public class MainActivity extends AppCompatActivity {
         ).build();
 
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+        setSupportActionBar(binding.toolbar);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        // ホームだけ、題名（推し馬ノート）の左に小さいアイコンを出す
+        navController.addOnDestinationChangedListener((controller, destination, arguments) ->
+                binding.toolbar.setLogo(destination.getId() == R.id.navigation_home
+                        ? ContextCompat.getDrawable(this, R.drawable.toolbar_logo) : null));
         NavigationUI.setupWithNavController(binding.navView, navController);
         // タブを押したら、そのタブの最初の画面を出す。
         // 標準の動きだと前に開いていた出走表などが復元され、ホームを押してもホームに戻れないため
