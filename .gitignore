@@ -23,3 +23,6 @@ store/work/
 
 # superpowers のブレインストーミングで作った見本の画面（手元で見るだけ）
 /.superpowers/
+
+# ブレインストーミングの画面（作業用）
+.superpowers/

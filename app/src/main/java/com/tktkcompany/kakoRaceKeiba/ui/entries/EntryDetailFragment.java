@@ -186,7 +186,7 @@ public class EntryDetailFragment extends Fragment {
         text.append(Lang.t("\n各馬の近走" + shownRuns + "走（新しい順）。行をタップするとそのレースの結果を表示します",
                 "\nLast " + shownRuns + " runs for each horse (newest first). Tap a row to see that race"));
         binding.textEntriesLead.setText(text);
-        binding.textEntriesLead.setTextColor(0xFF333333);
+        binding.textEntriesLead.setTextColor(0xFF2F3B22);
     }
 
     /** 「1勝クラス　(混) 定量 芝2200m 34頭 発走」から頭数と「発走」を除いた条件を返す */
@@ -303,7 +303,7 @@ public class EntryDetailFragment extends Fragment {
                             "▶ " + (runs.size() - shown) + " more runs (tap to watch an ad)"));
                     more.setOnClickListener(v -> watchRewardAd(entries));
                     more.setTextSize(12);
-                    more.setTextColor(0xFF1565C0);
+                    more.setTextColor(0xFF4A7A1E);
                     more.setPadding(0, 6, 0, 6);
                     pastContainer.addView(more);
                 }
@@ -375,7 +375,7 @@ public class EntryDetailFragment extends Fragment {
             SpannableStringBuilder text = new SpannableStringBuilder();
             if (horse.scratched) {
                 scratchedCount++;
-                appendStyled(text, Lang.t("出走取消・除外", "Scratched"), 0xFFC62828);
+                appendStyled(text, Lang.t("出走取消・除外", "Scratched"), 0xFF4A7A1E);
                 // 取り消された馬は薄く表示し、オッズは出さない
                 view.setAlpha(0.45f);
                 view.findViewById(R.id.text_entry_odds).setVisibility(View.GONE);
@@ -387,7 +387,7 @@ public class EntryDetailFragment extends Fragment {
                 String jockeyBefore = entry.getJockey() != null ? entry.getJockey().trim() : null;
                 if (horse.jockey != null && jockeyBefore != null && !sameJockey(jockeyBefore, horse.jockey)) {
                     if (text.length() > 0) text.append("　");
-                    appendStyled(text, Lang.t("騎手変更 ", "Jockey change ") + jockeyBefore + "→" + horse.jockey, 0xFFE65100);
+                    appendStyled(text, Lang.t("騎手変更 ", "Jockey change ") + jockeyBefore + "→" + horse.jockey, 0xFF4A7A1E);
                 }
             }
             if (text.length() == 0) continue;
@@ -429,7 +429,7 @@ public class EntryDetailFragment extends Fragment {
         box.setPadding(pad, (int) (8 * density), pad, (int) (8 * density));
         GradientDrawable bg = new GradientDrawable();
         bg.setCornerRadius(10 * density);
-        bg.setColor(0xFFF5F5F5);
+        bg.setColor(0xFFF8FBF2);
         box.setBackground(bg);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -443,12 +443,12 @@ public class EntryDetailFragment extends Fragment {
             SpannableStringBuilder text = new SpannableStringBuilder("🎫 " + b.label());
             if (b.isSettled()) {
                 text.append("　");
-                if (b.payout > 0) appendStyled(text, Lang.t("的中 ", "Won ") + Lang.yen(b.payout), 0xFFC62828);
+                if (b.payout > 0) appendStyled(text, Lang.t("的中 ", "Won ") + Lang.yen(b.payout), 0xFF4A7A1E);
                 else text.append(Lang.t("はずれ", "Lost"));
             }
             row.setText(text);
             row.setTextSize(14);
-            row.setTextColor(0xFF333333);
+            row.setTextColor(0xFF2F3B22);
             row.setPadding(0, (int) (4 * density), 0, (int) (4 * density));
             row.setOnLongClickListener(v -> {
                 new androidx.appcompat.app.AlertDialog.Builder(requireContext())
@@ -468,13 +468,13 @@ public class EntryDetailFragment extends Fragment {
             TextView total = new TextView(requireContext());
             total.setText(summary.label());
             total.setTextSize(13);
-            total.setTextColor(0xFF555555);
+            total.setTextColor(0xFF56664A);
             box.addView(total);
         }
         TextView add = new TextView(requireContext());
         add.setText(raceBets.isEmpty() ? Lang.t("🎫 買い目を記録する（記録だけで、馬券は買いません）", "🎫 Log a bet (records only, no real betting)") : Lang.t("＋ 買い目を追加（長押しで消す）", "+ Add a bet (long-press to delete)"));
         add.setTextSize(14);
-        add.setTextColor(0xFF1565C0);
+        add.setTextColor(0xFF4A7A1E);
         add.setPadding(0, (int) (6 * density), 0, (int) (6 * density));
         add.setOnClickListener(v -> showAddBetDialog());
         box.addView(add);
@@ -551,8 +551,8 @@ public class EntryDetailFragment extends Fragment {
     /** 増減が大きい（±10kg以上）ときは目立たせる */
     private static int weightColor(String weight) {
         java.util.regex.Matcher m = java.util.regex.Pattern.compile("\\(([+-]?\\d+)\\)").matcher(weight);
-        if (m.find() && Math.abs(Integer.parseInt(m.group(1))) >= 10) return 0xFFC62828;
-        return 0xFF333333;
+        if (m.find() && Math.abs(Integer.parseInt(m.group(1))) >= 10) return 0xFF4A7A1E;
+        return 0xFF2F3B22;
     }
 
     /** 出馬表の騎手名は略称で、取り込み時と同じとは限らないので、片方がもう片方で始まれば同じ騎手とみなす */
@@ -592,15 +592,15 @@ public class EntryDetailFragment extends Fragment {
         if (RecentRunsReward.isUnlocked(requireContext())) {
             view.setText(Lang.t("✓ 今日は近走を" + RecentRunsReward.REWARDED_RUNS + "走まで表示しています",
                     "✓ Showing the last " + RecentRunsReward.REWARDED_RUNS + " runs today"));
-            view.setTextColor(0xFF2E7D32);
-            bg.setColor(0xFFE8F5E9);
+            view.setTextColor(0xFF4E7A27);
+            bg.setColor(0xFFF1F8E4);
         } else {
             view.setText(Lang.t("▶ 広告を見ると、全馬の近走を" + RecentRunsReward.NORMAL_RUNS + "走→" + RecentRunsReward.REWARDED_RUNS + "走に増やせます（今日いっぱい）",
                     "▶ Watch an ad to see " + RecentRunsReward.REWARDED_RUNS + " recent runs instead of " + RecentRunsReward.NORMAL_RUNS + " for every horse (all day)"));
-            view.setTextColor(0xFF0D47A1);
+            view.setTextColor(0xFF4E7A27);
             view.setTypeface(view.getTypeface(), Typeface.BOLD);
-            bg.setColor(0xFFE3F2FD);
-            bg.setStroke((int) Math.max(1, density), 0xFF1565C0);
+            bg.setColor(0xFFF1F8E4);
+            bg.setStroke((int) Math.max(1, density), 0xFF4A7A1E);
             // ボタンを出すときに読み込んでおく（押されそうなときだけリクエストする）
             reward.preload(requireContext());
             view.setOnClickListener(v -> watchRewardAd(entries));
@@ -650,7 +650,7 @@ public class EntryDetailFragment extends Fragment {
     private static void paintMark(TextView view, @Nullable String mark) {
         view.setText(mark != null ? mark : Lang.t("印", "Pick"));
         view.setTextSize(mark != null ? 20 : 12);
-        view.setTextColor(mark == null ? 0xFFBDBDBD : "◎".equals(mark) ? 0xFFC62828 : 0xFF1565C0);
+        view.setTextColor(mark == null ? 0xFFBDBDBD : com.tktkcompany.kakoRaceKeiba.ui.theme.RaceColors.mark(mark));
     }
 
     /**
@@ -693,7 +693,7 @@ public class EntryDetailFragment extends Fragment {
             String label = Lang.t("結果 ", "Result ") + Lang.rank(rank);
             if (r.getPopular() != null) label += " (" + Lang.popularity(r.getPopular()) + ")";
             view.setText(label);
-            view.setTextColor("1".equals(rank) ? 0xFFC62828 : ("2".equals(rank) || "3".equals(rank)) ? 0xFF2E7D32 : 0xFF555555);
+            view.setTextColor(rank.matches("[123]") ? com.tktkcompany.kakoRaceKeiba.ui.theme.RaceColors.rank(rank) : 0xFF56664A);
             view.setVisibility(View.VISIBLE);
             if ("◎".equals(marks.get(key))) {
                 honmeiLine = "◎" + r.getHorseName() + Lang.t("は", ": ") + Lang.rank(rank)
@@ -781,7 +781,7 @@ public class EntryDetailFragment extends Fragment {
             star.setText(fav ? "★" : "☆");
             star.setTextColor(fav ? 0xFFFFB300 : 0xFFBDBDBD);
             ((MaterialCardView) cardView)
-                    .setCardBackgroundColor(fav ? 0xFFFFF8E1 : 0xFFFFFFFF);
+                    .setCardBackgroundColor(fav ? 0xFFF1F8E4 : 0xFFFFFFFF);
         };
         paint.run();
         star.setOnClickListener(v -> {
@@ -840,11 +840,11 @@ public class EntryDetailFragment extends Fragment {
             TextView badge = new TextView(requireContext());
             badge.setText(EntryForm.label(text));
             badge.setTextSize(11);
-            badge.setTextColor(caution ? 0xFFE65100 : 0xFF2E7D32);
+            badge.setTextColor(caution ? 0xFFB86A00 : 0xFF4E7A27);
             badge.setPadding((int) (8 * density), (int) (2 * density), (int) (8 * density), (int) (2 * density));
             GradientDrawable bg = new GradientDrawable();
             bg.setCornerRadius(10 * density);
-            bg.setStroke((int) Math.max(1, density), caution ? 0xFFFB8C00 : 0xFF43A047);
+            bg.setStroke((int) Math.max(1, density), caution ? 0xFFB86A00 : 0xFF7CB342);
             badge.setBackground(bg);
             group.addView(badge);
         }
@@ -881,13 +881,13 @@ public class EntryDetailFragment extends Fragment {
         TextView resultView = row.findViewById(R.id.text_run_result);
         resultView.setText(result);
         if ("1".equals(rank)) {
-            resultView.setTextColor(0xFFC62828);
+            resultView.setTextColor(0xFF4A7A1E);
             resultView.setTypeface(resultView.getTypeface(), Typeface.BOLD);
         } else if ("2".equals(rank) || "3".equals(rank)) {
-            resultView.setTextColor(0xFF2E7D32);
+            resultView.setTextColor(0xFF4E7A27);
             resultView.setTypeface(resultView.getTypeface(), Typeface.BOLD);
         } else {
-            resultView.setTextColor(0xFF333333);
+            resultView.setTextColor(0xFF2F3B22);
         }
 
         // その日の結果画面を、このレースまでスクロールしてこの馬の行に色を付けた状態で開く

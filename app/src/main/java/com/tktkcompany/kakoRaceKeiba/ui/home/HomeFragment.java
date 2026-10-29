@@ -3,6 +3,7 @@ package com.tktkcompany.kakoRaceKeiba.ui.home;
 import com.tktkcompany.kakoRaceKeiba.ads.AdUnits;
 import com.tktkcompany.kakoRaceKeiba.ads.BannerAd;
 import com.tktkcompany.kakoRaceKeiba.auth.GuestAccount;
+import com.tktkcompany.kakoRaceKeiba.ui.theme.Palette;
 import com.tktkcompany.kakoRaceKeiba.util.Lang;
 
 
@@ -296,7 +297,7 @@ public class HomeFragment extends Fragment {
                 ? Lang.t("推し馬・メモした馬の出走予定、推し馬の発走30分前と結果（確定後すぐ）をお知らせします。", "We'll notify you when your favorite or noted horses are entered, 30 minutes before your favorites run, and as soon as their results are official.")
                 : Lang.t("ログインして推し馬を登録すると、出走予定・発走前・結果もお知らせします。", "Sign in and add favorites to get entry, pre-race and result notifications."));
         title.setText(text);
-        title.setTextColor(0xFF333333);
+        title.setTextColor(Palette.ink(requireContext()));
         new AlertDialog.Builder(requireContext())
                 .setCustomTitle(title)
                 .setMultiChoiceItems(new String[]{Lang.t("重賞の発走30分前に上位人気とオッズを知らせる", "Notify me 30 minutes before graded races with the favorites and odds")}, checked,

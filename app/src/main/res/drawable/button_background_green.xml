@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <corners android:radius="24dp" /> <!-- 角丸の半径 -->
-    <solid android:color="#388E3C" /> <!-- ボタンの背景色（緑） -->
-</shape>

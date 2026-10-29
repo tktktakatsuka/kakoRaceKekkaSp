@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 推し馬ノートの色（夜。暗い緑の土台）。Java からは ui/theme/Palette で読む -->
+    <color name="oshi_bg">#151A10</color>
+    <color name="oshi_surface">#1E2618</color>
+    <color name="oshi_ink">#E8F0DC</color>
+    <color name="oshi_ink_soft">#B5C4A3</color>
+    <color name="oshi_gold">#E8B93A</color>
+    <color name="oshi_accent">#A5D46A</color>
+    <color name="oshi_primary">#3E5F20</color>
+    <color name="oshi_primary_light">#5C8A2E</color>
+    <color name="oshi_spot_from">#263319</color>
+    <color name="oshi_spot_to">#33441F</color>
+    <color name="oshi_line">#34422A</color>
+    <color name="oshi_nav">#1A2114</color>
+    <color name="oshi_nav_active">#3E5F20</color>
+    <color name="oshi_on_primary">#FFFFFF</color>
+    <color name="oshi_danger">#F2B8B5</color>
+</resources>

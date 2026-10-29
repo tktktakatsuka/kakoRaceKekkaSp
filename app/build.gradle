@@ -39,7 +39,7 @@ android {
         applicationId = "com.tktkcompany.kakoRaceKeiba"
         minSdk = 28
         targetSdk = 36
-        versionCode = 394
+        versionCode = 395
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField "String", "SUPABASE_URL", "\"${localProperties.getProperty('SUPABASE_URL', '')}\""
@@ -110,6 +110,8 @@ dependencies {
     // AndroidX & UI
     implementation libs.appcompat
     implementation libs.material
+    // ウェルカム画面の、左右にスワイプする3枚
+    implementation libs.viewpager2
     implementation libs.constraintlayout
     implementation libs.lifecycle.livedata.ktx
     implementation libs.lifecycle.viewmodel.ktx

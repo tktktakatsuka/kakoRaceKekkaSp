@@ -1,6 +1,8 @@
 <resources>
     <!-- 英語（端末の言語が日本語以外のとき）。日本語は values-ja -->
     <string name="app_name">Keiba Past Race Results</string>
+    <!-- 上の帯などに出すアプリの名前（ホーム画面のアイコンの名前 app_name とは別） -->
+    <string name="brand_name">Oshiuma Note</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Races</string>
     <string name="title_notifications">Race trends</string>

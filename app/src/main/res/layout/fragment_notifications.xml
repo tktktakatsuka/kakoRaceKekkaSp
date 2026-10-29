@@ -43,7 +43,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:text="@string/show_course_trends"
-                    android:textColor="#000000"
+                    android:textColor="@color/oshi_ink"
                     android:textSize="16sp" />
             </LinearLayout>
 

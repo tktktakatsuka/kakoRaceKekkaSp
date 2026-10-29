@@ -33,7 +33,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#E0E0E0"
+        android:background="@color/oshi_line"
         android:layout_marginTop="12dp"
         android:layout_marginBottom="12dp"/>
 
@@ -51,7 +51,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="\n#AI競馬 #競馬予想 #tktkcompany #https://play.google.com/store/apps/details?id=com.tktkcompany.kakoRaceKeiba"
-        android:textColor="@color/purple_500"
+        android:textColor="@color/oshi_accent"
         android:gravity="end"
         android:layout_marginTop="16dp"/>
 

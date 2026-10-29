@@ -33,7 +33,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                app:cardCornerRadius="12dp"
+                app:cardCornerRadius="20dp"
                 app:cardElevation="2dp">
 
                 <LinearLayout
@@ -54,7 +54,7 @@
                             android:layout_height="wrap_content"
                             android:text="@string/login_google"
                             android:textAllCaps="false"
-                            android:textColor="@android:color/white"
+                            android:textColor="@color/oshi_on_primary"
                             android:textSize="16sp" />
 
                         <TextView
@@ -62,7 +62,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:text="@string/login_benefit"
-                            android:textColor="#555555"
+                            android:textColor="@color/oshi_ink_soft"
                             android:textSize="13sp" />
                     </LinearLayout>
 
@@ -91,7 +91,7 @@
                                 android:id="@+id/text_user_name"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textColor="@android:color/black"
+                                android:textColor="@color/oshi_ink"
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
 
@@ -110,18 +110,18 @@
                                 android:minHeight="32dp"
                                 android:gravity="center_vertical"
                                 android:text="@string/delete_account"
-                                android:textColor="#888888"
+                                android:textColor="@color/oshi_ink_soft"
                                 android:textSize="12sp" />
                         </LinearLayout>
 
                         <Button
                             android:id="@+id/btn_logout"
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/logout"
-                            android:textColor="#D32F2F"
-                            app:strokeColor="#D32F2F" />
+                            android:textColor="@color/oshi_ink"
+                            app:strokeColor="@color/oshi_line" />
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -153,7 +153,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/other_horses"
-                        android:textColor="#1B5E20"
+                        android:textColor="@color/oshi_ink"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -164,7 +164,7 @@
                         android:background="?attr/selectableItemBackground"
                         android:padding="6dp"
                         android:text="@string/see_all"
-                        android:textColor="#2E7D32"
+                        android:textColor="@color/oshi_accent"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -176,7 +176,7 @@
                         android:background="?attr/selectableItemBackground"
                         android:padding="6dp"
                         android:text="@string/notification_settings_link"
-                        android:textColor="#1565C0"
+                        android:textColor="@color/oshi_accent"
                         android:textSize="13sp" />
                 </LinearLayout>
 
@@ -219,7 +219,7 @@
                     android:layout_marginTop="12dp"
                     android:layout_marginBottom="4dp"
                     android:text="@string/last_main_races"
-                    android:textColor="#1B5E20"
+                    android:textColor="@color/oshi_ink"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 

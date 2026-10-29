@@ -323,7 +323,7 @@ public final class CardStyles {
         if (bg == null) drawable.setColor(fill);
         drawable.setShape(GradientDrawable.OVAL);
         Context context = cell.getContext();
-        drawable.setStroke(HorseViews.dp(context, selected ? 3 : 1), selected ? 0xFF2E7D32 : 0xFFDDDDDD);
+        drawable.setStroke(HorseViews.dp(context, selected ? 3 : 1), selected ? 0xFF4E7A27 : 0xFFDDE8CC);
         cell.setBackground(drawable);
     }
 
@@ -331,7 +331,7 @@ public final class CardStyles {
         TextView view = new TextView(context);
         view.setText(text);
         view.setTextSize(14);
-        view.setTextColor(0xFF388E3C);
+        view.setTextColor(0xFF4E7A27);
         view.setTypeface(view.getTypeface(), Typeface.BOLD);
         view.setPadding(0, HorseViews.dp(context, 14), 0, HorseViews.dp(context, 4));
         return view;

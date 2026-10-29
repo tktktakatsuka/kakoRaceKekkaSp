@@ -117,7 +117,7 @@ public class EntriesFragment extends Fragment {
             TextView header = new TextView(requireContext());
             header.setText(WeekendDays.formatShort(date) + " " + Lang.course(course));
             header.setTextSize(18);
-            header.setTextColor(0xFF333333);
+            header.setTextColor(0xFF2F3B22);
             header.setTypeface(header.getTypeface(), Typeface.BOLD);
             header.setPadding(0, 32, 0, 8);
             binding.entriesContainer.addView(header);
@@ -136,7 +136,7 @@ public class EntriesFragment extends Fragment {
                     int from = number.length();
                     number.append("\n").append(start.format(DateTimeFormatter.ofPattern("H:mm"))).append(Lang.t("発走", ""));
                     number.setSpan(new RelativeSizeSpan(0.75f), from, number.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    number.setSpan(new ForegroundColorSpan(0xFF666666), from, number.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    number.setSpan(new ForegroundColorSpan(0xFF56664A), from, number.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
                 ((TextView) item.findViewById(R.id.text_race_day_date)).setText(number);
                 boolean next = raceNo == nextRaceNo;
@@ -160,7 +160,7 @@ public class EntriesFragment extends Fragment {
                 if (favoriteCount > 0) {
                     // お気に入り馬が出るレースは目立たせる
                     subText += Lang.t("・★推し馬" + favoriteCount + "頭", "・★" + favoriteCount + " favorite" + (favoriteCount == 1 ? "" : "s"));
-                    sub.setTextColor(0xFFE65100);
+                    sub.setTextColor(0xFF4A7A1E);
                 }
                 sub.setText(subText);
                 sub.setVisibility(View.VISIBLE);
@@ -201,8 +201,8 @@ public class EntriesFragment extends Fragment {
     /** 次のレースは緑の枠と背景で目立たせる */
     private void highlightNextRace(MaterialCardView card) {
         float density = getResources().getDisplayMetrics().density;
-        card.setCardBackgroundColor(0xFFE8F5E9);
-        card.setStrokeColor(0xFF43A047);
+        card.setCardBackgroundColor(0xFFF1F8E4);
+        card.setStrokeColor(0xFF7CB342);
         card.setStrokeWidth((int) (2 * density));
     }
 

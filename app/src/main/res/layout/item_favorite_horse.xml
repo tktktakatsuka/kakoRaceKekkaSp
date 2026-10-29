@@ -36,9 +36,18 @@
                 android:id="@+id/text_horse_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#1B1B1B"
+                android:textColor="@color/oshi_card_ink"
                 android:textSize="18sp"
                 android:textStyle="bold" />
+
+            <!-- 称号のバッジと貢いだ金額（買い目のある推し馬だけ。中身は FavoriteHorsesAdapter が入れる） -->
+            <LinearLayout
+                android:id="@+id/mitsugi_box"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="vertical"
+                android:visibility="gone" />
 
             <!-- 出走予定（出馬表に名前がある時だけ表示。タップでそのレースの出走表へ） -->
             <TextView
@@ -47,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:background="?attr/selectableItemBackground"
-                android:textColor="#E65100"
+                android:textColor="@color/oshi_card_accent"
                 android:textSize="13sp"
                 android:visibility="gone" />
 
@@ -58,7 +67,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
                 android:background="?attr/selectableItemBackground"
-                android:textColor="#555555"
+                android:textColor="@color/oshi_card_ink_soft"
                 android:textSize="13sp" />
 
             <!-- 前走・速報が1着のときだけ出す。押すと共有メニュー（X・LINE など）を開く -->
@@ -70,7 +79,7 @@
                 android:background="@drawable/bg_share_win"
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="6dp"
-                android:textColor="#C62828"
+                android:textColor="@color/oshi_card_accent"
                 android:textSize="13sp"
                 android:textStyle="bold"
                 android:visibility="gone" />
@@ -100,7 +109,7 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/cd_remove_favorite"
                 android:src="@android:drawable/ic_menu_close_clear_cancel"
-                app:tint="#BDBDBD" />
+                app:tint="@color/oshi_line" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

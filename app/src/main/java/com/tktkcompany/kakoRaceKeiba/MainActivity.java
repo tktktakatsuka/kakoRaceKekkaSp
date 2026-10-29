@@ -39,6 +39,8 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.tktkcompany.kakoRaceKeiba.ads.AdFree;
 import com.tktkcompany.kakoRaceKeiba.auth.GuestAccount;
+import com.tktkcompany.kakoRaceKeiba.ui.welcome.Welcome;
+import com.tktkcompany.kakoRaceKeiba.ui.welcome.WelcomeActivity;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -144,7 +146,12 @@ public class MainActivity extends AppCompatActivity {
         ).build();
 
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+        setSupportActionBar(binding.toolbar);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        // ホームだけ、題名（推し馬ノート）の左に小さいアイコンを出す
+        navController.addOnDestinationChangedListener((controller, destination, arguments) ->
+                binding.toolbar.setLogo(destination.getId() == R.id.navigation_home
+                        ? ContextCompat.getDrawable(this, R.drawable.toolbar_logo) : null));
         NavigationUI.setupWithNavController(binding.navView, navController);
         // タブを押したら、そのタブの最初の画面を出す。
         // 標準の動きだと前に開いていた出走表などが復元され、ホームを押してもホームに戻れないため
@@ -161,7 +168,12 @@ public class MainActivity extends AppCompatActivity {
         // 通知チャンネル作成と通知権限のリクエスト
         NotificationHelper.createChannels(this);
         if (savedInstanceState == null) {
-            requestNotificationPermissionIfNeeded();
+            // 初めて入れた人にはウェルカム画面を出し、閉じたあとで通知の許可を聞く（お知らせの楽しさを見せてから）
+            if (Welcome.shouldShow(this)) {
+                welcomeLauncher.launch(new Intent(this, WelcomeActivity.class));
+            } else {
+                requestNotificationPermissionIfNeeded();
+            }
         }
 
         // お気に入り馬の結果チェックを定期実行
@@ -242,6 +254,9 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         return navController.navigateUp() || super.onSupportNavigateUp();
     }
+
+    private final ActivityResultLauncher<Intent> welcomeLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result -> requestNotificationPermissionIfNeeded());
 
     private void requestNotificationPermissionIfNeeded() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU

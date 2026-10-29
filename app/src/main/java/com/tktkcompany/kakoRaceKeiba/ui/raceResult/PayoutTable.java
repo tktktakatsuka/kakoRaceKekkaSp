@@ -26,7 +26,7 @@ public final class PayoutTable {
     private PayoutTable() {
     }
 
-    /** 券種ごとのラベルの色（JRA の馬券の色に近いもの） */
+    /** 券種ごとのラベルの色（JRA の馬券の色に近いもの）。枠番の色と同じく、競馬の決まった色なので変えない */
     private static int typeColor(String type) {
         switch (type) {
             case "単勝": return 0xFFC62828;
@@ -49,13 +49,13 @@ public final class PayoutTable {
         GradientDrawable bg = new GradientDrawable();
         bg.setCornerRadius(10 * density);
         bg.setColor(0xFFFFFFFF);
-        bg.setStroke((int) Math.max(1, density), 0xFFFBC02D);
+        bg.setStroke((int) Math.max(1, density), 0xFFDDE8CC);
         table.setBackground(bg);
 
         // 見出しを押すと表を閉じる・開く
         TextView title = new TextView(context);
         title.setTextSize(15);
-        title.setTextColor(0xFF333333);
+        title.setTextColor(0xFF2F3B22);
         title.setTypeface(title.getTypeface(), Typeface.BOLD);
         title.setPadding(0, 0, 0, (int) (6 * density));
         table.addView(title);
@@ -87,7 +87,7 @@ public final class PayoutTable {
             group.setOrientation(LinearLayout.HORIZONTAL);
             group.setGravity(Gravity.CENTER_VERTICAL);
             group.setPadding(0, (int) (5 * density), 0, (int) (5 * density));
-            if (striped) group.setBackgroundColor(0xFFFAFAFA);
+            if (striped) group.setBackgroundColor(0xFFF8FBF2);
             striped = !striped;
 
             TextView label = new TextView(context);
@@ -118,7 +118,7 @@ public final class PayoutTable {
                 TextView numbers = new TextView(context);
                 numbers.setText(p.numbers);
                 numbers.setTextSize(15);
-                numbers.setTextColor(0xFF222222);
+                numbers.setTextColor(0xFF2F3B22);
                 numbers.setTypeface(Typeface.MONOSPACE);
                 numbers.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
                 row.addView(numbers);
@@ -128,7 +128,7 @@ public final class PayoutTable {
                 yen.setTextSize(15);
                 yen.setGravity(Gravity.END);
                 // 万馬券は目立たせる
-                yen.setTextColor(p.yen >= 10000 ? 0xFFC62828 : 0xFF222222);
+                yen.setTextColor(p.yen >= 10000 ? 0xFF4A7A1E : 0xFF2F3B22);
                 yen.setTypeface(yen.getTypeface(), Typeface.BOLD);
                 row.addView(yen);
                 lines.addView(row);

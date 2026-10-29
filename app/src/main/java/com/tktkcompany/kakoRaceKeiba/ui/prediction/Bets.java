@@ -13,6 +13,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.tktkcompany.kakoRaceKeiba.db.LivePayouts;
+import com.tktkcompany.kakoRaceKeiba.ui.favorite.MitsugiLoader;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -94,12 +95,15 @@ public final class Bets {
         value.put("numbers", numbers);
         value.put("amount", amount);
         ref(user.getUid()).child(date).push().setValue(value);
+        // 貢いだ金額を、次に開いたときに数え直す
+        MitsugiLoader.invalidate();
     }
 
     public static void delete(Bet bet) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) return;
         ref(user.getUid()).child(bet.date).child(bet.id).removeValue();
+        MitsugiLoader.invalidate();
     }
 
     /**

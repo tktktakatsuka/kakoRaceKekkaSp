@@ -23,7 +23,7 @@
                 android:id="@+id/text_entries_lead"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#555555"
+                android:textColor="@color/oshi_ink_soft"
                 android:textSize="13sp" />
 
             <ProgressBar
@@ -39,7 +39,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:gravity="center"
-                android:textColor="#555555"
+                android:textColor="@color/oshi_ink_soft"
                 android:textSize="14sp"
                 android:visibility="gone" />
 

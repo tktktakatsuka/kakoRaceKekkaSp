@@ -1,6 +1,7 @@
-// アプリのアイコン（案B：金色＋きらきら＋オリジナルの馬の顔）を、1か所の部品から書き出す。
+// アプリのアイコン（案B：金色＋きらきら＋オリジナルの馬の顔）と、ウェルカム画面の羽のある子を、1か所の部品から書き出す。
 //   store/icon/icon.svg                         … ストア用（512x512 の PNG はこれから作る）
 //   app/src/main/res/drawable/ic_launcher_*.xml … アプリ用のアダプティブアイコン（背景・前景・単色）
+//   app/src/main/res/drawable/welcome_pegasus.xml … ウェルカム画面の羽のある子（顔は同じ部品）
 // 使い方: node store/icon/make-icon.js
 const fs = require("fs");
 const path = require("path");
@@ -126,4 +127,19 @@ const mono = face
   .map(s => s.eye ? vecShape(s, { fill: "#FF000000" }) : vecShape(s, { fill: null, stroke: "#FF000000", sw: s.sw || 2.2 }));
 fs.writeFileSync(path.join(res, "ic_launcher_monochrome.xml"), header + group(mono.join("\n")));
 
-console.log("書き出しました: store/icon/icon.svg と ic_launcher_background / foreground / monochrome");
+// ---- ウェルカム画面に出す、羽のある子（ペガサス）。背景なし・縮めない。アプリのアイコンには使わない
+const WING = "M35,52C26,38 13,37 7,44C13,46 16,48 17,51C10,51 6,55 5,59C12,59 16,60 18,62C14,64 12,68 12,71C22,70 30,64 35,60Z";
+const WING_LINE = "M17,51C23,52 29,54 34,55M18,62C24,61 29,59 34,58";
+const wing = [
+  vecShape({ d: WING, fill: "#FFFFFF", stroke: INK, sw: 2 }),
+  vecShape({ d: WING_LINE, fill: null, stroke: "#E0B060", sw: 1.2 }, { fill: null }),
+].join("\n");
+const mirrored = `    <group
+        android:pivotX="54"
+        android:scaleX="-1">
+${wing}
+    </group>`;
+fs.writeFileSync(path.join(res, "welcome_pegasus.xml"), header + wing + "\n" + mirrored + "\n" +
+  face.map(s => vecShape(s)).join("\n") + "\n</vector>\n");
+
+console.log("書き出しました: store/icon/icon.svg と ic_launcher_background / foreground / monochrome と welcome_pegasus");

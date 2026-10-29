@@ -36,7 +36,7 @@
             android:id="@+id/name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#212121"
+            android:textColor="@color/oshi_ink"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -44,7 +44,7 @@
             android:id="@+id/sub"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#757575"
+            android:textColor="@color/oshi_ink_soft"
             android:textSize="12sp" />
     </LinearLayout>
 
@@ -53,7 +53,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:textColor="#212121"
+        android:textColor="@color/oshi_ink"
         android:textSize="16sp"
         android:textStyle="bold" />
 </LinearLayout>

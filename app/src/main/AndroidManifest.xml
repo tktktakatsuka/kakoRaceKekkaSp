@@ -54,8 +54,13 @@
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-4855274440005459~6583986610" />
 
+        <!-- 初めて開いたときだけ出すウェルカム画面 -->
+
         <activity
-            android:name="com.tktkcompany.kakoRaceKeiba.MainActivity"
+            android:name=".ui.welcome.WelcomeActivity"
+            android:exported="false" />
+
+        <activity android:name="com.tktkcompany.kakoRaceKeiba.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ホームの上の帯に出す小さいアイコン（24dp）と、題名とのすき間 -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:width="26dp" android:height="26dp" android:drawable="@mipmap/ic_launcher_round" android:right="10dp" />
+</layer-list>
