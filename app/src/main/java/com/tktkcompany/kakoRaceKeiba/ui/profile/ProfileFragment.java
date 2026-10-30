@@ -51,12 +51,15 @@ public class ProfileFragment extends Fragment {
     private List<String> favorites = new ArrayList<>();
     private Map<String, Mitsugi.Tally> mitsugi = new HashMap<>();
     private boolean editing;
+    /** 書く画面の入力を profile に写す（アイコンを変えて描き直す前に呼び、書きかけが消えないようにする） */
+    private Runnable collectEdits = () -> { };
 
     private final ActivityResultLauncher<PickVisualMediaRequest> pickPhoto = registerForActivityResult(
             new ActivityResultContracts.PickVisualMedia(), uri -> {
                 Context c = getContext();
                 if (uri == null || c == null || profile == null) return;
                 if (ProfilePhoto.save(c, uri)) {
+                    collectEdits.run();
                     profile.usePhoto = true;
                     render();
                 } else {
@@ -106,6 +109,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void renderView(Context c) {
+        collectEdits = () -> { };
         Bitmap photo = ProfilePhoto.load(c);
         content.addView(ProfileSheet.build(c, profile, photo, mitsugi, false));
         content.addView(button(c, Lang.t("📤 画像にしてシェア", "📤 Share as an image"), true, v -> {
@@ -142,6 +146,7 @@ public class ProfileFragment extends Fragment {
         for (String icon : CardStyles.icons()) {
             boolean selected = !profile.usePhoto && icon.equals(profile.emoji != null ? profile.emoji : "🐴");
             icons.addView(pill(c, icon, selected, v -> {
+                collectEdits.run();
                 profile.emoji = icon;
                 profile.usePhoto = false;
                 ProfilePhoto.delete(c);
@@ -196,7 +201,7 @@ public class ProfileFragment extends Fragment {
         EditText wish = field(c, Lang.t("ひとつ願いが叶うなら？", "If one wish came true?"), profile.wish);
         EditText note = field(c, Lang.t("何かひとこと", "A few words"), profile.note);
 
-        content.addView(button(c, Lang.t("保存する", "Save"), true, v -> {
+        collectEdits = () -> {
             profile.name = Profile.clamp(name.getText().toString());
             profile.career = Profile.clamp(career.getText().toString());
             profile.tendency = tendency.getProgress();
@@ -208,6 +213,9 @@ public class ProfileFragment extends Fragment {
             profile.race = Profile.clamp(race.getText().toString());
             profile.wish = Profile.clamp(wish.getText().toString());
             profile.note = Profile.clamp(note.getText().toString());
+        };
+        content.addView(button(c, Lang.t("保存する", "Save"), true, v -> {
+            collectEdits.run();
             Profiles.save(profile);
             editing = false;
             render();
