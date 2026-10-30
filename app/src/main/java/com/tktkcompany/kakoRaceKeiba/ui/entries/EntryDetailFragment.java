@@ -186,7 +186,8 @@ public class EntryDetailFragment extends Fragment {
         text.append(Lang.t("\n各馬の近走" + shownRuns + "走（新しい順）。行をタップするとそのレースの結果を表示します",
                 "\nLast " + shownRuns + " runs for each horse (newest first). Tap a row to see that race"));
         binding.textEntriesLead.setText(text);
-        binding.textEntriesLead.setTextColor(0xFF2F3B22);
+        // 画面の背景の上なので、夜のテーマの色にする
+        binding.textEntriesLead.setTextColor(com.tktkcompany.kakoRaceKeiba.ui.theme.Palette.ink(requireContext()));
     }
 
     /** 「1勝クラス　(混) 定量 芝2200m 34頭 発走」から頭数と「発走」を除いた条件を返す */

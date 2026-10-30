@@ -91,7 +91,7 @@ public class PaletteContrastTest {
 
     @Test
     public void lightCardLayoutsUseCardColors() throws Exception {
-        for (String layout : new String[]{"item_favorite_horse", "item_entry_horse"}) {
+        for (String layout : new String[]{"item_favorite_horse", "item_entry_horse", "item_past_run"}) {
             String xml = new String(Files.readAllBytes(new File("src/main/res/layout/" + layout + ".xml").toPath()), StandardCharsets.UTF_8);
             for (String themed : new String[]{"@color/oshi_ink\"", "@color/oshi_ink_soft\"", "@color/oshi_accent\""}) {
                 assertTrue(layout + " が夜に変わる色を使っている: " + themed, !xml.contains(themed));

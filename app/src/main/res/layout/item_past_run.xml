@@ -13,14 +13,14 @@
         android:layout_width="94dp"
         android:layout_height="wrap_content"
         android:maxLines="1"
-        android:textColor="@color/oshi_ink_soft"
+        android:textColor="@color/oshi_card_ink_soft"
         android:textSize="11sp" />
 
     <TextView
         android:id="@+id/text_run_course"
         android:layout_width="34dp"
         android:layout_height="wrap_content"
-        android:textColor="@color/oshi_ink_soft"
+        android:textColor="@color/oshi_card_ink_soft"
         android:textSize="12sp" />
 
     <TextView
@@ -30,7 +30,7 @@
         android:layout_weight="1"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textColor="@color/oshi_ink"
+        android:textColor="@color/oshi_card_ink"
         android:textSize="12sp" />
 
     <TextView
@@ -38,7 +38,7 @@
         android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:gravity="end"
-        android:textColor="@color/oshi_ink_soft"
+        android:textColor="@color/oshi_card_ink_soft"
         android:textSize="12sp" />
 
     <TextView
