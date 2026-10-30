@@ -274,3 +274,30 @@
 - [ ] **Step 2: 古い色の検査をもう一度**（Task 6 Step 2 のコマンド）
 - [ ] **Step 3: ストアの「新機能」の文を `store/release-notes-394.txt` に書く**（日本語・英語。ウェルカム画面、貢いだ金額と称号、見た目の一新）
 - [ ] **Step 4: コミット** — 「394 の新機能の文を足す」
+
+---
+
+## 追加：プロフ帳（設計書の 4。2026-10-30 に作者が 394 に追加）
+
+### Task 13: プロフ帳のデータ（Profile）
+
+**Files:** Create `ui/profile/Profile.java`（純粋な Java）・`ui/profile/Profiles.java`（Firebase `users/{uid}/profile` の読み書き）。Test: `ui/profile/ProfileTest.java`
+
+**Interfaces:**
+- `Profile`：`name, career, jockeys, love, race, wish, note`（String、`clamp` で40文字まで）、`tendency`（0〜4、範囲外は2）、`List<String> oshi`（最大3、重複なし）、`String emoji`（null なら🐴）、`boolean usePhoto`。
+- `static String Profile.clamp(String)`、`static int Profile.tendency(int)`、`static List<String> Profile.defaultOshi(List<String> favorites)`（先頭から3頭）、`boolean isEmpty()`（名前もひとことも推しも無い）。
+- `Profiles.load(Callback)`・`Profiles.save(Profile)`。
+
+テスト：`clampsTo40`、`tendencyOutOfRangeIsMiddle`、`defaultOshiTakesFirstThree`、`oshiHasNoDuplicates`、`emptyProfile`。
+
+### Task 14: 写真を端末の中だけに保存（ProfilePhoto）
+
+**Files:** Create `ui/profile/ProfilePhoto.java`。写真は Photo Picker（`PickVisualMedia`）で選び、中央を正方形に切り抜いて 512px の JPEG で `filesDir/profile_photo.jpg` に保存。`load(Context)`・`save(Context, Uri)`・`delete(Context)`。Firebase には上げない。
+
+### Task 15: プロフ帳の画面と入口
+
+**Files:** Create `ui/profile/ProfileFragment.java`（見る・書く）、`res/menu/home_toolbar.xml`。Modify `mobile_navigation.xml`（`navigation_profile`）、`MainActivity`（ホームの帯の右上にアイコン）、`HomeFragment`（プロフ帳がまだ空なら「📒 わたしのプロフ帳をつくろう」のカード）。
+
+### Task 16: シェアの画像と端末に保存（ProfileImage）
+
+**Files:** Create `ui/profile/ProfileImage.java`。画面の外で 1080×1350 のビューを組んで Bitmap に描き、`cache/images/profile.png` に書いて FileProvider で共有。保存は API 29 以上で MediaStore の `Pictures/推し馬ノート`（API 28 ではボタンを出さない）。
