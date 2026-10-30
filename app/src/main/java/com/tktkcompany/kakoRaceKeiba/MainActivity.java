@@ -156,6 +156,13 @@ public class MainActivity extends AppCompatActivity {
             // ホームだけ、右上にプロフ帳のボタン（onPrepareOptionsMenu で出し分ける）
             onHome = home;
             invalidateOptionsMenu();
+            // ホームに戻るたびに、ボタンを自分のアイコン（写真か絵文字）にする。プロフ帳で変えたらすぐ反映される
+            if (home) {
+                com.tktkcompany.kakoRaceKeiba.ui.profile.Profiles.load(p -> {
+                    profileIcon = com.tktkcompany.kakoRaceKeiba.ui.profile.ProfileIcon.of(this, p);
+                    invalidateOptionsMenu();
+                });
+            }
         });
         NavigationUI.setupWithNavController(binding.navView, navController);
         // タブを押したら、そのタブの最初の画面を出す。
@@ -256,6 +263,8 @@ public class MainActivity extends AppCompatActivity {
     // アクションバー左の矢印で、ひとつ前の画面に戻る
     /** 今ホームを出しているか（右上のプロフ帳のボタンを出すため） */
     private boolean onHome = true;
+    /** 右上のボタンの絵（null なら決まったアイコン） */
+    @androidx.annotation.Nullable private android.graphics.drawable.Drawable profileIcon;
 
     @Override
     public boolean onCreateOptionsMenu(android.view.Menu menu) {
@@ -266,7 +275,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(android.view.Menu menu) {
         android.view.MenuItem profile = menu.findItem(R.id.action_profile);
-        if (profile != null) profile.setVisible(onHome);
+        if (profile != null) {
+            profile.setVisible(onHome);
+            if (profileIcon != null) profile.setIcon(profileIcon);
+        }
         return super.onPrepareOptionsMenu(menu);
     }
 
