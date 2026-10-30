@@ -150,8 +150,13 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         // ホームだけ、題名（推し馬ノート）の左に小さいアイコンを出す
         navController.addOnDestinationChangedListener((controller, destination, arguments) ->
-                binding.toolbar.setLogo(destination.getId() == R.id.navigation_home
-                        ? ContextCompat.getDrawable(this, R.drawable.toolbar_logo) : null));
+        {
+            boolean home = destination.getId() == R.id.navigation_home;
+            binding.toolbar.setLogo(home ? ContextCompat.getDrawable(this, R.drawable.toolbar_logo) : null);
+            // ホームだけ、右上にプロフ帳のボタン（onPrepareOptionsMenu で出し分ける）
+            onHome = home;
+            invalidateOptionsMenu();
+        });
         NavigationUI.setupWithNavController(binding.navView, navController);
         // タブを押したら、そのタブの最初の画面を出す。
         // 標準の動きだと前に開いていた出走表などが復元され、ホームを押してもホームに戻れないため
@@ -249,6 +254,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // アクションバー左の矢印で、ひとつ前の画面に戻る
+    /** 今ホームを出しているか（右上のプロフ帳のボタンを出すため） */
+    private boolean onHome = true;
+
+    @Override
+    public boolean onCreateOptionsMenu(android.view.Menu menu) {
+        getMenuInflater().inflate(R.menu.home_toolbar, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(android.view.Menu menu) {
+        android.view.MenuItem profile = menu.findItem(R.id.action_profile);
+        if (profile != null) profile.setVisible(onHome);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@androidx.annotation.NonNull android.view.MenuItem item) {
+        if (item.getItemId() == R.id.action_profile) {
+            Navigation.findNavController(this, R.id.nav_host_fragment_activity_main).navigate(R.id.navigation_profile);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     @Override
     public boolean onSupportNavigateUp() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);

@@ -189,7 +189,49 @@ public class HomeFragment extends Fragment {
             // 空でも呼ぶ（主役のカードに推し馬を見つける案内を出し、横並びの欄を隠す）
             favoritesStrip.show(favorites);
         });
+        showProfilePrompt();
     }
+
+    /** プロフ帳をまだ作っていなければ「📒 わたしのプロフ帳をつくろう」 */
+    private void showProfilePrompt() {
+        com.tktkcompany.kakoRaceKeiba.ui.profile.Profiles.load(p -> {
+            if (binding == null || !isAdded()) return;
+            binding.profilePrompt.removeAllViews();
+            boolean show = p.isEmpty();
+            binding.profilePrompt.setVisibility(show ? View.VISIBLE : View.GONE);
+            if (!show) return;
+            android.content.Context c = requireContext();
+            com.google.android.material.card.MaterialCardView card = new com.google.android.material.card.MaterialCardView(c);
+            card.setRadius(com.tktkcompany.kakoRaceKeiba.ui.horse.HorseViews.dp(c, 20));
+            card.setStrokeColor(0xFF7CB342);
+            card.setStrokeWidth(com.tktkcompany.kakoRaceKeiba.ui.horse.HorseViews.dp(c, 2));
+            card.setCardElevation(0);
+            android.widget.LinearLayout inner = new android.widget.LinearLayout(c);
+            inner.setOrientation(android.widget.LinearLayout.VERTICAL);
+            int pad = com.tktkcompany.kakoRaceKeiba.ui.horse.HorseViews.dp(c, 14);
+            inner.setPadding(pad, pad, pad, pad);
+            TextView title = new TextView(c);
+            title.setText(Lang.t("📒 わたしのプロフ帳をつくろう", "📒 Make your profile"));
+            title.setTextSize(15);
+            title.setTypeface(title.getTypeface(), Typeface.BOLD);
+            title.setTextColor(0xFF2F3B22);
+            inner.addView(title);
+            TextView sub = new TextView(c);
+            sub.setText(Lang.t("推し馬・推し騎手・ひとことを書いて、1枚の画像にしてシェアできます",
+                    "Add your horses, jockeys and a few words, then share it as one image"));
+            sub.setTextSize(12);
+            sub.setTextColor(0xFF56664A);
+            inner.addView(sub);
+            card.addView(inner);
+            android.widget.FrameLayout.LayoutParams lp = new android.widget.FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            int m = com.tktkcompany.kakoRaceKeiba.ui.horse.HorseViews.dp(c, 8);
+            lp.setMargins(m, m, m, m);
+            card.setOnClickListener(v -> androidx.navigation.Navigation.findNavController(v).navigate(R.id.navigation_profile));
+            binding.profilePrompt.addView(card, lp);
+        });
+    }
+
 
     private FavoritesStrip favoritesStrip;
 

@@ -42,5 +42,6 @@
     <string name="label_entry_detail">Runners\' recent form</string>
     <string name="last_main_races">Main races of the last meeting</string>
     <string name="label_horse_search">Find a horse</string>
+    <string name="label_profile">My profile</string>
     <string name="find_horse">+ Find a horse to follow</string>
 </resources>

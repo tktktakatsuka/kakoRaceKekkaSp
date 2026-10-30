@@ -42,5 +42,6 @@
     <string name="label_entry_detail">出走馬の近走成績</string>
     <string name="last_main_races">前回の開催のメインレース</string>
     <string name="label_horse_search">馬を探す</string>
+    <string name="label_profile">わたしのプロフ帳</string>
     <string name="find_horse">＋ 馬を探して推し馬にする</string>
 </resources>

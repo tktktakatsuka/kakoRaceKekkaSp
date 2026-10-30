@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- プロフ帳のボタン（丸の中の人の形） -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="28dp"
+    android:height="28dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="@color/oshi_nav_active"
+        android:pathData="M12,1a11,11 0,1 0,0.001 0Z" />
+    <path
+        android:fillColor="@color/oshi_primary"
+        android:pathData="M12,6.5a3.2,3.2 0,1 0,0.001 0ZM6,17.5c0.8,-2.6 3.2,-4.2 6,-4.2s5.2,1.6 6,4.2c-1.5,1.6 -3.6,2.5 -6,2.5s-4.5,-0.9 -6,-2.5Z" />
+</vector>

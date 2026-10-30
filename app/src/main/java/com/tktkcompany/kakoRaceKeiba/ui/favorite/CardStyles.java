@@ -153,6 +153,18 @@ public final class CardStyles {
     }
 
     /** 馬のアイコン（選んだ絵文字か、いつもの馬のイラスト） */
+    /** 選べるアイコンの絵文字（「今までの馬のイラスト」の null は除く）。プロフ帳でも使う */
+    public static java.util.List<String> icons() {
+        java.util.List<String> list = new java.util.ArrayList<>();
+        for (String icon : ICONS) if (icon != null) list.add(icon);
+        return list;
+    }
+
+    /** 絵文字の丸いアイコン（null なら馬のイラスト）。プロフ帳の自分のアイコンに使う */
+    public static View emojiAvatar(Context context, @Nullable String icon, float sizeDp) {
+        return avatarOf(context, icon, sizeDp);
+    }
+
     public static View avatar(Context context, String horseName, float sizeDp) {
         Style style = get(horseName);
         return avatarOf(context, style != null ? style.icon : null, sizeDp);

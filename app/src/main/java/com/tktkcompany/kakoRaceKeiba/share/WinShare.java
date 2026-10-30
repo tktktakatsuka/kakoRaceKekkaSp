@@ -15,7 +15,7 @@ import com.tktkcompany.kakoRaceKeiba.util.WeekendDays;
 public final class WinShare {
 
     /** ストアのページ。シェアを見た人がすぐ入れられるように付ける */
-    static final String STORE_URL = "https://play.google.com/store/apps/details?id=com.tktkcompany.kakoRaceKeiba";
+    public static final String STORE_URL = "https://play.google.com/store/apps/details?id=com.tktkcompany.kakoRaceKeiba";
 
     private WinShare() {
     }

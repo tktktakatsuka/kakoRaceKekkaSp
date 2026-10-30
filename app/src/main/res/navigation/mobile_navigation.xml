@@ -94,4 +94,10 @@
         android:name="com.tktkcompany.kakoRaceKeiba.ui.horse.HorseSearchFragment"
         android:label="@string/label_horse_search" />
 
+    <!-- わたしのプロフ帳（ホームの帯の右上から開く） -->
+    <fragment
+        android:id="@+id/navigation_profile"
+        android:name="com.tktkcompany.kakoRaceKeiba.ui.profile.ProfileFragment"
+        android:label="@string/label_profile" />
+
 </navigation>

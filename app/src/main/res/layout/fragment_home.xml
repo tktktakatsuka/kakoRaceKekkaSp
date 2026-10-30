@@ -132,6 +132,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
+            <!-- 「わたしのプロフ帳をつくろう」（まだ作っていない人だけ。中身は HomeFragment が入れる） -->
+            <FrameLayout
+                android:id="@+id/profile_prompt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+
             <!-- ほかの推し馬（横に並べたカード。中身はコードで作る） -->
             <LinearLayout
                 android:id="@+id/layout_my_horses"
