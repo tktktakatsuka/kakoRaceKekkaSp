@@ -528,3 +528,5 @@ details.dress .preview { margin-top: 6px; }
 .pick-ic.photo.on { border-color: var(--green-dark); }
 /* 下の欄を書いている間も、画像の見本が見えるように上に留める */
 .prof-preview { position: sticky; top: calc(env(safe-area-inset-top) + 52px); z-index: 5; padding-top: 6px; background: var(--bg); }
+.pic-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.pic-pick { cursor: pointer; }

@@ -209,7 +209,7 @@ function saveStyle(name, st) {
   }
 }
 // 馬のアイコン（選んでいなければ馬の顔）。size は sm / md / lg
-const avatarOf = (icon, size) => `<span class="ava ${size}" aria-hidden="true">${icon ? esc(icon) : '<img src="assets/icon-192.png?v=13" alt="">'}</span>`;
+const avatarOf = (icon, size) => `<span class="ava ${size}" aria-hidden="true">${icon ? esc(icon) : '<img src="assets/icon-192.png?v=14" alt="">'}</span>`;
 const avatar = (name, size = 'md') => avatarOf(styleOf(name).icon, size);
 // 背景のクラス。選んでいなければ fallback（今週走る馬はクリーム、ほかは白。アプリと同じ）
 const bgClass = (name, fallback) => `bg-${styleOf(name).bg || fallback}`;
@@ -1019,6 +1019,8 @@ async function renderFav() {
 
 const PROF_KEY = 'profile';
 const PROF_PHOTO_KEY = 'profPhoto';
+const PROF_PIC_KEY = 'profPic'; // 大きく入れる推しの写真
+const PIC_NOTE_MAX = 16;
 // [保存名, 画面の見出し, 最大文字数, 複数行か, 入力例]
 const PROF_FIELDS = [
   ['name', '名前（アカウント名）', 12, false, '例：うまこ'],
@@ -1049,12 +1051,14 @@ function profile() {
   out.sex = PROF_SEX.includes(p.sex) ? p.sex : '';
   out.trend = Number.isInteger(p.trend) && p.trend >= 0 && p.trend < PROF_TREND ? p.trend : 3;
   out.icon = p.icon === 'photo' || CARD_ICONS.includes(p.icon) ? p.icon : '';
+  out.picNote = typeof p.picNote === 'string' ? p.picNote.slice(0, PIC_NOTE_MAX) : '';
   return out;
 }
 
-// 写真は 360px の正方形に縮めて保存する（CSP で data: の画像は読めないので、Blob に戻してから描く）
-async function loadPhoto() {
-  const url = load(PROF_PHOTO_KEY);
+// アイコンの写真は 360px の正方形、推しの写真は長い辺 900px に縮めて保存する
+// （CSP で data: の画像は読めないので、Blob に戻してから描く）
+async function loadPhoto(key = PROF_PHOTO_KEY) {
+  const url = load(key);
   if (!url || !url.startsWith('data:image/jpeg;base64,')) return null;
   try {
     const bin = atob(url.slice(url.indexOf(',') + 1));
@@ -1065,22 +1069,36 @@ async function loadPhoto() {
   }
 }
 const PHOTO_MAX_BYTES = 30e6; // これより大きい写真は、縮める前に読みこむだけで固まることがあるので断る
-async function photoFromFile(file) {
+async function photoFromFile(file, key = PROF_PHOTO_KEY) {
   if (file.size > PHOTO_MAX_BYTES) throw new Error('too large');
   const src = await createImageBitmap(file);
-  const side = Math.min(src.width, src.height);
   const cv = document.createElement('canvas');
-  cv.width = cv.height = 360;
-  cv.getContext('2d').drawImage(src, (src.width - side) / 2, (src.height - side) / 2, side, side, 0, 0, 360, 360);
+  if (key === PROF_PHOTO_KEY) {
+    const side = Math.min(src.width, src.height);
+    cv.width = cv.height = 360;
+    cv.getContext('2d').drawImage(src, (src.width - side) / 2, (src.height - side) / 2, side, side, 0, 0, 360, 360);
+  } else {
+    const k = Math.min(1, 900 / Math.max(src.width, src.height));
+    cv.width = Math.round(src.width * k);
+    cv.height = Math.round(src.height * k);
+    cv.getContext('2d').drawImage(src, 0, 0, cv.width, cv.height);
+  }
   const bmp = await createImageBitmap(cv);
-  store(PROF_PHOTO_KEY, cv.toDataURL('image/jpeg', 0.85)); // 描けるとわかってから保存する
+  // 描けるとわかってから保存する。入りきらなければ（大きい写真が保存の上限を超えたら）この画面を閉じるまでだけ使う
+  store(key, cv.toDataURL('image/jpeg', 0.82));
   return bmp;
+}
+// 枠いっぱいに、はみ出したぶんを切って描く
+function drawCover(ctx, img, x, y, w, h) {
+  const k = Math.max(w / img.width, h / img.height);
+  const sw = w / k, sh = h / k;
+  ctx.drawImage(img, (img.width - sw) / 2, (img.height - sh) / 2, sw, sh, x, y, w, h);
 }
 let horseFace = null;
 async function loadHorseFace() {
   if (horseFace) return horseFace;
   const img = new Image();
-  img.src = 'assets/icon-192.png?v=13';
+  img.src = 'assets/icon-192.png?v=14';
   try { await img.decode(); horseFace = img; } catch (e) { /* 読めなければ絵文字にする */ }
   return horseFace;
 }
@@ -1121,7 +1139,7 @@ function profBox(ctx, t, x, y, w, h, label, value, max = 36) {
 }
 
 // 1600×900 の横長（X のタイムラインで切れない比率）
-function drawProfile(p, photo, face) {
+function drawProfile(p, photo, face, pic) {
   const t = THEMES[currentTheme()];
   const W = 1600, H = 900;
   const cv = document.createElement('canvas');
@@ -1286,12 +1304,42 @@ function drawProfile(p, photo, face) {
   });
 
   const half = (RW - 20) / 2, third = (RW - 40) / 3;
-  profBox(ctx, t, R, 345, half, 150, '気になる馬・書ききれなかった推し', p.more, 32);
-  profBox(ctx, t, R + half + 20, 345, half, 150, '推し騎手・厩舎・産駒など', p.jockey, 34);
-  profBox(ctx, t, R, 510, third, 170, '永遠のラブ（引退馬）', p.love, 32);
-  profBox(ctx, t, R + third + 20, 510, third, 170, '心に残っているレース', p.race, 32);
-  profBox(ctx, t, R + (third + 20) * 2, 510, third, 170, 'ひとつ願いが叶うなら？', p.wish, 32);
-  profBox(ctx, t, R, 695, RW, 120, 'ひとこと', p.comment, 34);
+  if (pic) {
+    // 推しの写真があるときは、右に写真の枠を作って、ほかの欄を左に寄せる
+    const PW = 330, PX = R + RW - PW, q = (RW - PW - 40) / 2;
+    profBox(ctx, t, R, 345, q, 150, '気になる馬・推し', p.more, 30);
+    profBox(ctx, t, R + q + 20, 345, q, 150, '推し騎手・厩舎など', p.jockey, 30);
+    profBox(ctx, t, R, 510, q, 170, '永遠のラブ（引退馬）', p.love, 30);
+    profBox(ctx, t, R + q + 20, 510, q, 170, '心に残っているレース', p.race, 30);
+    profBox(ctx, t, R, 695, half, 120, 'ひとつ願いが叶うなら？', p.wish, 32);
+    profBox(ctx, t, R + half + 20, 695, half, 120, 'ひとこと', p.comment, 32);
+    ctx.save();
+    roundRect(ctx, PX, 345, PW, 335, 22);
+    ctx.clip();
+    drawCover(ctx, pic, PX, 345, PW, 335);
+    if (p.picNote) {
+      const sh = ctx.createLinearGradient(0, 590, 0, 680);
+      sh.addColorStop(0, 'rgba(0,0,0,0)');
+      sh.addColorStop(1, 'rgba(0,0,0,.65)');
+      ctx.fillStyle = sh;
+      ctx.fillRect(PX, 580, PW, 100);
+      ctx.fillStyle = '#ffffff';
+      const { lines } = fitText(ctx, p.picNote, PW - 36, 40, 30, 20, 'bold ');
+      ctx.fillText(lines[0], PX + 18, 636);
+    }
+    ctx.restore();
+    ctx.strokeStyle = t.accent;
+    ctx.lineWidth = 5;
+    roundRect(ctx, PX, 345, PW, 335, 22);
+    ctx.stroke();
+  } else {
+    profBox(ctx, t, R, 345, half, 150, '気になる馬・書ききれなかった推し', p.more, 32);
+    profBox(ctx, t, R + half + 20, 345, half, 150, '推し騎手・厩舎・産駒など', p.jockey, 34);
+    profBox(ctx, t, R, 510, third, 170, '永遠のラブ（引退馬）', p.love, 32);
+    profBox(ctx, t, R + third + 20, 510, third, 170, '心に残っているレース', p.race, 32);
+    profBox(ctx, t, R + (third + 20) * 2, 510, third, 170, 'ひとつ願いが叶うなら？', p.wish, 32);
+    profBox(ctx, t, R, 695, RW, 120, 'ひとこと', p.comment, 34);
+  }
 
   ctx.fillStyle = t.ink;
   ctx.font = `bold 24px ${FONT}`;
@@ -1314,7 +1362,7 @@ function profShareText(p) {
 async function renderProf() {
   const p = profile();
   const theme = currentTheme();
-  let [photo, face] = await Promise.all([loadPhoto(), loadHorseFace()]);
+  let [photo, face, pic] = await Promise.all([loadPhoto(), loadHorseFace(), loadPhoto(PROF_PIC_KEY)]);
   const field = ([k, label, max, multi, ph]) => {
     const id = `pf-${k}`;
     const attrs = `id="${id}" class="${multi ? 'memo' : 'text'}" data-prof="${k}" maxlength="${max}" placeholder="${esc(ph)}"${k.startsWith('oshi') ? ' list="favList"' : ''}`;
@@ -1333,6 +1381,13 @@ async function renderProf() {
       <p class="small">アイコン（📷 で写真も使えます）</p>
       <div class="pick">${iconPick}</div>
       ${field(PROF_FIELDS[0])}
+      <p class="small">推しの写真（右側に大きく入ります。パドックや現地で撮った写真など）</p>
+      <div class="pic-row">
+        <label class="pill pic-pick">📷 写真を選ぶ<input type="file" accept="image/*" id="pf-pic" hidden></label>
+        <button type="button" class="pill" data-pic-clear${pic ? '' : ' hidden'}>写真を外す</button>
+      </div>
+      <label class="small" for="pf-picNote">写真にひとこと（${PIC_NOTE_MAX}文字まで・なくてもOK）</label>
+      <input id="pf-picNote" class="text" data-prof="picNote" maxlength="${PIC_NOTE_MAX}" placeholder="例：2024 ダービーのパドック" value="${esc(p.picNote)}">
       <p class="small">性別（ネタ枠です）</p>
       <div class="pick">${PROF_SEX.map(s => `<button type="button" class="pill${p.sex === s ? ' on' : ''}" data-prof-sex="${esc(s)}" aria-pressed="${p.sex === s}">${esc(s)}</button>`).join('')}</div>
       <label class="small" for="pf-trend">ツイートの傾向（左が日常、右が馬）</label>
@@ -1355,9 +1410,9 @@ async function renderProf() {
   const save = () => store(PROF_KEY, JSON.stringify(p));
   const redraw = () => {
     clearTimeout(timer);
-    timer = setTimeout(() => preview.replaceChildren(drawProfile(p, photo, face)), 150);
+    timer = setTimeout(() => preview.replaceChildren(drawProfile(p, photo, face, pic)), 150);
   };
-  preview.replaceChildren(drawProfile(p, photo, face));
+  preview.replaceChildren(drawProfile(p, photo, face, pic));
 
   app.addEventListener('input', e => {
     const k = e.target.dataset?.prof;
@@ -1385,10 +1440,37 @@ async function renderProf() {
     save();
     redraw();
   });
+  let picPicks = 0; // 読みこんでいる間に別の写真を選ぶか外したら、古いほうは使わない
+  const clearBtn = app.querySelector('[data-pic-clear]');
+  document.getElementById('pf-pic').addEventListener('change', async e => {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // 同じ写真を選び直しても反応するように
+    if (!file) return;
+    const pick = ++picPicks;
+    let bmp;
+    try {
+      bmp = await photoFromFile(file, PROF_PIC_KEY);
+    } catch (err) {
+      if (pick === picPicks) alert('この写真は読みこめませんでした。別の写真を選んでください。');
+      return;
+    }
+    if (pick !== picPicks) return;
+    pic = bmp;
+    clearBtn.hidden = false;
+    redraw();
+  });
   app.addEventListener('click', e => {
     const b = e.target.closest('button');
     if (!b) return;
     const d = b.dataset;
+    if (d.picClear !== undefined) {
+      picPicks++;
+      pic = null;
+      try { localStorage.removeItem(PROF_PIC_KEY); } catch (err) { /* 保存できない環境では何もしない */ }
+      b.hidden = true;
+      redraw();
+      return;
+    }
     if (d.profIcon !== undefined && (d.profIcon === '' || CARD_ICONS.includes(d.profIcon))) {
       p.icon = d.profIcon;
       iconPicks++;
@@ -1409,7 +1491,7 @@ async function renderProf() {
       store('favMark', d.markPick);
       for (const s of app.querySelectorAll('[data-mark-pick]')) s.classList.toggle('on', s === b);
     } else if (d.profShare === 'img') {
-      shareCanvas(drawProfile(p, photo, face), `${profShareText(p)}\n${absUrl('prof.html')}`, 'oshiuma-profile.png');
+      shareCanvas(drawProfile(p, photo, face, pic), `${profShareText(p)}\n${absUrl('prof.html')}`, 'oshiuma-profile.png');
       return;
     } else if (d.profShare === 'x') {
       openX(profShareText(p), absUrl('prof.html'));
