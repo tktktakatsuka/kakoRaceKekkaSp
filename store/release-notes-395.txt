@@ -2,10 +2,12 @@
 ・見た目を一新：やさしい黄緑の、目にやさしい落ち着いたデザインに
 ・推し馬に「貢いだ金額」と「回収した金額」を表示。金額に応じて🌱〜💎の称号バッジがつきます（記録した買い目から計算します）
 ・初めて使う方へ、アプリの楽しみ方を紹介するウェルカム画面を追加
+・「わたしのプロフ帳」を追加：推し馬・推し騎手・ひとことを書いて、1枚の画像にしてシェア・保存できます（写真はスマホの中だけに保存）
 ・そのほか細かな改善
 
 ■ English (en-US)
 ・A fresh new look in soft, easy-on-the-eyes green
 ・See how much you've spent on and won back from each favorite horse, with 🌱–💎 badges by amount (based on the bets you log)
 ・A new welcome screen that shows first-time users what the app can do
+・New "My profile": add your horses, jockeys and a few words, then share or save it as one image (photos stay on your phone)
 ・Other small improvements
