@@ -1064,14 +1064,17 @@ async function loadPhoto() {
     return null;
   }
 }
+const PHOTO_MAX_BYTES = 30e6; // これより大きい写真は、縮める前に読みこむだけで固まることがあるので断る
 async function photoFromFile(file) {
+  if (file.size > PHOTO_MAX_BYTES) throw new Error('too large');
   const src = await createImageBitmap(file);
   const side = Math.min(src.width, src.height);
   const cv = document.createElement('canvas');
   cv.width = cv.height = 360;
   cv.getContext('2d').drawImage(src, (src.width - side) / 2, (src.height - side) / 2, side, side, 0, 0, 360, 360);
-  store(PROF_PHOTO_KEY, cv.toDataURL('image/jpeg', 0.85));
-  return createImageBitmap(cv);
+  const bmp = await createImageBitmap(cv);
+  store(PROF_PHOTO_KEY, cv.toDataURL('image/jpeg', 0.85)); // 描けるとわかってから保存する
+  return bmp;
 }
 let horseFace = null;
 async function loadHorseFace() {
@@ -1178,6 +1181,12 @@ function drawProfile(p, photo, face) {
     ctx.fillText(p.icon, cx, cy + 6);
   } else if (face) {
     ctx.drawImage(face, cx - r, cy - r, r * 2, r * 2);
+  } else {
+    // 写真や馬の顔が読めなかったときは絵文字にする
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = `110px ${FONT}`;
+    ctx.fillText('🐴', cx, cy + 6);
   }
   ctx.restore();
   ctx.strokeStyle = t.accent;
@@ -1342,6 +1351,7 @@ async function renderProf() {
 
   const preview = document.getElementById('preview');
   let timer = 0;
+  let iconPicks = 0; // 写真を読みこんでいる間に別のアイコンが選ばれたら、読み終わった写真は使わない
   const save = () => store(PROF_KEY, JSON.stringify(p));
   const redraw = () => {
     clearTimeout(timer);
@@ -1360,12 +1370,16 @@ async function renderProf() {
   document.getElementById('pf-photo').addEventListener('change', async e => {
     const file = e.target.files?.[0];
     if (!file) return;
+    const pick = ++iconPicks;
+    let bmp;
     try {
-      photo = await photoFromFile(file);
+      bmp = await photoFromFile(file);
     } catch (err) {
-      alert('この写真は読みこめませんでした。別の写真を選んでください。');
+      if (pick === iconPicks) alert('この写真は読みこめませんでした。別の写真を選んでください。');
       return;
     }
+    if (pick !== iconPicks) return;
+    photo = bmp;
     p.icon = 'photo';
     for (const x of app.querySelectorAll('.pick-ic')) x.classList.toggle('on', x.hasAttribute('data-prof-photo'));
     save();
@@ -1377,6 +1391,7 @@ async function renderProf() {
     const d = b.dataset;
     if (d.profIcon !== undefined && (d.profIcon === '' || CARD_ICONS.includes(d.profIcon))) {
       p.icon = d.profIcon;
+      iconPicks++;
       for (const x of app.querySelectorAll('.pick-ic')) x.classList.toggle('on', x === b);
     } else if (d.profSex) {
       p.sex = p.sex === d.profSex ? '' : d.profSex; // もう一度押すと外せる
