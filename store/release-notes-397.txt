@@ -1,0 +1,7 @@
+■ 日本語（ja-JP）
+・アプリの名前を「推し馬ノート」に変えました（ホーム画面のアイコンの名前も変わります）
+・そのほか細かな改善
+
+■ English (en-US)
+・The app is now called "Oshiuma Note" (the name under the home screen icon changes too)
+・Other small improvements
